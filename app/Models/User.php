@@ -2,23 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
+    use Notifiable;
 
     protected $fillable = [
         'name',
         'email',
         'password',
         'role',
-        'is_active',
-        'email_verified_at',
     ];
 
     protected $hidden = [
@@ -28,16 +23,17 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed', // Laravel 10+ auto hash
-        'is_active' => 'boolean',
+        'password'          => 'hashed',
     ];
 
-    // ==========================================
-    // RELATIONSHIPS
-    // ==========================================
-
-    public function certificates()
+    // Helper method
+    public function isAdmin(): bool
     {
-        return $this->hasMany(Certificate::class, 'created_by');
+        return $this->role === 'admin';
+    }
+
+    public function isSiswa(): bool
+    {
+        return $this->role === 'siswa';
     }
 }

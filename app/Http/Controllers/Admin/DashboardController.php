@@ -10,4 +10,16 @@ class DashboardController extends Controller
     {
         return view('admin.dashboard');
     }
+    public function allStudents()
+    {
+        return view('admin.siswa');
+    }
+    public function sertifikat()
+    {
+        return view('admin.sertifikat');
+    }
+    public function verifikasi()
+    {
+        return view('verifikasi');
+    }
 }

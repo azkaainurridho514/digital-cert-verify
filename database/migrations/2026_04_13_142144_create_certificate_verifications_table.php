@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('students', function (Blueprint $table) {
+        Schema::create('certificate_verifications', function (Blueprint $table) {
             $table->id();
-            $table->string("user_id");
-            $table->string("program_id")->nullable();
-            $table->string("nis");
+            $table->String("certificate_id");
+            $table->datetime("verified_at");
+            $table->String("ip_address");
+            $table->String("device_info");
+            $table->String("result");
             $table->timestamps();
         });
     }
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('students');
+        Schema::dropIfExists('certificate_verifications');
     }
 };

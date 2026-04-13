@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('students', function (Blueprint $table) {
+        Schema::create('certificate_signatures', function (Blueprint $table) {
             $table->id();
-            $table->string("user_id");
-            $table->string("program_id")->nullable();
-            $table->string("nis");
+            $table->String("certificate_id");
+            $table->String("public_key");
+            $table->String("signatures");
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('students');
+        Schema::dropIfExists('certificate_signatures');
     }
 };

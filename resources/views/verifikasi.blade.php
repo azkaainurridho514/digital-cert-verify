@@ -3,46 +3,138 @@
 @section('page-title', 'Verifikasi')
 
 @push('styles')
-    <style>
-        .scan-box { position: relative; width: 100%; aspect-ratio: 1/1; max-height: 320px; overflow: hidden; background: #000; border-radius: 12px; }
-        .scan-box video { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .scan-box canvas.overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        .scan-frame { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 180px; height: 180px; pointer-events: none; }
-        .scan-frame::before, .scan-frame::after,
-        .scan-corner-br::before, .scan-corner-br::after { content: ''; position: absolute; width: 32px; height: 32px; }
-        .scan-frame::before { top:0;left:0; border-top: 3px solid #22c55e; border-left: 3px solid #22c55e; border-radius: 4px 0 0 0; }
-        .scan-frame::after  { top:0;right:0; border-top: 3px solid #22c55e; border-right: 3px solid #22c55e; border-radius: 0 4px 0 0; }
-        .scan-corner-br::before { bottom:0;left:0; border-bottom: 3px solid #22c55e; border-left: 3px solid #22c55e; border-radius: 0 0 0 4px; }
-        .scan-corner-br::after  { bottom:0;right:0; border-bottom: 3px solid #22c55e; border-right: 3px solid #22c55e; border-radius: 0 0 4px 0; }
-        .scan-line { position: absolute; left: 8%; width: 84%; height: 2px; background: linear-gradient(90deg, transparent, #22c55e, transparent); animation: scanAnim 2s linear infinite; }
-        @keyframes scanAnim { 0%{top:10%} 100%{top:88%} }
-        .upload-zone { border: 2px dashed #6c757d; border-radius: 12px; padding: 2rem; text-align: center; cursor: pointer; transition: border-color .2s, background .2s; }
-        .upload-zone:hover, .upload-zone.dragover { border-color: #0d6efd; background: rgba(13,110,253,.05); }
-        #preview { max-height: 200px; border-radius: 8px; object-fit: contain; }
-        .nav-pills .nav-link { border-radius: 8px; font-weight: 500; color: #495057; }
-        .nav-pills .nav-link.active { background: #0d6efd; color: #fff; }
-        #qr-canvas { display: none; }
-        .spinner-scan { width: 18px; height: 18px; border: 2.5px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; display: inline-block; vertical-align: middle; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        
-        /* SweetAlert2 custom */
-        .swal-cert-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; }
-        .swal-cert-table tr + tr td { border-top: 1px solid #f0f0f0; }
-        .swal-cert-table td { padding: 7px 6px; }
-        .swal-cert-table td:first-child { color: #6c757d; width: 42%; font-size: 0.82rem; }
-        .swal2-popup { border-radius: 16px !important; }
-        .swal2-title { font-size: 1.2rem !important; font-weight: 600 !important; }
-        </style>
+<style>
+    /* ── Scan Box ── */
+    .scan-box {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1/1;
+        max-height: 320px;
+        overflow: hidden;
+        background: #000;
+        border-radius: 12px;
+    }
+
+    /* Container video Html5Qrcode mengisi penuh */
+    #qr-reader-container {
+        position: absolute;
+        inset: 0;
+        width: 100% !important;
+        height: 100% !important;
+        display: none;
+        z-index: 1;
+    }
+
+    /* Paksa semua child Html5Qrcode memenuhi container */
+    #qr-reader-container > div,
+    #qr-reader-container > div > div {
+        width: 100% !important;
+        height: 100% !important;
+        padding: 0 !important;
+        border: none !important;
+        background: transparent !important;
+    }
+
+    #qr-reader-container video {
+        position: absolute;
+        inset: 0;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        display: block !important;
+    }
+
+    /* Sembunyikan semua UI bawaan Html5Qrcode */
+    #qr-reader-container img,
+    #qr-reader-container button,
+    #qr-reader-container select,
+    #qr-reader-container span,
+    #qr-reader-container a,
+    #qr-reader-container #qr-reader__dashboard,
+    #qr-reader-container #qr-reader__header_message,
+    #qr-reader-container #qr-reader__status_span,
+    #qr-reader-container #qr-reader__camera_permission_button,
+    #qr-reader-container #qr-reader__filescan-input {
+        display: none !important;
+    }
+
+    /* Placeholder */
+    #cam-placeholder {
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,.75);
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Frame overlay di atas video */
+    .scan-frame {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 180px;
+        height: 180px;
+        pointer-events: none;
+        z-index: 3;
+    }
+
+    .scan-frame::before, .scan-frame::after,
+    .scan-corner-br::before, .scan-corner-br::after {
+        content: '';
+        position: absolute;
+        width: 32px;
+        height: 32px;
+    }
+    .scan-frame::before { top:0;left:0; border-top:3px solid #22c55e; border-left:3px solid #22c55e; border-radius:4px 0 0 0; }
+    .scan-frame::after  { top:0;right:0; border-top:3px solid #22c55e; border-right:3px solid #22c55e; border-radius:0 4px 0 0; }
+    .scan-corner-br::before { bottom:0;left:0; border-bottom:3px solid #22c55e; border-left:3px solid #22c55e; border-radius:0 0 0 4px; }
+    .scan-corner-br::after  { bottom:0;right:0; border-bottom:3px solid #22c55e; border-right:3px solid #22c55e; border-radius:0 0 4px 0; }
+
+    .scan-line {
+        position: absolute;
+        left: 8%; width: 84%; height: 2px;
+        background: linear-gradient(90deg, transparent, #22c55e, transparent);
+        animation: scanAnim 2s linear infinite;
+        z-index: 4;
+    }
+    @keyframes scanAnim { 0%{top:10%} 100%{top:88%} }
+
+    /* ── Upload ── */
+    .upload-zone { border:2px dashed #6c757d; border-radius:12px; padding:2rem; text-align:center; cursor:pointer; transition:border-color .2s,background .2s; }
+    .upload-zone:hover, .upload-zone.dragover { border-color:#0d6efd; background:rgba(13,110,253,.05); }
+    #preview { max-height:200px; border-radius:8px; object-fit:contain; }
+
+    /* ── Nav ── */
+    .nav-pills .nav-link { border-radius:8px; font-weight:500; color:#495057; }
+    .nav-pills .nav-link.active { background:#0d6efd; color:#fff; }
+
+    /* ── Spinner ── */
+    .spinner-scan { width:18px; height:18px; border:2.5px solid #fff; border-top-color:transparent; border-radius:50%; animation:spin .7s linear infinite; display:inline-block; vertical-align:middle; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* ── SweetAlert2 ── */
+    .swal-cert-table { width:100%; border-collapse:collapse; font-size:0.9rem; text-align:left; }
+    .swal-cert-table tr + tr td { border-top:1px solid #f0f0f0; }
+    .swal-cert-table td { padding:7px 6px; }
+    .swal-cert-table td:first-child { color:#6c757d; width:42%; font-size:0.82rem; }
+    .swal2-popup { border-radius:16px !important; }
+    .swal2-title { font-size:1.2rem !important; font-weight:600 !important; }
+</style>
 @endpush
+
 @section('content')
- 
+
 <div class="page-header">
     <h4>Verifikasi Sertifikat</h4>
     <p>Scan QR code atau unggah gambar sertifikat untuk memverifikasi.</p>
 </div>
- 
-<div class="card-modern p-4" style="max-width: 680px;">
- 
+
+<div class="card-modern p-4" style="max-width:680px;">
+
     {{-- Tab Navigation --}}
     <ul class="nav nav-pills mb-4 gap-2">
         <li class="nav-item">
@@ -64,21 +156,29 @@
             </button>
         </li>
     </ul>
- 
+
     {{-- Pane: Scan Kamera --}}
     <div id="pane-scan">
         <div class="scan-box mb-3">
-            <video id="video" autoplay playsinline muted></video>
-            <canvas class="overlay" id="qr-overlay"></canvas>
-            <div class="scan-frame"><div class="scan-corner-br"></div><div class="scan-line"></div></div>
-            <div id="cam-placeholder" class="d-flex flex-column align-items-center justify-content-center h-100" style="position:absolute;inset:0;background:rgba(0,0,0,.75);">
+            {{-- Video Html5Qrcode --}}
+            <div id="qr-reader-container"></div>
+
+            {{-- Placeholder: disembunyikan saat kamera aktif --}}
+            <div id="cam-placeholder">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="1.5" class="mb-3">
                     <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
                     <circle cx="12" cy="13" r="4"/>
                 </svg>
                 <p class="small text-secondary mb-0">Kamera belum aktif</p>
             </div>
+
+            {{-- Frame & scan line (selalu tampil di atas video) --}}
+            <div class="scan-frame">
+                <div class="scan-corner-br"></div>
+                <div class="scan-line"></div>
+            </div>
         </div>
+
         <div class="d-flex gap-2">
             <button class="btn btn-primary flex-grow-1" id="btnStart" onclick="startCamera()">
                 Aktifkan Kamera
@@ -89,7 +189,7 @@
         </div>
         <p class="text-muted small mt-2 mb-0" id="scan-hint">Arahkan kamera ke QR code pada sertifikat.</p>
     </div>
- 
+
     {{-- Pane: Upload Gambar --}}
     <div id="pane-upload" class="d-none">
         <div class="upload-zone mb-3" id="dropzone"
@@ -112,23 +212,20 @@
             <span id="btnVerifyLabel">Verifikasi QR</span>
         </button>
     </div>
- 
-    {{-- Canvas tersembunyi untuk decode QR --}}
-    <canvas id="qr-canvas"></canvas>
- 
+
+    {{-- Div tersembunyi untuk Html5Qrcode.scanFile() --}}
+    <div id="qr-file-scanner" style="display:none;"></div>
+
 </div>
 @endsection
 
 @push('scripts')
-    
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
-let stream = null, scanning = false, animId = null, uploadedFile = null;
-const video    = document.getElementById('video');
-const overlay  = document.getElementById('qr-overlay');
-const qrCanvas = document.getElementById('qr-canvas');
-const ctx2     = qrCanvas.getContext('2d');
- 
+let html5QrCode  = null;
+let scanning     = false;
+let uploadedFile = null;
+
 /* ── Mode switch ── */
 function switchMode(mode) {
     stopCamera();
@@ -137,86 +234,81 @@ function switchMode(mode) {
     document.getElementById('tab-scan').classList.toggle('active', mode === 'scan');
     document.getElementById('tab-upload').classList.toggle('active', mode !== 'scan');
 }
- 
+
 /* ── Kamera ── */
 async function startCamera() {
     const btn = document.getElementById('btnStart');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-scan me-2"></span>Memulai...';
+
     try {
-        stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: 'environment' }, audio: false
-        });
-        video.srcObject = stream;
-        await video.play();
+        // Bersihkan instance lama
+        if (html5QrCode) {
+            try { await html5QrCode.stop(); } catch(e) {}
+            html5QrCode.clear();
+            html5QrCode = null;
+        }
+
+        html5QrCode = new Html5Qrcode("qr-reader-container");
+
+        const cameras = await Html5Qrcode.getCameras();
+        if (!cameras || cameras.length === 0) throw new Error('Tidak ada kamera ditemukan.');
+
+        // Utamakan kamera belakang
+        const cam = cameras.find(c => /back|environment|rear/i.test(c.label)) ?? cameras[0];
+
+        await html5QrCode.start(
+            cam.id,
+            { fps: 10, qrbox: { width: 200, height: 200 }, aspectRatio: 1.0 },
+            (decodedText) => {
+                stopCamera();
+                processQRData(decodedText);
+            },
+            () => {}
+        );
+
+        // Sembunyikan placeholder, tampilkan video
         document.getElementById('cam-placeholder').style.display = 'none';
+        document.getElementById('qr-reader-container').style.display = 'block';
+
+        scanning = true;
         document.getElementById('btnStop').disabled = false;
         btn.innerHTML = '<span class="spinner-scan me-2"></span>Memindai...';
-        scanning = true;
         document.getElementById('scan-hint').textContent = 'Arahkan QR code ke bingkai hijau...';
-        requestAnimationFrame(scanFrame);
+
     } catch (e) {
+        scanning = false;
         btn.disabled = false;
         btn.innerHTML = 'Aktifkan Kamera';
         Swal.fire({
             icon: 'error',
             title: 'Akses Kamera Ditolak',
-            text: 'Izinkan akses kamera di pengaturan browser untuk melanjutkan.',
+            text: e.message || 'Izinkan akses kamera di pengaturan browser.',
             confirmButtonColor: '#0d6efd',
             confirmButtonText: 'Mengerti'
         });
     }
 }
- 
-function stopCamera() {
+
+async function stopCamera() {
+    if (html5QrCode && scanning) {
+        try { await html5QrCode.stop(); } catch(e) {}
+        try { html5QrCode.clear(); } catch(e) {}
+        html5QrCode = null;
+    }
     scanning = false;
-    if (animId) cancelAnimationFrame(animId);
-    if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
-    video.srcObject = null;
+
+    // Kembalikan placeholder
     document.getElementById('cam-placeholder').style.display = '';
+    document.getElementById('qr-reader-container').style.display = 'none';
+
     const btn = document.getElementById('btnStart');
     btn.disabled = false;
     btn.innerHTML = 'Aktifkan Kamera';
     document.getElementById('btnStop').disabled = true;
-    overlay.getContext('2d').clearRect(0, 0, overlay.width, overlay.height);
     document.getElementById('scan-hint').textContent = 'Arahkan kamera ke QR code pada sertifikat.';
 }
- 
-function scanFrame() {
-    if (!scanning) return;
-    if (video.readyState === video.HAVE_ENOUGH_DATA) {
-        const w = video.videoWidth, h = video.videoHeight;
-        qrCanvas.width = w; qrCanvas.height = h;
-        overlay.width  = video.offsetWidth;
-        overlay.height = video.offsetHeight;
-        ctx2.drawImage(video, 0, 0, w, h);
-        const imgData = ctx2.getImageData(0, 0, w, h);
-        const code = jsQR(imgData.data, w, h, { inversionAttempts: 'dontInvert' });
-        const oCtx = overlay.getContext('2d');
-        oCtx.clearRect(0, 0, overlay.width, overlay.height);
-        if (code) {
-            const sx = overlay.width / w, sy = overlay.height / h;
-            const pts = code.location;
-            oCtx.beginPath();
-            oCtx.moveTo(pts.topLeftCorner.x * sx,     pts.topLeftCorner.y * sy);
-            oCtx.lineTo(pts.topRightCorner.x * sx,    pts.topRightCorner.y * sy);
-            oCtx.lineTo(pts.bottomRightCorner.x * sx, pts.bottomRightCorner.y * sy);
-            oCtx.lineTo(pts.bottomLeftCorner.x * sx,  pts.bottomLeftCorner.y * sy);
-            oCtx.closePath();
-            oCtx.strokeStyle = '#22c55e';
-            oCtx.lineWidth   = 3;
-            oCtx.stroke();
-            oCtx.fillStyle = 'rgba(34,197,94,0.12)';
-            oCtx.fill();
-            scanning = false;
-            stopCamera();
-            processQRData(code.data);
-            return;
-        }
-    }
-    animId = requestAnimationFrame(scanFrame);
-}
- 
+
 /* ── Upload ── */
 function handleFile(file) {
     if (!file) return;
@@ -231,20 +323,20 @@ function handleFile(file) {
     };
     reader.readAsDataURL(file);
 }
- 
+
 function handleDrop(e) {
     e.preventDefault();
     document.getElementById('dropzone').classList.remove('dragover');
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith('image/')) handleFile(file);
 }
- 
+
 function verifyUpload() {
     if (!uploadedFile) return;
     const btn = document.getElementById('btnVerify');
     btn.disabled = true;
     document.getElementById('btnVerifyLabel').innerHTML = '<span class="spinner-scan me-2"></span>Memverifikasi...';
- 
+
     Swal.fire({
         title: 'Memverifikasi...',
         text: 'Sedang membaca QR code dari gambar.',
@@ -252,33 +344,30 @@ function verifyUpload() {
         allowEscapeKey: false,
         didOpen: () => Swal.showLoading()
     });
- 
-    const img = new Image();
-    img.onload = () => {
-        qrCanvas.width  = img.naturalWidth;
-        qrCanvas.height = img.naturalHeight;
-        ctx2.drawImage(img, 0, 0);
-        const imgData = ctx2.getImageData(0, 0, qrCanvas.width, qrCanvas.height);
-        const code = jsQR(imgData.data, qrCanvas.width, qrCanvas.height, { inversionAttempts: 'attemptBoth' });
-        setTimeout(() => {
+
+    const fileScanner = new Html5Qrcode("qr-file-scanner");
+    fileScanner.scanFile(uploadedFile, true)
+        .then(decodedText => {
+            fileScanner.clear();
             btn.disabled = false;
             document.getElementById('btnVerifyLabel').textContent = 'Verifikasi QR';
             Swal.close();
-            if (code) processQRData(code.data);
-            else      showSwalError('QR Tidak Ditemukan', 'Tidak ada QR code yang terdeteksi pada gambar ini.');
-        }, 700);
-    };
-    img.src = document.getElementById('preview').src;
+            processQRData(decodedText);
+        })
+        .catch(() => {
+            fileScanner.clear();
+            btn.disabled = false;
+            document.getElementById('btnVerifyLabel').textContent = 'Verifikasi QR';
+            Swal.close();
+            showSwalError('QR Tidak Ditemukan', 'Tidak ada QR code yang terdeteksi pada gambar ini.');
+        });
 }
- 
+
 /* ── Proses Data QR ── */
 function processQRData(data) {
-   
- 
-    // --- Opsi A: validasi lokal ---
     let parsed = null;
     try { parsed = JSON.parse(data); } catch (e) {}
- 
+
     if (parsed && (parsed.nomor || parsed.nama || parsed.id)) {
         showSwalSuccess(parsed);
     } else if (data.startsWith('http')) {
@@ -300,7 +389,7 @@ function processQRData(data) {
         });
     }
 }
- 
+
 /* ── SweetAlert helpers ── */
 function showSwalSuccess(data) {
     const rows = [
@@ -312,17 +401,10 @@ function showSwalSuccess(data) {
     ];
     const tableHtml = `
         <table class="swal-cert-table mt-1">
-            ${rows.map(([k, v]) => `
-                <tr>
-                    <td>${k}</td>
-                    <td><strong>${v}</strong></td>
-                </tr>`).join('')}
-            <tr>
-                <td>Status</td>
-                <td><span class="badge bg-success px-3 py-1">Valid</span></td>
-            </tr>
+            ${rows.map(([k,v]) => `<tr><td>${k}</td><td><strong>${v}</strong></td></tr>`).join('')}
+            <tr><td>Status</td><td><span class="badge bg-success px-3 py-1">Valid</span></td></tr>
         </table>`;
- 
+
     Swal.fire({
         icon: 'success',
         title: 'Sertifikat Valid!',
@@ -332,7 +414,7 @@ function showSwalSuccess(data) {
         footer: '<span class="text-muted small">Sertifikat telah terverifikasi dengan sukses.</span>'
     });
 }
- 
+
 function showSwalError(title, msg) {
     Swal.fire({
         icon: 'error',
@@ -344,4 +426,3 @@ function showSwalError(title, msg) {
 }
 </script>
 @endpush
- 

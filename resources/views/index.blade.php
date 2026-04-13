@@ -590,7 +590,7 @@
             </div>
 
             <div class="cert-card">
-              <div class="cert-badge">OLC — Digital Certificate</div>
+              <div class="cert-badge">OLC — Certificate Digital Verification</div>
               <div class="cert-name">Azka Ainurridho</div>
               <div class="cert-program">Intensive English Program</div>
               <div class="cert-row">

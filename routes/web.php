@@ -6,7 +6,13 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Siswa\DashboardController as SiswaDashboard;
 
 // ===== AUTH =====
-Route::get('/', fn() => redirect()->route('login'));
+// Route::get('/', fn() => redirect()->route('login'));
+Route::get('/', function(){
+    return view("index");
+});
+Route::get('/scan', function(){
+    return view("scanner");
+});
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');

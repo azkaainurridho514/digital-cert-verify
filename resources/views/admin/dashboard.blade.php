@@ -7,13 +7,12 @@
 
 <div class="page-header">
     <h4>Dashboard Admin</h4>
-    <p>Selamat datang, <strong>{{ auth()->user()->name }}</strong>! Berikut ringkasan sistem hari ini.</p>
+    <p>Selamat datang, <strong>{{ auth()->user()->name }}</strong>! Berikut ringkasan sistem bulan ini.</p>
 </div>
 
 {{-- Stat Cards --}}
-<div class="row g-4 mb-4">
-
-    <div class="col-12 col-sm-6 col-xl-3">
+<div class="row g-4 justify-content-center mb-5">
+    <div class="col-6 col-md-4 col-lg-3">
         <div class="stat-card">
             <div class="stat-icon" style="background: rgba(37,99,235,0.1); color: #2563eb;">
                 <i class="bi bi-people-fill"></i>
@@ -21,46 +20,85 @@
             <div class="stat-value">{{ $totalSiswa ?? 248 }}</div>
             <div class="stat-label">Total Siswa</div>
             <div class="stat-change up">
+                <i class="bi bi-arrow-up-short"></i> +11 bulan ini
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(37, 222, 235, 0.1); color: #17d0e8;">
+                <i class="bi bi-person-lines-fill"></i>
+            </div>
+            <div class="stat-value">{{ $totalSiswa ?? 70 }}</div>
+            <div class="stat-label">Total Siswa Aktif</div>
+            <div class="stat-change up">
+                <i class="bi bi-arrow-up-short"></i> +15 bulan ini
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(103, 37, 235, 0.1); color: #6725eb;">
+                <i class="bi bi-person-vcard-fill"></i>
+            </div>
+            <div class="stat-value">{{ $totalSiswa ?? 120 }}</div>
+            <div class="stat-label">Total Alumni</div>
+            <div class="stat-change up">
                 <i class="bi bi-arrow-up-short"></i> +12 bulan ini
             </div>
         </div>
     </div>
 
-    <div class="col-12 col-sm-6 col-xl-3">
+    <div class="col-6 col-md-4 col-lg-3">
         <div class="stat-card">
-            <div class="stat-icon" style="background: rgba(16,185,129,0.1); color: #10b981;">
+            <div class="stat-icon" style="background: rgba(185, 182, 16, 0.1); color: #ceca12;">
                 <i class="bi bi-award-fill"></i>
             </div>
-            <div class="stat-value">{{ $totalSertifikat ?? 186 }}</div>
+            <div class="stat-value">{{ $totalSertifikat ?? 589 }}</div>
             <div class="stat-label">Sertifikat Diterbitkan</div>
             <div class="stat-change up">
-                <i class="bi bi-arrow-up-short"></i> +8 minggu ini
+                <i class="bi bi-arrow-up-short"></i> +8 bulan ini
             </div>
         </div>
     </div>
 
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="stat-card">
-            <div class="stat-icon" style="background: rgba(245,158,11,0.1); color: #f59e0b;">
-                <i class="bi bi-hourglass-split"></i>
-            </div>
-            <div class="stat-value">{{ $menungguVerifikasi ?? 14 }}</div>
-            <div class="stat-label">Menunggu Verifikasi</div>
-            <div class="stat-change down">
-                <i class="bi bi-arrow-down-short"></i> -3 hari ini
-            </div>
-        </div>
-    </div>
-
-    <div class="col-12 col-sm-6 col-xl-3">
+    <div class="col-6 col-md-4 col-lg-3">
         <div class="stat-card">
             <div class="stat-icon" style="background: rgba(139,92,246,0.1); color: #8b5cf6;">
                 <i class="bi bi-patch-check-fill"></i>
             </div>
-            <div class="stat-value">{{ $terverifikasi ?? 172 }}</div>
-            <div class="stat-label">Terverifikasi</div>
+            <div class="stat-value">{{ $terverifikasi ?? 121 }}</div>
+            <div class="stat-label">Percobaan Verifikasi</div>
             <div class="stat-change up">
-                <i class="bi bi-arrow-up-short"></i> +5 hari ini
+                +5 bulan ini
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(92, 246, 113, 0.2); color: #1bc50f;">
+                <i class="bi bi-shield-fill-check"></i>
+            </div>
+            <div class="stat-value">{{ $terverifikasi ?? 22 }}</div>
+            <div class="stat-label">Verifikasi Berhasil</div>
+            <div class="stat-change up">
+                +5 bulan ini
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(245, 11, 11, 0.1); color: #f50b0b;">
+                <i class="bi bi-x-octagon-fill"></i>
+            </div>
+            <div class="stat-value">{{ $menungguVerifikasi ?? 6 }}</div>
+            <div class="stat-label">Verifikasi Gagal</div>
+            <div class="stat-change down">
+                 +3 bulan ini
             </div>
         </div>
     </div>

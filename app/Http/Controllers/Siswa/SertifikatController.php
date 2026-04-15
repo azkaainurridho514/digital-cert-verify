@@ -3,64 +3,81 @@
 namespace App\Http\Controllers\Siswa;
 
 use App\Http\Controllers\Controller;
+use App\Models\Certificate;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SertifikatController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function data(Request $request)
     {
-        //
-    }
+        $user  = Auth::user();
+        $query = Certificate::with('program')
+            ->where('user_id', $user->id);
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('certificate_number', 'like', "%{$search}%")
+                  ->orWhere('description',          'like', "%{$search}%")
+                  ->orWhere('grade',                'like', "%{$search}%")
+                  ->orWhere('status',               'like', "%{$search}%")
+                  ->orWhereHas('program', fn($p) =>
+                      $p->where('name', 'like', "%{$search}%")
+                        ->orWhere('code', 'like', "%{$search}%")
+                  );
+            });
+        }
 
-    /**
-     * Display a data of the resource.
-     */
-    public function data()
-    {
-        //
-    }
+        $certificates = $query->orderByDesc('issued_date')->get();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $data = $certificates->map(function ($cert, $index) {
+            return [
+                'id'                 => $cert->id,
+                'certificate_number' => $cert->certificate_number   ?? '-',
+                'grade'              => $cert->grade                ?? '-',
+                'program_name'       => $cert->program->name        ?? '-',
+                'level'              => $cert->level                ?? '-',
+                'description'        => $cert->description          ?? '-',
+                'issued_date'        => $cert->issued_date
+                    ? \Carbon\Carbon::parse($cert->issued_date)->translatedFormat('d M Y')
+                    : '-',
+                'status'             => $cert->status            ?? 'Draft',
+                'has_file'           => !empty($cert->file_path),
+            ];
+        });
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+        return response()->json([
+            'success' => true,
+            'data'    => $data,
+        ]);
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function download(string $id): StreamedResponse|\Illuminate\Http\JsonResponse
     {
-        //
-    }
+        $user = Auth::user();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        $cert = Certificate::where('id', $id)
+            ->where('user_id', $user->id)
+            ->firstOrFail();
+        if ($cert->status !== 'Di Terbitkan') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sertifikat belum dapat diunduh.',
+            ], 403);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        if (empty($cert->file_path) || !Storage::exists($cert->file_path)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'File sertifikat tidak ditemukan.',
+            ], 404);
+        }
+
+        $filename = 'Sertifikat-' . ($cert->certificate_number ?? $cert->id) . '.pdf';
+
+        return Storage::download($cert->file_path, $filename, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
 }

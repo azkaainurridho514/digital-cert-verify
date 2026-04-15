@@ -13,17 +13,16 @@ return new class extends Migration
     {
         Schema::create('certificates', function (Blueprint $table) {
             $table->id();
-            $table->String('user_id');
-            $table->string('certificate_number')->unique();
-            $table->String('program_id');
+            $table->string('user_id');
+            $table->string('certificate_number')->nullable()->unique();
+            $table->string('program_id')->nullable();
             $table->text('description')->nullable();
             $table->string('grade')->nullable();
+            $table->string('level')->nullable();
             $table->dateTime('issued_date')->nullable();
             $table->string('file_path')->nullable();
-            $table->string('qr_code')->nullable();
-            $table->text('signature')->nullable();
             $table->enum('status', ['Draft', 'Di Proses', 'Di Terbitkan'])->default('Draft');
-            $table->String('created_by');
+            $table->string('created_by');
             $table->timestamps();
         });
     }

@@ -18,10 +18,10 @@
             <div class="stat-icon" style="background: rgba(37,99,235,0.1); color: #2563eb;">
                 <i class="bi bi-award-fill"></i>
             </div>
-            <div class="stat-value">3</div>
+            <div class="stat-value">{{ $totalSertifikat }}</div>
             <div class="stat-label">Total Sertifikat</div>
             <div class="stat-change up">
-                <i class="bi bi-check-circle-fill"></i> Semua aktif
+                <i class="bi bi-check-circle-fill"></i> Semua terdaftar
             </div>
         </div>
     </div>
@@ -31,8 +31,8 @@
             <div class="stat-icon" style="background: rgba(16,185,129,0.1); color: #10b981;">
                 <i class="bi bi-patch-check-fill"></i>
             </div>
-            <div class="stat-value">2</div>
-            <div class="stat-label">Sudah Diverifikasi</div>
+            <div class="stat-value">{{ $sudahDiterbitkan }}</div>
+            <div class="stat-label">Sudah Diterbitkan</div>
             <div class="stat-change up">
                 <i class="bi bi-shield-check"></i> Valid & Resmi
             </div>
@@ -44,8 +44,8 @@
             <div class="stat-icon" style="background: rgba(245,158,11,0.1); color: #f59e0b;">
                 <i class="bi bi-hourglass-split"></i>
             </div>
-            <div class="stat-value">1</div>
-            <div class="stat-label">Menunggu Verifikasi</div>
+            <div class="stat-value">{{ $menungguProses }}</div>
+            <div class="stat-label">Menunggu Proses</div>
             <div class="stat-change">
                 <i class="bi bi-clock"></i> Sedang diproses
             </div>
@@ -61,53 +61,83 @@
             <div class="card-header-modern">
                 <div>
                     <h6 class="mb-0 fw-bold" style="font-size: 15px;">Sertifikat Saya</h6>
-                    <span class="text-muted" style="font-size: 12px;">Daftar semua sertifikat yang dimiliki</span>
+                    <span class="text-muted" style="font-size: 12px;">Daftar sertifikat terbaru yang dimiliki</span>
                 </div>
                 <a href="{{ route('siswa.sertifikat') }}" class="btn btn-sm btn-outline-primary rounded-3" style="font-size: 12px;">
                     Lihat Semua
                 </a>
             </div>
+
             <div class="p-3 d-flex flex-column gap-3">
+                @forelse($sertifikat as $cert)
+                    <div class="d-flex align-items-center gap-3 p-3 rounded-3"
+                         style="background: #f8fafc; border: 1px solid #e2e8f0;">
 
-                @php
-                $certs = [
-                    ['TOEFL Preparation', 'Jan 2025', 'CERT-2025-001', 'Terverifikasi', '#10b981'],
-                    ['English for Business', 'Des 2024', 'CERT-2024-089', 'Terverifikasi', '#10b981'],
-                    ['Conversation Class', 'Nov 2024', 'CERT-2024-061', 'Menunggu', '#f59e0b'],
-                ];
-                @endphp
-
-                @foreach($certs as $cert)
-                <div class="d-flex align-items-center gap-3 p-3 rounded-3"
-                     style="background: #f8fafc; border: 1px solid #e2e8f0;">
-                    <div style="width: 44px; height: 44px; background: linear-gradient(135deg, #2563eb, #7c3aed);
-                                border-radius: 12px; display: flex; align-items: center; justify-content: center;
-                                flex-shrink: 0; color: #fff; font-size: 20px;">
-                        <i class="bi bi-award-fill"></i>
-                    </div>
-                    <div class="flex-grow-1 min-w-0">
-                        <div class="fw-semibold" style="font-size: 14px; color: #0f172a;">{{ $cert[0] }}</div>
-                        <div class="text-muted" style="font-size: 12px;">
-                            <i class="bi bi-calendar3 me-1"></i>{{ $cert[1] }} &nbsp;·&nbsp;
-                            <code style="font-size: 11px;">{{ $cert[2] }}</code>
+                        {{-- Icon --}}
+                        <div style="width: 44px; height: 44px;
+                                    background: linear-gradient(135deg, #2563eb, #7c3aed);
+                                    border-radius: 12px; display: flex; align-items: center;
+                                    justify-content: center; flex-shrink: 0;
+                                    color: #fff; font-size: 20px;">
+                            <i class="bi bi-award-fill"></i>
                         </div>
-                    </div>
-                    <div>
-                        <span class="badge rounded-pill px-3" style="background: {{ $cert[3] === 'Terverifikasi' ? 'rgba(16,185,129,0.12)' : 'rgba(245,158,11,0.12)' }}; color: {{ $cert[4] }}; font-size: 11px;">
-                            <i class="bi {{ $cert[3] === 'Terverifikasi' ? 'bi-check-circle-fill' : 'bi-clock-fill' }} me-1"></i>
-                            {{ $cert[3] }}
-                        </span>
-                    </div>
-                    <div>
-                        <button class="btn btn-sm btn-outline-secondary rounded-3 px-2"
-                                onclick="downloadCert('{{ $cert[2] }}')"
-                                title="Download">
-                            <i class="bi bi-download" style="font-size: 13px;"></i>
-                        </button>
-                    </div>
-                </div>
-                @endforeach
 
+                        {{-- Info --}}
+                        <div class="flex-grow-1 min-w-0">
+                            <div class="fw-semibold" style="font-size: 14px; color: #0f172a;">
+                                {{ $cert->program->name ?? '-' }}
+                            </div>
+                            <div class="text-muted" style="font-size: 12px;">
+                                <i class="bi bi-calendar3 me-1"></i>
+                                {{ $cert->issued_date ? \Carbon\Carbon::parse($cert->issued_date)->translatedFormat('M Y') : '-' }}
+                                &nbsp;·&nbsp;
+                                <code style="font-size: 11px;">{{ $cert->certificate_number ?? '-' }}</code>
+                            </div>
+                        </div>
+
+                        {{-- Badge Status --}}
+                        <div>
+                            @if($cert->status === 'Di Terbitkan')
+                                <span class="badge rounded-pill px-3"
+                                      style="background: rgba(16,185,129,0.12); color: #10b981; font-size: 11px;">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Diterbitkan
+                                </span>
+                            @elseif($cert->status === 'Di Proses')
+                                <span class="badge rounded-pill px-3"
+                                      style="background: rgba(245,158,11,0.12); color: #f59e0b; font-size: 11px;">
+                                    <i class="bi bi-clock-fill me-1"></i>Di Proses
+                                </span>
+                            @else
+                                <span class="badge rounded-pill px-3"
+                                      style="background: rgba(100,116,139,0.12); color: #64748b; font-size: 11px;">
+                                    <i class="bi bi-pencil-fill me-1"></i>{{ $cert->status }}
+                                </span>
+                            @endif
+                        </div>
+
+                        {{-- Tombol Download --}}
+                        <div>
+                            @if($cert->status === 'Di Terbitkan' && $cert->file_path)
+                                <a href="{{ route('siswa.sertifikat.download', $cert->id) }}"
+                                   class="btn btn-sm btn-outline-secondary rounded-3 px-2"
+                                   title="Download Sertifikat">
+                                    <i class="bi bi-download" style="font-size: 13px;"></i>
+                                </a>
+                            @else
+                                <button class="btn btn-sm btn-outline-secondary rounded-3 px-2"
+                                        disabled title="Belum tersedia">
+                                    <i class="bi bi-slash-circle" style="font-size: 13px;"></i>
+                                </button>
+                            @endif
+                        </div>
+
+                    </div>
+                @empty
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                        Belum ada sertifikat.
+                    </div>
+                @endforelse
             </div>
         </div>
     </div>
@@ -139,23 +169,3 @@
 </div>
 
 @endsection
-
-@push('scripts')
-<script>
-function downloadCert(certId) {
-    Swal.fire({
-        icon: 'info',
-        title: 'Download Sertifikat',
-        html: 'Sertifikat <code>' + certId + '</code> sedang disiapkan...',
-        timer: 2000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-        toast: true,
-        position: 'top-end',
-        customClass: { popup: 'rounded-4' }
-    });
-    // TODO: ganti dengan actual download URL
-    // window.location.href = '/siswa/sertifikat/' + certId + '/download';
-}
-</script>
-@endpush

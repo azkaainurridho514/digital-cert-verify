@@ -13,10 +13,13 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
+        'phone',
+        'address',
+        'photo',
     ];
-
+        
     protected $hidden = [
+        'role',
         'password',
         'remember_token',
     ];
@@ -35,5 +38,15 @@ class User extends Authenticatable
     public function isSiswa(): bool
     {
         return $this->role === 'siswa';
+    }
+
+    public function certificates()
+    {
+        return $this->hasMany(Certificate::class);
+    }
+
+    public function student()
+    {
+        return $this->hasOne(Student::class);
     }
 }

@@ -14,6 +14,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
         ]);
+        $this->call([
+            ProgramSeeder::class,
+        ]);
 
         $faker = \Faker\Factory::create('id_ID');
 

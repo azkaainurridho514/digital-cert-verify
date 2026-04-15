@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('students', function (Blueprint $table) {
             $table->id();
             $table->string("user_id");
-            $table->string("program_id")->nullable();
+            // $table->string("program_id")->nullable();
             $table->string("nis");
+            $table->boolean("status")->default(true);
             $table->timestamps();
         });
     }

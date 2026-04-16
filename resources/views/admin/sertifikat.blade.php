@@ -53,6 +53,11 @@
     .pg-btn:hover:not(:disabled) { border-color: #3b82f6; color: #3b82f6; background: #eff6ff; }
     .pg-btn:disabled { opacity: .4; cursor: not-allowed; }
     .pg-active { background: #3b82f6 !important; color: #fff !important; border-color: #3b82f6 !important; }
+    .qr-container {
+    background: #f3f4f6;
+        padding: 5px;
+        border-radius: 5px;
+    }
 </style>
 @endpush
 
@@ -313,22 +318,25 @@ function renderTable(rows) {
                     ${cert.user_name}
                 </div>
             </td>
-            <td class="py-3">${cert.certificate_number}</td>
-            <td class="py-3 text-muted">${cert.grade}</td>
-            <td class="py-3 text-muted">${cert.program_name}</td>
-            <td class="py-3 text-muted">${cert.level}</td>
-            <td class="py-3 text-muted">${cert.description}</td>
-            <td class="py-3 text-muted">${cert.issued_date}</td>
+            <td class="py-3">${cert.certificate_number || "-"}</td>
+            <td class="py-3 text-muted">${cert.grade || "-"}</td>
+            <td class="py-3 text-muted">${cert.program_name || "-"}</td>
+            <td class="py-3 text-muted">${cert.level || "-"}</td>
+            <td class="py-3 text-muted">${cert.description || "-"}</td>
+            <td class="py-3 text-muted">${cert.issued_date || "-"}</td>
             <td class="py-3">${renderBadge(cert.status)}</td>
             <td class="py-3">
-                <span class="badge text-bg-primary" style="cursor:pointer;" onclick="onChangeStatus(${cert.id},${cert.user_id})" title="Change Status">
+                <span class="badge text-bg-primary" style="cursor:pointer;" onclick="onChangeStatus('${cert.id}','${cert.user_id}')" title="Change Status">
                     <i class="bi bi-pencil"></i>
                 </span>
-                <span class="badge text-bg-info" style="cursor:pointer;" onclick="onDetail(${cert.id})" title="Detail">
+                <span class="badge text-bg-danger" style="cursor:pointer;" onclick="onDelete('${cert.id}','${cert.user_id}')" title="Delete">
+                    <i class="bi bi-trash"></i>
+                </span>
+                <span class="badge text-bg-info" style="cursor:pointer;" onclick="onDetail('${cert.id}')" title="Detail">
                     <i class="bi bi-eye"></i>
                 </span>
                 ${cert.has_file && cert.status === 'Di Terbitkan'
-                    ? `<span class="badge text-bg-warning" style="cursor:pointer;" onclick="onPrint(${cert.id})" title="Cetak">
+                    ? `<span class="badge text-bg-warning" style="cursor:pointer;" onclick="onPrint('${cert.id}')" title="Cetak">
                            <i class="bi bi-printer"></i>
                        </span>`
                     : `<span class="badge text-bg-secondary" title="File belum tersedia" style="opacity:.5;">
@@ -405,7 +413,7 @@ function renderPagination(meta) {
 
             <div class="d-flex align-items-center gap-3">
                 <span class="text-muted">
-                    Menampilkan <b>${from}–${to}</b> dari <b>${total}</b> data
+                    Menampilkan <b>${from}-${to}</b> dari <b>${total}</b> data
                 </span>
                 <div class="d-flex align-items-center gap-2">
                     <span class="text-muted">Baris:</span>
@@ -531,7 +539,6 @@ async function confirmSubmit() {
 }
 
 async function submitFormSertifikat(userId, programId) {
-
     const btn = document.getElementById('btnSave');
     btn.disabled = true;
     document.getElementById('btnSaveLabel').textContent = 'Menyimpan...';
@@ -549,6 +556,7 @@ async function submitFormSertifikat(userId, programId) {
                 program_id:         programId,
                 certificate_number: document.getElementById('inputCertificateNumber').value,
                 grade:              document.getElementById('inputGrade').value,
+                level:              document.getElementById('inputLevel').value,
                 description:        document.getElementById('inputDescription').value,
             }),
         });
@@ -593,7 +601,7 @@ function searchStudent(keyword) {
         const data  = await res.json();
         result.innerHTML = data.length
             ? data.map(s => `
-                <div class="search-item" onclick="selectStudent(${s.id}, '${s.name}', '${s.email}')">
+                <div class="search-item" onclick="selectStudent('${s.id}', '${s.name}', '${s.email}')">
                     <div class="si-main">
                         <div class="si-avatar">${s.name.charAt(0)}</div>
                         <div class="si-info">
@@ -624,7 +632,7 @@ function searchProgram(keyword) {
         const data = await res.json();
         result.innerHTML = data.length
             ? data.map(p => `
-                <div class="search-item" onclick="selectProgram(${p.id}, '${p.name}', '${p.code}')">
+                <div class="search-item" onclick="selectProgram('${p.id}', '${p.name}', '${p.code}')">
                     <div class="si-main">
                         <div class="si-avatar">${p.name.charAt(0)}</div>
                         <div class="si-info">
@@ -659,6 +667,11 @@ async function onDetail(id) {
         const d = json.data;
 
         document.getElementById('detailBody').innerHTML = `
+            <div class=" mb-3">
+                ${d.file_path 
+                    ? `<img src="${d.file_path}" width="120" />` 
+                    : '-'}
+            </div>
             <div class="detail-row"><div class="detail-label">Nama Siswa</div><div class="detail-value">${d.user_name}</div></div>
             <div class="detail-row"><div class="detail-label">Email</div><div class="detail-value">${d.user_email}</div></div>
             <div class="detail-row"><div class="detail-label">No. Sertifikat</div><div class="detail-value"><code>${d.certificate_number}</code></div></div>
@@ -682,7 +695,7 @@ async function generateCertNumber(certId) {
     if (btn) { btn.disabled = true; btn.textContent = '...'; }
  
     try {
-        const res  = await fetch(`${URL_UPDATE}/${certId}/generate-cert-number`, {
+        const res  = await fetch(`${URL_UPDATE}/generate-cert-number`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRF-TOKEN':     CSRF,
@@ -774,7 +787,7 @@ async function onChangeStatus(id, userId) {
         const inputStyle = 'width:100%;border:1.5px solid #e2e8f0;border-radius:9px;padding:8px 12px;font-size:13px;color:#374151;outline:none;background:#fff;';
         const labelStyle = 'font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;';
         const wrapStyle  = 'margin-bottom:10px;';
- 
+        
         Swal.fire({
             title: `<span style="font-size:15px;font-weight:700;">Ubah Sertifikat</span>`,
             html: `
@@ -813,7 +826,7 @@ async function onChangeStatus(id, userId) {
                         <label style="${labelStyle}">
                             Program
                             <span style="color:#ef4444;">*</span>
-                            <span style="font-weight:400;color:#6b7280;"> (wajib jika Di Terbitkan)</span>
+                            
                         </label>
                         <select id="swalProgramId" style="${inputStyle}">
                             <option value="">-- Pilih Program --</option>
@@ -894,7 +907,6 @@ async function onChangeStatus(id, userId) {
                 const grade       = popup.querySelector('#swalGrade')?.value ?? '';
                 const level       = popup.querySelector('#swalLevel')?.value ?? '';
                 const description = popup.querySelector('#swalDescription')?.value.trim() ?? '';
- 
                 // Validasi wajib jika Di Terbitkan
                 if (selected.value === 'Di Terbitkan') {
                     if (!certNumber) {
@@ -935,7 +947,6 @@ async function onChangeStatus(id, userId) {
                 }
  
                 Swal.showLoading();
- 
                 try {
                     const r = await fetch(`${URL_UPDATE}/${id}`, {
                         method: 'PUT',
@@ -986,6 +997,65 @@ async function onChangeStatus(id, userId) {
             title:              'Gagal',
             text:               'Tidak dapat memuat data sertifikat.',
             confirmButtonColor: '#3b82f6',
+        });
+    }
+}
+
+async function onDelete(id, userId) {
+    currentDetailId = id;
+
+    const confirm = await Swal.fire({
+        title: 'Hapus Data?',
+        text: "Data sertifikat akan dihapus permanen!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#e2e8f0',
+        confirmButtonText: 'Ya, Hapus',
+        cancelButtonText: 'Batal',
+        customClass: {
+            popup: 'swal-popup-custom'
+        }
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    Swal.fire({
+        title: 'Menghapus...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+    });
+
+    try {
+        const res = await fetch(`${URL_UPDATE}/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': CSRF,
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        });
+
+        const json = await res.json();
+
+        if (!json.success) {
+            throw new Error(json.message || 'Gagal menghapus data');
+        }
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: 'Data berhasil dihapus',
+            timer: 1500,
+            showConfirmButton: false
+        });
+
+        fetchData(); 
+
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal',
+            text: error.message || 'Terjadi kesalahan saat menghapus data'
         });
     }
 }

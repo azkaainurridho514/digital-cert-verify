@@ -25,6 +25,7 @@ class ProgramSeeder extends Seeder
 
         foreach ($programs as $program) {
             DB::table('programs')->insert([
+                'id'   => (string) Str::uuid(),
                 'name' => $program['name'],
                 'code' => $program['code'],
                 'created_at' => now(),

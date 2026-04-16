@@ -12,11 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('students', function (Blueprint $table) {
-            $table->id();
-            $table->string("user_id");
-            // $table->string("program_id")->nullable();
-            $table->string("nis");
-            $table->boolean("status")->default(true);
+            $table->uuid('id')->primary();
+            $table->uuid("user_id");
+            $table->string("nis")->nullable();
+            $table->boolean("status")->default(false);
             $table->timestamps();
         });
     }

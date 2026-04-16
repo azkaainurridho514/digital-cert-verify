@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('certificate_signatures', function (Blueprint $table) {
-            $table->id();
-            $table->String("certificate_id");
-            $table->String("public_key");
-            $table->String("signatures");
+            $table->uuid('id')->primary();
+            $table->uuid("certificate_id");
+            $table->text("public_key");
+            $table->string("signatures");
             $table->timestamps();
         });
     }

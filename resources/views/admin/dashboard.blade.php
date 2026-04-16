@@ -31,7 +31,7 @@
                 <i class="bi bi-person-lines-fill"></i>
             </div>
             <div class="stat-value">{{ $totalSiswaMengikutiProgram }}</div>
-            <div class="stat-label">Total Siswa Mengikuti Program</div>
+            <div class="stat-label">Mengikuti Program</div>
             <div class="stat-change {{ $newSiswaMengikutiProgram > 0 ? 'up' : '' }}">
                 <i class="bi bi-arrow-up-short"></i> +{{ $newSiswaMengikutiProgram }} bulan ini
             </div>
@@ -44,7 +44,7 @@
                 <i class="bi bi-person-vcard-fill"></i>
             </div>
             <div class="stat-value">{{ $totalSiswaTidakMengikutiProgram }}</div>
-            <div class="stat-label">Total Siswa Tidak Mengikuti Program</div>
+            <div class="stat-label">Tidak Mengikuti Program</div>
             <div class="stat-change {{ $newSiswaTidakMengikutiProgram > 0 ? 'up' : '' }}">
                 <i class="bi bi-arrow-up-short"></i> +{{ $newSiswaTidakMengikutiProgram }} bulan ini
             </div>
@@ -116,7 +116,7 @@
                     <h6 class="mb-0 fw-bold" style="font-size: 15px;">Aktivitas Verifikasi Terbaru</h6>
                     <span class="text-muted" style="font-size: 12px;">7 hari terakhir</span>
                 </div>
-                <a href="{{ route('admin.verifikasi') }}" class="btn btn-sm btn-outline-primary rounded-3" style="font-size: 12px;">
+                <a href="{{ route('verifikasi') }}" class="btn btn-sm btn-outline-primary rounded-3" style="font-size: 12px;">
                     Lihat Semua
                 </a>
             </div>
@@ -185,7 +185,7 @@
                 <a href="{{ route('admin.sertifikat') }}" class="btn btn-outline-success w-100 text-start rounded-3 py-2">
                     <i class="bi bi-file-earmark-plus-fill me-2"></i> Buat Sertifikat
                 </a>
-                <a href="{{ route('admin.verifikasi') }}" class="btn btn-outline-warning w-100 text-start rounded-3 py-2">
+                <a href="{{ route('verifikasi') }}" class="btn btn-outline-warning w-100 text-start rounded-3 py-2">
                     <i class="bi bi-patch-check me-2"></i> Proses Verifikasi
                 </a>
                 <hr class="my-1">

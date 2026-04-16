@@ -7,17 +7,22 @@ use App\Http\Controllers\Siswa\DashboardController as SiswaDashboard;
 use App\Http\Controllers\Siswa\SertifikatController as SertifikatSiswaController;
 use App\Http\Controllers\Admin\SertifikatController as SertifikatAdminController;
 use App\Http\Controllers\Admin\SiswaController;
+use App\Http\Controllers\HomeController;
 
-Route::get('/', function(){
-    return view("index");
-});
-Route::get('/scan', function(){
-    return view("scanner");
-});
+
+Route::get('/',  [HomeController::class, 'index']);
+Route::get('/scan', [HomeController::class, 'scannerHome']);
+
+Route::post('/v/verify-qr', [HomeController::class, 'verifyQr']);
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+
+Route::middleware(['auth'])
+    ->group(function () {
+        Route::get('/verifikasi', [AdminDashboard::class, 'verifikasi'])->name('verifikasi');
+    });
 
 Route::prefix('admin')
     ->name('admin.')
@@ -33,13 +38,14 @@ Route::prefix('admin')
             Route::get('/{id}',           [SertifikatAdminController::class, 'show'])->name('show');
             Route::put('/{id}',           [SertifikatAdminController::class, 'update'])->name('update');
             Route::delete('/{id}',        [SertifikatAdminController::class, 'destroy'])->name('destroy');
-            Route::get('/{id}/generate-cert-number',           [SertifikatAdminController::class, 'generateCertNumber'])->name('generate-cert-number');
+            Route::get('/generate-cert-number',           [SertifikatAdminController::class, 'generateCertNumber'])->name('generateCertNumber');
+            // Route::get('/{id}/generate-cert-number',           [SertifikatAdminController::class, 'generateCertNumber'])->name('generateCertNumber');
         });
         
         Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
         Route::get('/siswa', [AdminDashboard::class, 'allStudents'])->name('siswa');
         Route::get('/sertifikat', [AdminDashboard::class, 'sertifikat'])->name('sertifikat');
-        Route::get('/verifikasi', [AdminDashboard::class, 'verifikasi'])->name('verifikasi');
+       
 
 
         Route::prefix('siswa')->name('siswa.')->group(function () {
@@ -59,12 +65,12 @@ Route::prefix('siswa')
     ->group(function () {
         Route::get('/dashboard',  [SiswaDashboard::class, 'index'])->name('dashboard');
         Route::get('/sertifikat', [SiswaDashboard::class, 'sertifikat'])->name('sertifikat');
-        Route::get('/verifikasi', [SiswaDashboard::class, 'verifikasi'])->name('verifikasi');
+        // Route::get('/verifikasi', [SiswaDashboard::class, 'verifikasi'])->name('verifikasi');
  
         Route::prefix('sertifikat')->name('sertifikat.')->group(function () {
             Route::get('/data',          [SertifikatSiswaController::class, 'data'])->name('data');
             Route::post('/',             [SertifikatSiswaController::class, 'store'])->name('store');
-            Route::get('/{id}/download', [SertifikatSiswaController::class, 'download'])->name('download'); // ← tambahan
+            Route::get('/{id}/download', [SertifikatSiswaController::class, 'download'])->name('download'); 
             Route::get('/{id}',          [SertifikatSiswaController::class, 'show'])->name('show');
             Route::get('/{id}/edit',     [SertifikatSiswaController::class, 'edit'])->name('edit');
             Route::put('/{id}',          [SertifikatSiswaController::class, 'update'])->name('update');

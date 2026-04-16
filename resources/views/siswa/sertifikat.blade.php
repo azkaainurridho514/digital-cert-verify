@@ -94,7 +94,7 @@
 
                 <td class="py-3">${cert.grade}</td>
                 <td class="py-3 text-muted">${cert.program_name}</td>
-                <td class="py-3 text-muted">${cert.program_level}</td>
+                <td class="py-3 text-muted">${cert.level}</td>
                 <td class="py-3 text-muted">${cert.description}</td>
                 <td class="py-3 text-muted">${cert.issued_date}</td>
 

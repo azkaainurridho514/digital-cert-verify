@@ -35,8 +35,8 @@
             <span class="nav-text">Manajemen Sertifikat</span>
         </a>
 
-        <a href="{{ route('admin.verifikasi') }}"
-           class="nav-item-link {{ request()->routeIs('admin.verifikasi*') ? 'active' : '' }}">
+        <a href="{{ route('verifikasi') }}"
+           class="nav-item-link {{ request()->routeIs('verifikasi*') ? 'active' : '' }}">
             <i class="bi bi-patch-check-fill nav-icon"></i>
             <span class="nav-text">Verifikasi</span>
         </a>
@@ -59,8 +59,8 @@
             <span class="nav-text">Sertifikat Saya</span>
         </a>
 
-        <a href="{{ route('siswa.verifikasi') }}"
-           class="nav-item-link {{ request()->routeIs('siswa.verifikasi*') ? 'active' : '' }}">
+        <a href="{{ route('verifikasi') }}"
+           class="nav-item-link {{ request()->routeIs('verifikasi*') ? 'active' : '' }}">
             <i class="bi bi-patch-check-fill nav-icon"></i>
             <span class="nav-text">Verifikasi Sertifikat</span>
         </a>

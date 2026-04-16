@@ -159,7 +159,7 @@
 
                 <hr class="my-3">
 
-                <a href="{{ route('siswa.verifikasi') }}" class="btn btn-primary w-100 rounded-3 py-2">
+                <a href="{{ route('verifikasi') }}" class="btn btn-primary w-100 rounded-3 py-2">
                     <i class="bi bi-qr-code-scan me-2"></i>
                     Verifikasi Sertifikat
                 </a>

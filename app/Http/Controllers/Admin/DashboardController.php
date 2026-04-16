@@ -14,11 +14,15 @@ class DashboardController extends Controller
     {
         $totalSiswa       = User::where('role', 'siswa')->count();
         $totalSiswaMengikutiProgram  = User::where('role', 'siswa')
-                                ->whereHas('student', fn($q) => $q->where('status', 'Aktif'))
-                                ->count();
-        $totalSiswaTidakMengikutiProgram      = User::where('role', 'siswa')
-                                ->whereHas('student', fn($q) => $q->where('status', 'Alumni'))
-                                ->count();
+                    ->whereHas('certificates', function ($q) {
+                        $q->whereIn('status', ['Draft', 'Di Proses']);
+                    })
+                    ->count();
+        $totalSiswaTidakMengikutiProgram = User::where('role', 'siswa')
+                    ->whereDoesntHave('certificates', function ($q) {
+                        $q->whereIn('status', ['Draft', 'Di Proses']);
+                    })
+                    ->count();
         $totalSertifikat  = Certificate::where('status', 'Di Terbitkan')->count();
 
         $totalVerifikasi  = CertificateVerification::count();

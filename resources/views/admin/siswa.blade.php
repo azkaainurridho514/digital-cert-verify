@@ -301,16 +301,16 @@ function renderTable(rows) {
             <td class="py-3 text-muted">${s.email}</td>
             <td class="py-3 text-muted">${s.address}</td>
             <td class="py-3">
-                ${s.status === true
+                ${s.status === 1
                     ? `<span class="badge bg-success-subtle text-success rounded-pill px-3"><i class="bi bi-check-circle-fill me-1"></i>Aktif</span>`
                     : `<span class="badge bg-secondary-subtle text-secondary rounded-pill px-3"><i class="bi bi-x-circle-fill me-1"></i>Tidak Aktif</span>`
                 }
             </td>
             <td class="py-3">
-                <span class="badge text-bg-warning" style="cursor:pointer;" onclick="openModalEdit(${s.id})" title="Edit">
+                <span class="badge text-bg-warning" style="cursor:pointer;" onclick="openModalEdit('${s.id}')" title="Edit">
                     <i class="bi bi-pencil-square"></i>
                 </span>
-                <span class="badge text-bg-danger" style="cursor:pointer;" onclick="onDelete(${s.id}, '${s.name}')" title="Hapus">
+                <span class="badge text-bg-danger" style="cursor:pointer;" onclick="onDelete('${s.id}', '${s.name}')" title="Hapus">
                     <i class="bi bi-trash"></i>
                 </span>
             </td>

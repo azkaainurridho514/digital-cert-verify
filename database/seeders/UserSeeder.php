@@ -5,12 +5,12 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Student;
 
 class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Admin
         User::updateOrCreate(
             ['email' => 'admin@olc.id'],
             [
@@ -22,8 +22,6 @@ class UserSeeder extends Seeder
                 'address'  => 'Jl. Admin No. 1, Jakarta',
             ]
         );
-
-        // Siswa
         $siswa = User::updateOrCreate(
             ['email' => 'siswa@olc.id'],
             [
@@ -33,6 +31,13 @@ class UserSeeder extends Seeder
                 'phone'    => '081234567891',
                 'photo'    => 'default.png',
                 'address'  => 'Jl. Siswa No. 2, Bandung',
+            ]
+        );
+        Student::updateOrCreate(
+            ['user_id' => $siswa->id],
+            [
+                'nis'    => '123456789',
+                'status' => 0,
             ]
         );
 

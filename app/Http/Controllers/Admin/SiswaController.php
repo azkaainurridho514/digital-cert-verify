@@ -101,6 +101,7 @@ class SiswaController extends Controller
                     ? Storage::url($user->photo)
                     : null,
                 'joined_at' => $user->created_at->translatedFormat('d M Y'),
+                'status'    => $user->student->status ?? '-',
             ];
         });
 

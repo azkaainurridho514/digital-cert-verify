@@ -4,13 +4,18 @@
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}"> {{-- ✅ FIX 1: CSRF token --}}
   <title>Scan Certificate | OLC</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  {{-- ✅ FIX 2: SweetAlert2 --}}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode"></script>
+  {{-- ✅ FIX 2: SweetAlert2 --}}
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
 
@@ -32,8 +37,6 @@
       min-height: 100vh;
     }
 
-    /* ── Navbar ── */
-
     .navbar-olc {
       background: rgba(13,15,20,0.95);
       backdrop-filter: blur(12px);
@@ -48,8 +51,6 @@
     }
 
     .navbar-brand span { color: var(--gold); }
-
-    /* ── Page bg ── */
 
     .page-bg {
       position: fixed;
@@ -70,15 +71,11 @@
       z-index: 0;
     }
 
-    /* ── Main ── */
-
     .scan-section {
       position: relative;
       z-index: 1;
       padding: 70px 0 100px;
     }
-
-    /* ── Header ── */
 
     .page-label {
       display: inline-block;
@@ -119,8 +116,6 @@
       animation: fadeUp 0.6s 0.2s ease both;
     }
 
-    /* ── Info badges ── */
-
     .badges-row {
       animation: fadeUp 0.6s 0.3s ease both;
     }
@@ -140,8 +135,6 @@
       border-color: rgba(201,168,76,0.3);
       color: var(--gold-light);
     }
-
-    /* ── Scan card ── */
 
     .scan-card {
       background: var(--dark-3);
@@ -175,24 +168,24 @@
       margin-bottom: 24px;
     }
 
-    /* ── Scanner wrapper ── */
-
+    /* ✅ FIX 3: min-height agar tidak 0px */
     .scanner-wrapper {
-    position: relative;
-    width: 100%;
-    border-radius: 12px;
-    overflow: hidden;
-    background: #0a0c10;
-    display: none;
-    border: 1px solid rgba(201,168,76,0.15);
+      position: relative;
+      width: 100%;
+      min-height: 280px; /* ← tambahan */
+      border-radius: 12px;
+      overflow: hidden;
+      background: #0a0c10;
+      display: none;
+      border: 1px solid rgba(201,168,76,0.15);
     }
 
     .corner {
-    position: absolute;
-    width: 32px;
-    height: 32px;
-    z-index: 10;
-    pointer-events: none;
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      z-index: 10;
+      pointer-events: none;
     }
 
     .corner-tl { top: 12px; left: 12px; border-top: 2.5px solid var(--gold); border-left: 2.5px solid var(--gold); border-radius: 4px 0 0 0; }
@@ -201,45 +194,47 @@
     .corner-br { bottom: 12px; right: 12px; border-bottom: 2.5px solid var(--gold); border-right: 2.5px solid var(--gold); border-radius: 0 0 4px 0; }
 
     .scan-line {
-    position: absolute;
-    left: 12px; right: 12px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    z-index: 9;
-    animation: scanMove 2s ease-in-out infinite;
-    display: none;
+      position: absolute;
+      left: 12px; right: 12px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      z-index: 9;
+      animation: scanMove 2s ease-in-out infinite;
+      display: none;
     }
 
     @keyframes scanMove {
-    0%   { top: 12px; opacity: 0; }
-    10%  { opacity: 1; }
-    90%  { opacity: 1; }
-    100% { top: calc(100% - 12px); opacity: 0; }
+      0%   { top: 12px; opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 1; }
+      100% { top: calc(100% - 12px); opacity: 0; }
     }
 
+    /* ✅ FIX 3: min-height pada qr-reader */
     #qr-reader {
-    width: 100% !important;
-    border: none !important;
+      width: 100% !important;
+      min-height: 280px !important; /* ← tambahan */
+      border: none !important;
     }
 
     #qr-reader video {
-    width: 100% !important;
-    display: block !important;
+      width: 100% !important;
+      height: 100% !important;
+      display: block !important;
+      object-fit: cover !important; /* ← agar tidak stretch */
     }
 
     #qr-reader__scan_region,
     #qr-reader > div {
-    padding: 0 !important;
-    border: none !important;
+      padding: 0 !important;
+      border: none !important;
     }
 
     #qr-reader__dashboard,
     #qr-reader__status_span,
     #qr-reader__filescan-input {
-    display: none !important;
+      display: none !important;
     }
-
-    /* ── Button ── */
 
     .btn-scan {
       background: var(--gold);
@@ -271,8 +266,6 @@
       box-shadow: none;
       transform: none;
     }
-
-    /* ── Results ── */
 
     .result-valid {
       background: rgba(16,185,129,0.08);
@@ -336,16 +329,12 @@
 
     .info-value.gold { color: var(--gold); }
 
-    /* ── Footer ── */
-
     .footer {
       margin-top: 60px;
       font-size: 12px;
       color: var(--text-muted);
       letter-spacing: 0.3px;
     }
-
-    /* ── Animations ── */
 
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(24px); }
@@ -408,39 +397,40 @@
             <!-- VALID -->
             <div class="result-valid text-start" id="validCard">
               <div class="result-title-valid">
-                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                </svg>
                 Certificate Verified
               </div>
+              {{-- ✅ FIX 6: Data diisi dinamis dari response API --}}
               <div class="info-row">
                 <span class="info-label">Nama</span>
-                <span class="info-value">Azka Ainurridho</span>
+                <span class="info-value" id="res-nama">-</span>
               </div>
               <div class="info-row">
                 <span class="info-label">Program</span>
-                <span class="info-value">Intensive English Program</span>
+                <span class="info-value" id="res-program">-</span>
               </div>
               <div class="info-row">
                 <span class="info-label">Nilai</span>
-                <span class="info-value gold">A — Excellent</span>
+                <span class="info-value gold" id="res-nilai">-</span>
               </div>
               <div class="info-row">
                 <span class="info-label">No Sertifikat</span>
-                <span class="info-value">OLC-ENG-2026-001</span>
+                <span class="info-value" id="res-no">-</span>
               </div>
               <div class="info-row">
                 <span class="info-label">Tanggal Terbit</span>
-                <span class="info-value">12 March 2026</span>
+                <span class="info-value" id="res-tanggal">-</span>
               </div>
             </div>
 
             <!-- INVALID -->
             <div class="result-invalid text-start" id="invalidCard">
-              <div class="result-title-invalid">Certificate Invalid ✕</div>
-              <div style="font-size:13px;color:var(--text-muted);">QR Code tidak terdaftar dalam sistem verifikasi OLC.</div>
+              <div class="result-title-invalid">Invalid ✕</div>
+              <div class="invalid-message" style="font-size:13px;color:var(--text-muted);"></div>
             </div>
-
           </div>
-
         </div>
       </div>
 
@@ -453,55 +443,149 @@
 
   <script>
 
-  let scanner;
+  let scanner = null;
   let scanning = false;
+  let isStopping = false; 
 
-  function randomValidation() { return Math.random() < 0.5; }
-  function showValid() { $("#invalidCard").hide(); $("#validCard").fadeIn(); }
-  function showInvalid() { $("#validCard").hide(); $("#invalidCard").fadeIn(); }
+  function showValid(data) {
+      $("#res-nama").text(data.user?.name ?? '-');
+      $("#res-program").text(data.program?.name ?? '-');
+      $("#res-nilai").text(data.grade ?? '-');
+      $("#res-no").text(data.certificate_number ?? '-');
+      $("#res-tanggal").text(data.issued_date ?? '-');
+
+      $("#invalidCard").hide();
+      $("#validCard").fadeIn();
+  }
+
+  function showInvalid(message = 'QR Code tidak terdaftar dalam sistem verifikasi OLC.') {
+    $("#validCard").hide();
+    $("#invalidCard").find('.invalid-message').text(message);
+    $("#invalidCard").fadeIn();
+  }
+
+  function stopScanner() {
+    if (!scanner || isStopping) return;
+    isStopping = true;
+    scanner.stop()
+      .then(() => {
+        scanning = false;
+        isStopping = false;
+        $("#toggleScan").text("Start Scan").removeClass("stop");
+        $("#scannerWrapper").hide();
+        $("#scanLine").hide();
+      })
+      .catch(err => {
+        console.warn("Stop error:", err);
+        scanning = false;
+        isStopping = false;
+      });
+  }
 
   $(document).ready(function () {
-
     scanner = new Html5Qrcode("qr-reader");
 
     $("#toggleScan").click(function () {
       if (!scanning) {
 
         Html5Qrcode.getCameras().then(devices => {
-          if (devices.length) {
+          if (!devices || devices.length === 0) {
+            Swal.fire({ icon: 'error', title: 'Kamera tidak ditemukan', text: 'Pastikan device memiliki kamera dan izin sudah diberikan.' });
+            return;
+          }
 
-            $("#scannerWrapper").show();
-            $("#scanLine").show();
+          $("#scannerWrapper").show();
+          $("#scanLine").show();
+          scanning = true;
+          $("#toggleScan").text("Stop Scan").addClass("stop");
+
+          setTimeout(() => {
+
+            const backCamera = devices.find(d =>
+              d.label.toLowerCase().includes("back") ||
+              d.label.toLowerCase().includes("rear") ||
+              d.label.toLowerCase().includes("environment")
+            ) || devices[0];
 
             scanner.start(
-              devices[0].id,
-              { fps: 10, qrbox: 250 },
+              { deviceId: { exact: backCamera.id } },
+              {
+                fps: 15,
+                qrbox: { width: 250, height: 250 },
+                aspectRatio: 1.333,
+                disableFlip: false,
+                experimentalFeatures: {
+                  useBarCodeDetectorIfSupported: true
+                }
+              },
               function (decodedText) {
-                let valid = randomValidation();
-                if (valid) { showValid(); } else { showInvalid(); }
-                scanner.stop();
-                scanning = false;
-                $("#toggleScan").text("Start Scan").removeClass("stop");
-                $("#scannerWrapper").hide();
-                $("#scanLine").hide();
+                stopScanner();
+                verifyQr(decodedText);
+              },
+              function (_errorMsg) {
               }
-            );
+            ).catch(err => {
+              console.error("❌ Scanner start failed:", err);
+              scanning = false;
+              isStopping = false;
+              $("#toggleScan").text("Start Scan").removeClass("stop");
+              $("#scannerWrapper").hide();
+              $("#scanLine").hide();
+              Swal.fire({ icon: 'error', title: 'Gagal membuka kamera', text: String(err) });
+            });
 
-            scanning = true;
-            $("#toggleScan").text("Stop Scan").addClass("stop");
-          }
+          }, 300);
+
+        }).catch(err => {
+          console.error("Gagal akses kamera:", err);
+          Swal.fire({ icon: 'error', title: 'Akses kamera ditolak', text: 'Berikan izin kamera pada browser Anda.' });
         });
 
       } else {
-
-        scanner.stop();
-        scanning = false;
-        $("#toggleScan").text("Start Scan").removeClass("stop");
-        $("#scannerWrapper").hide();
-        $("#scanLine").hide();
-
+        stopScanner();
       }
     });
+
+    function verifyQr(qrCode) {
+      if (!qrCode) return;
+
+      Swal.fire({
+        title: 'Memverifikasi...',
+        text: 'Mohon tunggu sebentar',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+
+      $.ajax({
+        url: '/v/verify-qr',
+        type: 'POST',
+        data: {
+          qr_code: qrCode,
+          _token: $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function (res) {
+          Swal.close();
+          showValid(res.data ?? {});
+        },
+        error: function (err) {
+          const msg = err.responseJSON?.message || 'Terjadi kesalahan';
+          const status = err.status;
+          setTimeout(() => {
+            Swal.close();
+            if (status === 400 || status === 404 || status === 401) {
+              showInvalid(msg);
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: msg,
+                confirmButtonColor: '#ef4444'
+              });
+            }
+          }, 1000);
+        }
+      });
+    }
 
   });
 

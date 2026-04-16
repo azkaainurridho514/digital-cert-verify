@@ -12,12 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('certificate_verifications', function (Blueprint $table) {
-            $table->id();
-            $table->String("certificate_id");
+            $table->uuid('id')->primary();
+            $table->uuid("certificate_id");
             $table->datetime("verified_at");
             $table->String("ip_address");
             $table->String("device_info");
-            $table->String("result");
+            $table->tinyInteger("result");
             $table->timestamps();
         });
     }

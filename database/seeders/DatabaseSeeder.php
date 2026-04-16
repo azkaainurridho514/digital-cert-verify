@@ -6,6 +6,8 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use App\Models\User;
+use App\Models\Student;
 
 class DatabaseSeeder extends Seeder
 {
@@ -20,29 +22,23 @@ class DatabaseSeeder extends Seeder
 
         $faker = \Faker\Factory::create('id_ID');
 
+        
         for ($i = 1; $i <= 10; $i++) {
 
-            // insert ke users
-            $userId = DB::table('users')->insertGetId([
+            $user = User::create([
                 'role' => 'siswa',
                 'name' => $faker->name(),
                 'email' => $faker->unique()->safeEmail(),
                 'password' => Hash::make('password'),
                 'phone' => $faker->phoneNumber(),
                 'photo' => 'default.png',
-                'address' => $faker->address(), // sudah cukup panjang
-                'remember_token' => Str::random(10),
-                'created_at' => now(),
-                'updated_at' => now(),
+                'address' => $faker->address(),
             ]);
 
-            // insert ke students
-            DB::table('students')->insert([
-                'user_id' => $userId,
-                'program_id' => null,
+            Student::create([
+                'user_id' => $user->id,
                 'nis' => 'NIS' . str_pad($i, 4, '0', STR_PAD_LEFT),
-                'created_at' => now(),
-                'updated_at' => now(),
+                'status' => 0,
             ]);
         }
         echo "SUDAH BERHASIL SEED";

@@ -4,74 +4,682 @@
 
 @push('styles')
 <style>
-    .badge-mode   { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-    .badge-add    { background: #dbeafe; color: #1d4ed8; }
-    .badge-edit   { background: #fef3c7; color: #92400e; }
-    .photo-area   { display: flex; align-items: center; gap: 14px; padding: 14px; background: #f8fafc; border-radius: 12px; border: 1.5px dashed #e2e8f0; }
-    .photo-preview{ width: 58px; height: 58px; border-radius: 50%; background: #e0e7ff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
-    .form-label-sm { font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 5px; display: block; }
-    .fi           { width: 100%; border: 1.5px solid #e2e8f0; border-radius: 9px; padding: 8px 12px; font-size: 13px; color: #374151; background: #fff; outline: none; transition: border-color .18s, box-shadow .18s; }
-    .fi:hover     { border-color: #93c5fd; }
-    .fi:focus     { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.12); }
-    .fi-icon      { position: relative; }
-    .fi-icon .fi  { padding-left: 36px; }
-    .fi-icon .icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: #9ca3af; z-index: 1; }
-    .btn-cancel { border: 1.5px solid #e2e8f0; background: #fff; border-radius: 9px; padding: 8px 18px; font-size: 13px; color: #374151; cursor: pointer; }
-    .btn-save   { border: none; background: #3b82f6; border-radius: 9px; padding: 8px 22px; font-size: 13px; font-weight: 600; color: #fff; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
-    .btn-save:hover { background: #2563eb; }
-    .close-btn { width: 32px; height: 32px; border: none; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; }
-    .close-btn i { font-size: 18px; color: #64748b; }
-    .close-btn:hover { background: #e2e8f0; }
-    .close-btn:hover i { color: #0f172a; }
-    .search-item { padding: 10px 12px; cursor: pointer; transition: all 0.2s ease; }
-    .search-item:hover { background: #f8fafc; }
-    .si-main { display: flex; align-items: center; gap: 10px; }
-    .si-avatar { width: 32px; height: 32px; border-radius: 50%; background: #e0e7ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
-    .si-info { display: flex; flex-direction: column; }
-    .si-name { font-size: 13px; font-weight: 600; color: #111827; }
-    .si-meta { font-size: 11px; color: #6b7280; }
-    .search-dropdown { box-shadow: 0 10px 25px rgba(0,0,0,0.08); position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-radius: 10px; margin-top: 5px; max-height: 180px; overflow-y: auto; z-index: 9999; }
-    .detail-row { display: flex; gap: 8px; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
-    .detail-row:last-child { border-bottom: none; }
-    .detail-label { width: 140px; flex-shrink: 0; color: #6b7280; font-weight: 600; font-size: 12px; }
-    .detail-value { color: #111827; }
-    .card-modern {overflow: visible !important;}
+    /* ── Design Tokens ─────────────────────────────────── */
+    :root {
+        --c-blue:       #2563eb;
+        --c-blue-soft:  #eff6ff;
+        --c-blue-mid:   #93c5fd;
+        --c-green:      #16a34a;
+        --c-green-soft: #f0fdf4;
+        --c-yellow:     #d97706;
+        --c-yellow-soft:#fffbeb;
+        --c-red:        #dc2626;
+        --c-red-soft:   #fef2f2;
+        --c-slate-50:   #f8fafc;
+        --c-slate-100:  #f1f5f9;
+        --c-slate-200:  #e2e8f0;
+        --c-slate-400:  #94a3b8;
+        --c-slate-500:  #64748b;
+        --c-slate-700:  #334155;
+        --c-slate-900:  #0f172a;
+        --c-white:      #ffffff;
+        --radius-xs:    6px;
+        --radius-sm:    10px;
+        --radius-md:    14px;
+        --radius-lg:    18px;
+        --radius-xl:    22px;
+        --shadow-xs:    0 1px 2px rgba(0,0,0,.05);
+        --shadow-sm:    0 1px 3px rgba(0,0,0,.07), 0 4px 12px rgba(0,0,0,.05);
+        --shadow-md:    0 4px 16px rgba(0,0,0,.08), 0 1px 4px rgba(0,0,0,.04);
+        --shadow-lg:    0 12px 36px rgba(0,0,0,.10), 0 4px 12px rgba(0,0,0,.06);
+        --font-sans:    'DM Sans', sans-serif;
+        --font-display: 'Sora', sans-serif;
+        --transition:   all .2s ease;
+    }
 
+    /* ── Page Header ───────────────────────────────────── */
+    .page-header {
+        margin-bottom: 24px;
+    }
+    .page-header h4 {
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--c-slate-900);
+        margin-bottom: 4px;
+    }
+    .page-header p {
+        font-size: .85rem;
+        color: var(--c-slate-500);
+        margin: 0;
+    }
+
+    /* ── Main Card ─────────────────────────────────────── */
+    .cert-card {
+        background: var(--c-white);
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--c-slate-200);
+        box-shadow: var(--shadow-sm);
+        overflow: visible;
+    }
+
+    /* ── Card Header ───────────────────────────────────── */
+    .cert-card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 18px 22px;
+        border-bottom: 1px solid var(--c-slate-100);
+        flex-wrap: wrap;
+    }
+    .cert-card-header .header-title {
+        font-family: var(--font-display);
+        font-size: .95rem;
+        font-weight: 700;
+        color: var(--c-slate-900);
+        flex: 1;
+        min-width: 120px;
+    }
+
+    /* ── Search Input ──────────────────────────────────── */
+    .search-wrap {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    .search-icon {
+        position: absolute;
+        left: 11px;
+        color: var(--c-slate-400);
+        display: flex;
+        pointer-events: none;
+        z-index: 1;
+    }
+    .search-input {
+        border: 1.5px solid var(--c-slate-200);
+        border-radius: var(--radius-sm);
+        padding: 8px 34px 8px 34px;
+        font-size: 13px;
+        font-family: var(--font-sans);
+        color: var(--c-slate-700);
+        background: var(--c-slate-50);
+        outline: none;
+        width: 210px;
+        transition: var(--transition);
+    }
+    .search-input:focus {
+        border-color: var(--c-blue);
+        background: var(--c-white);
+        box-shadow: 0 0 0 3px rgba(37,99,235,.10);
+        width: 240px;
+    }
+    .search-input::placeholder { color: var(--c-slate-400); }
+    .clear-btn {
+        position: absolute;
+        right: 9px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        color: var(--c-slate-400);
+        display: flex;
+        align-items: center;
+        padding: 0;
+        transition: color .15s;
+    }
+    .clear-btn:hover { color: var(--c-slate-700); }
+
+    /* ── Custom Select (cs) ────────────────────────────── */
+    .cs { position: relative; }
+    .cs-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border: 1.5px solid var(--c-slate-200);
+        border-radius: var(--radius-sm);
+        background: var(--c-slate-50);
+        font-size: 13px;
+        font-family: var(--font-sans);
+        color: var(--c-slate-700);
+        cursor: pointer;
+        white-space: nowrap;
+        transition: var(--transition);
+        outline: none;
+    }
+    .cs-btn:hover, .cs-btn.active {
+        border-color: var(--c-blue);
+        background: var(--c-blue-soft);
+        color: var(--c-blue);
+    }
+    .cs-btn .ico { width: 14px; height: 14px; flex-shrink: 0; }
+    .cs-btn .arr { width: 14px; height: 14px; flex-shrink: 0; transition: transform .2s; }
+    .cs-btn.active .arr { transform: rotate(180deg); }
+    .cs-btn .lbl { flex: 1; }
+    .cs-menu {
+        display: none;
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 0;
+        min-width: 180px;
+        background: var(--c-white);
+        border: 1px solid var(--c-slate-200);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-lg);
+        z-index: 9999;
+        padding: 6px;
+        animation: fadeDown .15s ease;
+    }
+    .cs-menu.open { display: block; }
+    @keyframes fadeDown {
+        from { opacity: 0; transform: translateY(-6px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .cs-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 12px;
+        border-radius: var(--radius-xs);
+        font-size: 13px;
+        font-family: var(--font-sans);
+        color: var(--c-slate-700);
+        cursor: pointer;
+        transition: background .15s;
+    }
+    .cs-item:hover { background: var(--c-slate-50); }
+    .cs-item.on { color: var(--c-blue); font-weight: 600; }
+    .cs-item.on .idot { background: var(--c-blue); }
+    .cs-item .idot {
+        width: 7px; height: 7px;
+        border-radius: 50%;
+        background: var(--c-slate-300);
+        flex-shrink: 0;
+    }
+    .cs-item .chk { width: 14px; height: 14px; margin-left: auto; opacity: 0; }
+    .cs-item.on .chk { opacity: 1; color: var(--c-blue); }
+    .cs-sep { height: 1px; background: var(--c-slate-100); margin: 4px 0; }
+
+    /* ── Btn Save / Create ─────────────────────────────── */
+    .btn-create {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 9px 18px;
+        background: var(--c-blue);
+        color: var(--c-white);
+        border: none;
+        border-radius: var(--radius-sm);
+        font-size: 13px;
+        font-weight: 600;
+        font-family: var(--font-sans);
+        cursor: pointer;
+        transition: var(--transition);
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(37,99,235,.25);
+    }
+    .btn-create:hover {
+        background: #1d4ed8;
+        box-shadow: 0 4px 14px rgba(37,99,235,.35);
+        transform: translateY(-1px);
+    }
+    .btn-create:active { transform: translateY(0); }
+
+    /* ── Table ─────────────────────────────────────────── */
+    .cert-table-wrap { overflow-x: auto; }
+    .cert-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+    .cert-table thead tr {
+        background: var(--c-slate-50);
+        border-bottom: 1px solid var(--c-slate-200);
+    }
+    .cert-table thead th {
+        font-family: var(--font-display);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+        color: var(--c-slate-400);
+        padding: 11px 14px;
+        white-space: nowrap;
+    }
+    .cert-table thead th:first-child { padding-left: 22px; border-radius: var(--radius-xs) 0 0 0; }
+    .cert-table thead th:last-child  { padding-right: 22px; border-radius: 0 var(--radius-xs) 0 0; }
+    .cert-table tbody tr {
+        border-bottom: 1px solid var(--c-slate-100);
+        transition: background .15s;
+    }
+    .cert-table tbody tr:last-child { border-bottom: none; }
+    .cert-table tbody tr:hover { background: var(--c-slate-50); }
+    .cert-table tbody td {
+        padding: 13px 14px;
+        color: var(--c-slate-700);
+        vertical-align: middle;
+    }
+    .cert-table tbody td:first-child { padding-left: 22px; }
+    .cert-table tbody td:last-child  { padding-right: 22px; }
+    .td-muted { color: var(--c-slate-400); font-size: 12.5px; }
+
+    /* ── User Avatar chip ──────────────────────────────── */
+    .user-chip {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
+    .user-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6366f1, #2563eb);
+        color: #fff;
+        font-family: var(--font-display);
+        font-size: 11px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        letter-spacing: .03em;
+    }
+    .user-name { font-weight: 500; color: var(--c-slate-900); font-size: 13px; }
+
+    /* ── Status Badges ─────────────────────────────────── */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11.5px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    .status-badge.published {
+        background: var(--c-green-soft);
+        color: var(--c-green);
+    }
+    .status-badge.process {
+        background: var(--c-yellow-soft);
+        color: var(--c-yellow);
+    }
+    .status-badge.draft {
+        background: var(--c-slate-100);
+        color: var(--c-slate-500);
+    }
+    .status-badge i { font-size: 10px; }
+
+    /* ── Action Buttons ────────────────────────────────── */
+    .action-wrap { display: flex; align-items: center; gap: 5px; flex-wrap: nowrap; }
+    .act-btn {
+        width: 30px; height: 30px;
+        border: none;
+        border-radius: var(--radius-xs);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 12px;
+        transition: var(--transition);
+        text-decoration: none;
+        flex-shrink: 0;
+    }
+    .act-btn-edit   { background: #eff6ff; color: #2563eb; }
+    .act-btn-edit:hover   { background: #2563eb; color: #fff; }
+    .act-btn-delete { background: #fef2f2; color: #dc2626; }
+    .act-btn-delete:hover { background: #dc2626; color: #fff; }
+    .act-btn-view   { background: #f0f9ff; color: #0284c7; }
+    .act-btn-view:hover   { background: #0284c7; color: #fff; }
+    .act-btn-print  { background: #fffbeb; color: #d97706; }
+    .act-btn-print:hover  { background: #d97706; color: #fff; }
+    .act-btn-disabled { background: var(--c-slate-100); color: var(--c-slate-400); cursor: not-allowed; opacity: .6; }
+
+    /* ── Pagination ────────────────────────────────────── */
+    .pagination-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 16px 22px;
+        border-top: 1px solid var(--c-slate-100);
+        font-size: 13px;
+    }
+    .pagination-info { color: var(--c-slate-500); }
+    .pagination-info b { color: var(--c-slate-700); font-weight: 600; }
+    .per-page-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--c-slate-500);
+    }
+    .per-page-select {
+        border: 1.5px solid var(--c-slate-200);
+        border-radius: var(--radius-xs);
+        padding: 4px 8px;
+        font-size: 12px;
+        color: var(--c-slate-700);
+        background: var(--c-white);
+        outline: none;
+        cursor: pointer;
+    }
     .pg-btn {
         min-width: 32px; height: 32px;
-        border: 1.5px solid #e2e8f0;
-        border-radius: 8px;
-        background: #fff;
-        color: #374151;
+        border: 1.5px solid var(--c-slate-200);
+        border-radius: var(--radius-xs);
+        background: var(--c-white);
+        color: var(--c-slate-600);
         font-size: 12px;
         font-weight: 600;
-        display: inline-flex; align-items: center; justify-content: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
-        transition: all .18s;
+        transition: var(--transition);
         padding: 0 8px;
+        font-family: var(--font-display);
     }
-    .pg-btn:hover:not(:disabled) { border-color: #3b82f6; color: #3b82f6; background: #eff6ff; }
-    .pg-btn:disabled { opacity: .4; cursor: not-allowed; }
-    .pg-active { background: #3b82f6 !important; color: #fff !important; border-color: #3b82f6 !important; }
-    .qr-container {
-    background: #f3f4f6;
-        padding: 5px;
-        border-radius: 5px;
+    .pg-btn:hover:not(:disabled) {
+        border-color: var(--c-blue);
+        color: var(--c-blue);
+        background: var(--c-blue-soft);
+    }
+    .pg-btn:disabled { opacity: .35; cursor: not-allowed; }
+    .pg-active {
+        background: var(--c-blue) !important;
+        color: #fff !important;
+        border-color: var(--c-blue) !important;
+    }
+    .pg-controls { display: flex; align-items: center; gap: 4px; }
+
+    /* ── Empty / Loading State ─────────────────────────── */
+    .empty-state {
+        padding: 52px 20px;
+        text-align: center;
+        color: var(--c-slate-400);
+    }
+    .empty-state i { font-size: 2.2rem; margin-bottom: 10px; display: block; }
+    .empty-state p { font-size: 13.5px; margin: 0; }
+    .loading-state {
+        padding: 52px 20px;
+        text-align: center;
+        color: var(--c-slate-400);
+    }
+
+    /* ══════════════ MODAL STYLES ══════════════════════════════════════ */
+
+    /* Shared modal wrapper */
+    .modal-content {
+        border: none;
+        border-radius: var(--radius-xl) !important;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+    }
+    .modal-header {
+        padding: 20px 24px 16px;
+        border-bottom: 1px solid var(--c-slate-100);
+        background: var(--c-white);
+    }
+    .modal-title-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 3px;
+    }
+    .modal-main-title {
+        font-family: var(--font-display);
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--c-slate-900);
+        margin: 0;
+    }
+    .modal-subtitle {
+        font-size: 12px;
+        color: var(--c-slate-400);
+        margin: 0;
+    }
+    .modal-body { padding: 22px 24px; background: var(--c-white); }
+    .modal-footer {
+        padding: 14px 24px;
+        border-top: 1px solid var(--c-slate-100);
+        background: var(--c-slate-50);
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+
+    /* Close button */
+    .modal-close-btn {
+        width: 32px; height: 32px;
+        border: 1.5px solid var(--c-slate-200);
+        border-radius: 50%;
+        background: var(--c-white);
+        color: var(--c-slate-500);
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer;
+        font-size: 17px;
+        transition: var(--transition);
+        flex-shrink: 0;
+    }
+    .modal-close-btn:hover {
+        background: var(--c-slate-100);
+        color: var(--c-slate-900);
+        border-color: var(--c-slate-300);
+    }
+
+    /* Badge mode */
+    .badge-mode {
+        display: inline-flex; align-items: center; gap: 4px;
+        font-size: 10.5px; font-weight: 700;
+        padding: 3px 10px; border-radius: 20px;
+        letter-spacing: .03em;
+        text-transform: uppercase;
+    }
+    .badge-add  { background: #dbeafe; color: #1d4ed8; }
+
+    /* Form field group */
+    .field-group { display: flex; flex-direction: column; gap: 14px; }
+    .field-item { display: flex; flex-direction: column; gap: 5px; }
+    .field-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--c-slate-500);
+        font-family: var(--font-display);
+    }
+    .field-label .req { color: var(--c-red); }
+    .field-input {
+        border: 1.5px solid var(--c-slate-200);
+        border-radius: var(--radius-sm);
+        padding: 9px 13px;
+        font-size: 13px;
+        font-family: var(--font-sans);
+        color: var(--c-slate-700);
+        background: var(--c-white);
+        outline: none;
+        transition: var(--transition);
+        width: 100%;
+    }
+    .field-input:hover  { border-color: var(--c-blue-mid); }
+    .field-input:focus  { border-color: var(--c-blue); box-shadow: 0 0 0 3px rgba(37,99,235,.10); }
+    .field-input::placeholder { color: var(--c-slate-400); }
+    .field-icon-wrap { position: relative; }
+    .field-icon-wrap .f-icon {
+        position: absolute;
+        left: 11px; top: 50%;
+        transform: translateY(-50%);
+        color: var(--c-slate-400);
+        font-size: 13px;
+        z-index: 1;
+        pointer-events: none;
+    }
+    .field-icon-wrap .field-input { padding-left: 34px; }
+
+    /* Grid 2 col */
+    .field-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 480px) { .field-grid-2 { grid-template-columns: 1fr; } }
+
+    /* Textarea */
+    textarea.field-input { resize: vertical; min-height: 72px; }
+
+    /* Search dropdown inside modal */
+    .search-dropdown {
+        position: absolute; top: 100%; left: 0; right: 0;
+        background: var(--c-white);
+        border: 1px solid var(--c-slate-200);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-lg);
+        margin-top: 4px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 9999;
+        animation: fadeDown .15s ease;
+    }
+    .search-item {
+        padding: 10px 13px;
+        cursor: pointer;
+        transition: background .15s;
+        border-radius: var(--radius-xs);
+        margin: 3px;
+    }
+    .search-item:hover { background: var(--c-slate-50); }
+    .si-main { display: flex; align-items: center; gap: 10px; }
+    .si-avatar {
+        width: 32px; height: 32px; border-radius: 50%;
+        background: linear-gradient(135deg, #a5b4fc, #6366f1);
+        color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-family: var(--font-display); font-size: 12px; font-weight: 700;
+        flex-shrink: 0;
+    }
+    .si-info  { display: flex; flex-direction: column; gap: 1px; }
+    .si-name  { font-size: 13px; font-weight: 600; color: var(--c-slate-900); }
+    .si-meta  { font-size: 11px; color: var(--c-slate-400); }
+
+    /* Student / Program preview tag */
+    .field-preview {
+        font-size: 11.5px;
+        color: var(--c-slate-500);
+        padding: 5px 10px;
+        background: var(--c-slate-50);
+        border-radius: var(--radius-xs);
+        border: 1px solid var(--c-slate-100);
+        display: flex; align-items: center; gap: 5px;
+    }
+    .field-preview b { color: var(--c-slate-700); }
+
+    /* Modal footer buttons */
+    .btn-modal-cancel {
+        border: 1.5px solid var(--c-slate-200);
+        background: var(--c-white);
+        border-radius: var(--radius-sm);
+        padding: 8px 18px;
+        font-size: 13px;
+        font-family: var(--font-sans);
+        color: var(--c-slate-600);
+        cursor: pointer;
+        font-weight: 500;
+        transition: var(--transition);
+    }
+    .btn-modal-cancel:hover {
+        background: var(--c-slate-50);
+        border-color: var(--c-slate-300);
+    }
+    .btn-modal-save {
+        display: inline-flex; align-items: center; gap: 7px;
+        border: none;
+        background: var(--c-blue);
+        border-radius: var(--radius-sm);
+        padding: 9px 22px;
+        font-size: 13px;
+        font-weight: 600;
+        font-family: var(--font-sans);
+        color: #fff;
+        cursor: pointer;
+        transition: var(--transition);
+        box-shadow: 0 2px 8px rgba(37,99,235,.2);
+    }
+    .btn-modal-save:hover { background: #1d4ed8; }
+    .btn-modal-save:disabled { opacity: .6; cursor: not-allowed; }
+
+    /* Detail rows */
+    .detail-row {
+        display: flex;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--c-slate-100);
+        font-size: 13px;
+        align-items: flex-start;
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label {
+        width: 130px;
+        flex-shrink: 0;
+        font-size: 11.5px;
+        font-weight: 600;
+        color: var(--c-slate-400);
+        font-family: var(--font-display);
+        padding-top: 1px;
+    }
+    .detail-value { color: var(--c-slate-700); line-height: 1.5; }
+
+    /* QR / image preview in detail */
+    .cert-img-preview {
+        width: 110px; height: 110px;
+        border-radius: var(--radius-md);
+        object-fit: contain;
+        border: 1.5px solid var(--c-slate-200);
+        padding: 6px;
+        background: var(--c-slate-50);
+    }
+    .cert-no-img {
+        width: 110px; height: 110px;
+        border-radius: var(--radius-md);
+        background: var(--c-slate-100);
+        display: flex; align-items: center; justify-content: center;
+        color: var(--c-slate-400);
+        font-size: 28px;
+    }
+
+    /* Number badge */
+    .row-number {
+        width: 24px; height: 24px;
+        border-radius: 6px;
+        background: var(--c-slate-100);
+        color: var(--c-slate-500);
+        font-size: 11px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center; justify-content: center;
+        font-family: var(--font-display);
+    }
+
+    /* ── Responsive tweaks ─────────────────────────────── */
+    @media (max-width: 640px) {
+        .cert-card-header { padding: 14px 16px; gap: 10px; }
+        .cert-table thead th, .cert-table tbody td { padding: 10px 10px; }
+        .cert-table thead th:first-child, .cert-table tbody td:first-child { padding-left: 14px; }
+        .pagination-wrap { padding: 14px 16px; }
+        .search-input { width: 160px; }
+        .search-input:focus { width: 180px; }
     }
 </style>
 @endpush
 
 @section('content')
+
+{{-- Page Header --}}
 <div class="page-header">
     <h4>Manajemen Sertifikat</h4>
-    <p>Buat dan kelola sertifikat siswa.</p>
+    <p>Buat dan kelola sertifikat siswa secara efisien.</p>
 </div>
 
-<div class="card-modern">
-    <div class="card-header-modern d-flex align-items-center justify-content-between gap-3">
-        <div class="flex-grow-1">
-            <h6 class="mb-0 fw-bold" style="font-size: 15px;">Semua Sertifikat</h6>
-        </div>
+{{-- ═══════════ MAIN CARD ═══════════ --}}
+<div class="cert-card">
+
+    {{-- Card Header --}}
+    <div class="cert-card-header">
+        <div class="header-title">Semua Sertifikat</div>
 
         {{-- Search --}}
         <div class="search-wrap">
@@ -118,153 +726,170 @@
             </div>
         </div>
 
-        <button class="btn-save" onclick="openModalTambah()">
+        <button class="btn-create" onclick="openModalTambah()">
             <i class="bi bi-plus-lg"></i> Buat Sertifikat
         </button>
     </div>
 
-    <div class="p-0">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0" style="font-size: 13px;">
-                <thead>
-                    <tr class="table-light">
-                        <th class="px-4 py-3 fw-semibold text-secondary">No</th>
-                        <th class="py-3 fw-semibold text-secondary">Nama Siswa</th>
-                        <th class="py-3 fw-semibold text-secondary">Nomor Sertifikat</th>
-                        <th class="py-3 fw-semibold text-secondary">Nilai</th>
-                        <th class="py-3 fw-semibold text-secondary">Nama Program</th>
-                        <th class="py-3 fw-semibold text-secondary">Level</th>
-                        <th class="py-3 fw-semibold text-secondary">Deskripsi</th>
-                        <th class="py-3 fw-semibold text-secondary">Tanggal Terbit</th>
-                        <th class="py-3 fw-semibold text-secondary">Status</th>
-                        <th class="py-3 fw-semibold text-secondary">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <tr id="loadingRow">
-                        <td colspan="10" class="text-center py-4 text-muted">
-                            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                            Memuat data...
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div id="paginationWrap"></div>
+    {{-- Table --}}
+    <div class="cert-table-wrap">
+        <table class="cert-table">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nama Siswa</th>
+                    <th>No. Sertifikat</th>
+                    <th>Nilai</th>
+                    <th>Program</th>
+                    <th>Level</th>
+                    <th>Deskripsi</th>
+                    <th>Tgl. Terbit</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr>
+                    <td colspan="10">
+                        <div class="loading-state">
+                            <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                            <span>Memuat data...</span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
+
+    {{-- Pagination --}}
+    <div id="paginationWrap"></div>
+
 </div>
 
 
-{{-- ═══════════════════════════════════════════════════════ MODAL TAMBAH ═══ --}}
+{{-- ══════════════════════════ MODAL TAMBAH SERTIFIKAT ════════════════════════ --}}
 <div class="modal fade" id="modalSertifikat" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 560px;">
-        <div class="modal-content" style="border-radius: 16px; border: none; overflow: hidden;">
-            <div class="modal-header" style="padding: 18px 22px; border-bottom: 1px solid #f1f5f9;">
-                <div>
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <h5 class="modal-title fw-bold mb-0" style="font-size: 15px;">Tambah Sertifikat</h5>
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <div style="flex:1;">
+                    <div class="modal-title-row">
+                        <h5 class="modal-main-title">Tambah Sertifikat</h5>
                         <span class="badge-mode badge-add"><i class="bi bi-plus-lg"></i> Baru</span>
                     </div>
-                    <p class="text-muted mb-0" style="font-size: 12px;">Lengkapi data sertifikat dengan benar</p>
+                    <p class="modal-subtitle">Lengkapi data sertifikat dengan benar</p>
                 </div>
-                <button type="button" class="close-btn" data-bs-dismiss="modal"><i class="bi bi-x"></i></button>
+                <button type="button" class="modal-close-btn" data-bs-dismiss="modal">
+                    <i class="bi bi-x"></i>
+                </button>
             </div>
 
-            <div class="modal-body" style="padding: 20px 22px; display: flex; flex-direction: column; gap: 14px;">
+            <div class="modal-body">
+                <div class="field-group">
 
-                {{-- Nomor Sertifikat --}}
-                <div>
-                    <label class="form-label-sm">Nomor Sertifikat</label>
-                    <div class="fi-icon">
-                        <span class="icon"><i class="bi bi-upc-scan"></i></span>
-                        <input type="text" class="fi" id="inputCertificateNumber" placeholder="Auto / Generate">
+                    {{-- Nomor Sertifikat --}}
+                    <div class="field-item">
+                        <label class="field-label">Nomor Sertifikat</label>
+                        <div class="field-icon-wrap">
+                            <i class="bi bi-upc-scan f-icon"></i>
+                            <input type="text" class="field-input" id="inputCertificateNumber"
+                                   placeholder="Auto / Generate">
+                        </div>
                     </div>
-                </div>
 
-                {{-- Nama Siswa (Searchable) --}}
-                <div>
-                    <label class="form-label-sm">Nama Siswa <span class="text-danger">*</span></label>
-                    <div class="fi-icon position-relative">
-                        <span class="icon"><i class="bi bi-person"></i></span>
-                        <input type="text" class="fi" id="inputStudent"
-                               placeholder="Cari nama siswa..."
-                               onkeyup="searchStudent(this.value)" autocomplete="off">
-                        <div id="studentResult" class="search-dropdown"></div>
+                    {{-- Nama Siswa --}}
+                    <div class="field-item">
+                        <label class="field-label">Nama Siswa <span class="req">*</span></label>
+                        <div class="field-icon-wrap position-relative">
+                            <i class="bi bi-person f-icon"></i>
+                            <input type="text" class="field-input" id="inputStudent"
+                                   placeholder="Cari nama siswa..."
+                                   onkeyup="searchStudent(this.value)" autocomplete="off">
+                            <div id="studentResult" class="search-dropdown"></div>
+                        </div>
+                        <input type="hidden" id="inputStudentId">
+                        <div id="studentPreview"></div>
                     </div>
-                    <input type="hidden" id="inputStudentId">
-                    <div id="studentPreview" class="mt-2 text-muted" style="font-size:12px;"></div>
-                </div>
 
-                {{-- Program (Searchable) --}}
-                <div>
-                    <label class="form-label-sm">Program <span class="text-danger">*</span></label>
-                    <div class="fi-icon position-relative">
-                        <span class="icon"><i class="bi bi-book"></i></span>
-                        <input type="text" class="fi" id="inputProgram"
-                               placeholder="Cari program..."
-                               onkeyup="searchProgram(this.value)" autocomplete="off">
-                        <div id="programResult" class="search-dropdown"></div>
+                    {{-- Program --}}
+                    <div class="field-item">
+                        <label class="field-label">Program <span class="req">*</span></label>
+                        <div class="field-icon-wrap position-relative">
+                            <i class="bi bi-book f-icon"></i>
+                            <input type="text" class="field-input" id="inputProgram"
+                                   placeholder="Cari program..."
+                                   onkeyup="searchProgram(this.value)" autocomplete="off">
+                            <div id="programResult" class="search-dropdown"></div>
+                        </div>
+                        <input type="hidden" id="inputProgramId">
+                        <div id="programPreview"></div>
                     </div>
-                    <input type="hidden" id="inputProgramId">
-                    <div id="programPreview" class="mt-2 text-muted" style="font-size:12px;"></div>
-                </div>
 
-                {{-- Nilai & Level --}}
-                <div class="row g-3">
-                    <div class="col-6">
-                        <label class="form-label-sm">Nilai</label>
-                        <input type="text" class="fi" placeholder="A / B / C" id="inputGrade">
+                    {{-- Nilai & Level --}}
+                    <div class="field-grid-2">
+                        <div class="field-item">
+                            <label class="field-label">Nilai</label>
+                            <input type="text" class="field-input" placeholder="A / B / C" id="inputGrade">
+                        </div>
+                        <div class="field-item">
+                            <label class="field-label">Level</label>
+                            <select class="field-input" id="inputLevel">
+                                <option value="">-- Pilih Level --</option>
+                                <option>Beginner</option>
+                                <option>Intermediate</option>
+                                <option>Advanced</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="col-6">
-                        <label class="form-label-sm">Level</label>
-                        <select class="fi" id="inputLevel">
-                            <option value="">-- Pilih Level --</option>
-                            <option>Beginner</option>
-                            <option>Intermediate</option>
-                            <option>Advanced</option>
-                        </select>
+
+                    {{-- Deskripsi --}}
+                    <div class="field-item">
+                        <label class="field-label">Deskripsi</label>
+                        <textarea class="field-input" rows="3" placeholder="Deskripsi sertifikat..." id="inputDescription"></textarea>
                     </div>
-                </div>
 
-                {{-- Deskripsi --}}
-                <div>
-                    <label class="form-label-sm">Deskripsi</label>
-                    <textarea class="fi" rows="3" placeholder="Deskripsi sertifikat..." id="inputDescription"></textarea>
                 </div>
-
             </div>
 
-            <div class="modal-footer" style="padding: 14px 22px; background: #fafafa; border-top: 1px solid #f1f5f9;">
-                <button type="button" class="btn-cancel" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn-save" id="btnSave" onclick="confirmSubmit()">
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn-modal-save" id="btnSave" onclick="confirmSubmit()">
                     <i class="bi bi-check-lg"></i>
                     <span id="btnSaveLabel">Simpan Sertifikat</span>
                 </button>
             </div>
+
         </div>
     </div>
 </div>
 
 
-{{-- ════════════════════════════════════════════════════════ MODAL DETAIL ═══ --}}
+{{-- ══════════════════════════ MODAL DETAIL ═══════════════════════════════════ --}}
 <div class="modal fade" id="modalDetail" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
-        <div class="modal-content" style="border-radius: 16px; border: none;">
-            <div class="modal-header" style="padding: 18px 22px; border-bottom: 1px solid #f1f5f9;">
-                <h5 class="modal-title fw-bold mb-0" style="font-size: 15px;">Detail Sertifikat</h5>
-                <button type="button" class="close-btn" data-bs-dismiss="modal"><i class="bi bi-x"></i></button>
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 460px;">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-main-title">Detail Sertifikat</h5>
+                <button type="button" class="modal-close-btn" data-bs-dismiss="modal">
+                    <i class="bi bi-x"></i>
+                </button>
             </div>
-            <div class="modal-body" style="padding: 20px 22px;" id="detailBody">
-                <div class="text-center py-3 text-muted">
-                    <div class="spinner-border spinner-border-sm"></div>
+
+            <div class="modal-body" id="detailBody">
+                <div class="loading-state">
+                    <div class="spinner-border spinner-border-sm text-primary"></div>
                 </div>
             </div>
-            <div class="modal-footer" style="padding: 14px 22px; background: #fafafa; border-top: 1px solid #f1f5f9;">
-                <button type="button" class="btn-cancel" data-bs-dismiss="modal">Tutup</button>
-                <button type="button" class="btn-save" id="btnPrintFromDetail" onclick="doPrint()">
+
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="btn-modal-save" id="btnPrintFromDetail" onclick="doPrint()" style="display:none;">
                     <i class="bi bi-printer"></i> Cetak
                 </button>
             </div>
+
         </div>
     </div>
 </div>
@@ -303,55 +928,59 @@ document.addEventListener('DOMContentLoaded', () => {
 function renderTable(rows) {
     const tbody = document.getElementById('tableBody');
     if (!rows || rows.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-muted">
-            <i class="bi bi-inbox me-2"></i>Tidak ada sertifikat ditemukan.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10">
+            <div class="empty-state">
+                <i class="bi bi-inbox"></i>
+                <p>Tidak ada sertifikat ditemukan.</p>
+            </div>
+        </td></tr>`;
         return;
     }
     tbody.innerHTML = rows.map(cert => `
         <tr>
-            <td class="px-4 py-3">${cert.no}</td>
-            <td class="py-3">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="user-avatar" style="width:28px;height:28px;font-size:11px;">
-                        ${cert.user_name.substring(0, 2).toUpperCase()}
-                    </div>
-                    ${cert.user_name}
+            <td><span class="row-number">${cert.no}</span></td>
+            <td>
+                <div class="user-chip">
+                    <div class="user-avatar">${cert.user_name.substring(0, 2).toUpperCase()}</div>
+                    <span class="user-name">${cert.user_name}</span>
                 </div>
             </td>
-            <td class="py-3">${cert.certificate_number || "-"}</td>
-            <td class="py-3 text-muted">${cert.grade || "-"}</td>
-            <td class="py-3 text-muted">${cert.program_name || "-"}</td>
-            <td class="py-3 text-muted">${cert.level || "-"}</td>
-            <td class="py-3 text-muted">${cert.description || "-"}</td>
-            <td class="py-3 text-muted">${cert.issued_date || "-"}</td>
-            <td class="py-3">${renderBadge(cert.status)}</td>
-            <td class="py-3">
-                <span class="badge text-bg-primary" style="cursor:pointer;" onclick="onChangeStatus('${cert.id}','${cert.user_id}')" title="Change Status">
-                    <i class="bi bi-pencil"></i>
-                </span>
-                <span class="badge text-bg-danger" style="cursor:pointer;" onclick="onDelete('${cert.id}','${cert.user_id}')" title="Delete">
-                    <i class="bi bi-trash"></i>
-                </span>
-                <span class="badge text-bg-info" style="cursor:pointer;" onclick="onDetail('${cert.id}')" title="Detail">
-                    <i class="bi bi-eye"></i>
-                </span>
-                ${cert.has_file && cert.status === 'Di Terbitkan'
-                    ? `<span class="badge text-bg-warning" style="cursor:pointer;" onclick="onPrint('${cert.id}')" title="Cetak">
-                           <i class="bi bi-printer"></i>
-                       </span>`
-                    : `<span class="badge text-bg-secondary" title="File belum tersedia" style="opacity:.5;">
-                           <i class="bi bi-printer"></i>
-                       </span>`
-                }
+            <td><code style="font-size:12px;background:#f1f5f9;padding:2px 7px;border-radius:5px;color:#334155;">${cert.certificate_number || "-"}</code></td>
+            <td class="td-muted">${cert.grade || "-"}</td>
+            <td class="td-muted">${cert.program_name || "-"}</td>
+            <td class="td-muted">${cert.level || "-"}</td>
+            <td class="td-muted" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${cert.description || ''}">${cert.description || "-"}</td>
+            <td class="td-muted">${cert.issued_date || "-"}</td>
+            <td>${renderBadge(cert.status)}</td>
+            <td>
+                <div class="action-wrap">
+                    <button class="act-btn act-btn-edit" onclick="onChangeStatus('${cert.id}','${cert.user_id}')" title="Ubah Status">
+                        <i class="bi bi-pencil-fill"></i>
+                    </button>
+                    <button class="act-btn act-btn-delete" onclick="onDelete('${cert.id}','${cert.user_id}')" title="Hapus">
+                        <i class="bi bi-trash-fill"></i>
+                    </button>
+                    <button class="act-btn act-btn-view" onclick="onDetail('${cert.id}')" title="Detail">
+                        <i class="bi bi-eye-fill"></i>
+                    </button>
+                    ${cert.has_file && cert.status === 'Di Terbitkan'
+                        ? `<button class="act-btn act-btn-print" onclick="onPrint('${cert.id}')" title="Cetak">
+                               <i class="bi bi-printer-fill"></i>
+                           </button>`
+                        : `<button class="act-btn act-btn-disabled" title="File belum tersedia" disabled>
+                               <i class="bi bi-printer-fill"></i>
+                           </button>`
+                    }
+                </div>
             </td>
         </tr>
     `).join('');
 }
 
 function renderBadge(status) {
-    if (status === 'Di Terbitkan') return `<span class="badge bg-success-subtle text-success rounded-pill"><i class="bi bi-check-circle-fill me-1"></i>${status}</span>`;
-    if (status === 'Di Proses')   return `<span class="badge bg-warning-subtle text-warning rounded-pill"><i class="bi bi-clock-fill me-1"></i>${status}</span>`;
-    return `<span class="badge bg-secondary-subtle text-secondary rounded-pill"><i class="bi bi-pencil-fill me-1"></i>${status}</span>`;
+    if (status === 'Di Terbitkan') return `<span class="status-badge published"><i class="bi bi-check-circle-fill"></i>${status}</span>`;
+    if (status === 'Di Proses')   return `<span class="status-badge process"><i class="bi bi-clock-fill"></i>${status}</span>`;
+    return `<span class="status-badge draft"><i class="bi bi-pencil-fill"></i>${status}</span>`;
 }
 
 let currentPage = 1;
@@ -361,8 +990,12 @@ let perPage     = 10;
 async function fetchData(page = 1) {
     currentPage = page;
     const tbody = document.getElementById('tableBody');
-    tbody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-muted">
-        <div class="spinner-border spinner-border-sm me-2"></div>Memuat data...</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="10">
+        <div class="loading-state">
+            <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+            Memuat data...
+        </div>
+    </td></tr>`;
     try {
         const params = new URLSearchParams();
         if (activeSearch) params.set('search', activeSearch);
@@ -372,78 +1005,68 @@ async function fetchData(page = 1) {
         const res  = await fetch(`${URL_DATA}?${params}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
         const json = await res.json();
         renderTable(json.data);
-        renderPagination(json.meta);  
+        renderPagination(json.meta);
     } catch (e) {
-        tbody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-danger">
-            <i class="bi bi-exclamation-circle me-2"></i>Gagal memuat data.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10">
+            <div class="empty-state" style="color:#dc2626;">
+                <i class="bi bi-exclamation-circle" style="color:#dc2626;"></i>
+                <p>Gagal memuat data. Silakan refresh halaman.</p>
+            </div>
+        </td></tr>`;
     }
 }
 
 function renderPagination(meta) {
     if (!meta) return;
-
     totalPages = meta.last_page;
     const from  = meta.from ?? 0;
     const to    = meta.to   ?? 0;
     const total = meta.total ?? 0;
 
     let pages = '';
-
     const range = 2;
     const start = Math.max(1, currentPage - range);
     const end   = Math.min(totalPages, currentPage + range);
 
     if (start > 1) {
         pages += pageBtn(1, '1');
-        if (start > 2) pages += `<span class="px-2 text-muted">…</span>`;
+        if (start > 2) pages += `<span style="padding:0 4px;color:#94a3b8;font-size:13px;">…</span>`;
     }
-
     for (let i = start; i <= end; i++) {
         pages += pageBtn(i, i, i === currentPage);
     }
-
     if (end < totalPages) {
-        if (end < totalPages - 1) pages += `<span class="px-2 text-muted">…</span>`;
+        if (end < totalPages - 1) pages += `<span style="padding:0 4px;color:#94a3b8;font-size:13px;">…</span>`;
         pages += pageBtn(totalPages, totalPages);
     }
 
     document.getElementById('paginationWrap').innerHTML = `
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 px-4 py-3"
-             style="border-top: 1px solid #f1f5f9; font-size: 13px;">
-
-            <div class="d-flex align-items-center gap-3">
-                <span class="text-muted">
-                    Menampilkan <b>${from}-${to}</b> dari <b>${total}</b> data
+        <div class="pagination-wrap">
+            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+                <span class="pagination-info">
+                    Menampilkan <b>${from}–${to}</b> dari <b>${total}</b> data
                 </span>
-                <div class="d-flex align-items-center gap-2">
-                    <span class="text-muted">Baris:</span>
-                    <select onchange="changePerPage(this.value)"
-                            style="border:1.5px solid #e2e8f0; border-radius:8px; padding:4px 8px; font-size:12px; color:#374151; outline:none;">
+                <div class="per-page-wrap">
+                    <span>Baris:</span>
+                    <select class="per-page-select" onchange="changePerPage(this.value)">
                         ${[10, 25, 50, 100].map(n =>
                             `<option value="${n}" ${n === perPage ? 'selected' : ''}>${n}</option>`
                         ).join('')}
                     </select>
                 </div>
             </div>
-
-            <div class="d-flex align-items-center gap-1">
-                <button onclick="fetchData(1)" ${currentPage === 1 ? 'disabled' : ''}
-                        class="pg-btn" title="Halaman pertama">
+            <div class="pg-controls">
+                <button onclick="fetchData(1)" ${currentPage === 1 ? 'disabled' : ''} class="pg-btn" title="Pertama">
                     <i class="bi bi-chevron-double-left"></i>
                 </button>
-                <button onclick="fetchData(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}
-                        class="pg-btn" title="Sebelumnya">
+                <button onclick="fetchData(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="pg-btn" title="Sebelumnya">
                     <i class="bi bi-chevron-left"></i>
                 </button>
-
                 ${pages}
-
-                <button onclick="fetchData(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}
-                        class="pg-btn" title="Berikutnya">
+                <button onclick="fetchData(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="pg-btn" title="Berikutnya">
                     <i class="bi bi-chevron-right"></i>
                 </button>
-                <button onclick="fetchData(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''}
-                        class="pg-btn" title="Halaman terakhir">
+                <button onclick="fetchData(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''} class="pg-btn" title="Terakhir">
                     <i class="bi bi-chevron-double-right"></i>
                 </button>
             </div>
@@ -452,8 +1075,7 @@ function renderPagination(meta) {
 }
 
 function pageBtn(page, label, active = false) {
-    return `<button onclick="fetchData(${page})"
-                class="pg-btn ${active ? 'pg-active' : ''}">${label}</button>`;
+    return `<button onclick="fetchData(${page})" class="pg-btn ${active ? 'pg-active' : ''}">${label}</button>`;
 }
 
 function changePerPage(val) {
@@ -571,7 +1193,6 @@ async function submitFormSertifikat(userId, programId) {
                 text: json.message ?? 'Terjadi kesalahan.',
                 confirmButtonText: 'Oke',
                 confirmButtonColor: '#3b82f6',
-                borderRadius: '12px',
             });
         }
     } catch (e) {
@@ -581,7 +1202,6 @@ async function submitFormSertifikat(userId, programId) {
             text: 'Gagal menyimpan. Coba lagi.',
             confirmButtonText: 'Oke',
             confirmButtonColor: '#3b82f6',
-            borderRadius: '12px',
         });
     } finally {
         btn.disabled = false;
@@ -610,14 +1230,15 @@ function searchStudent(keyword) {
                         </div>
                     </div>
                 </div>`).join('')
-            : `<div class="search-item text-muted">Tidak ditemukan</div>`;
+            : `<div class="search-item" style="color:#94a3b8;font-size:13px;">Tidak ditemukan</div>`;
     }, 300);
 }
 function selectStudent(id, name, email) {
     document.getElementById('inputStudent').value   = name;
     document.getElementById('inputStudentId').value = id;
     document.getElementById('studentResult').innerHTML = '';
-    document.getElementById('studentPreview').innerHTML = `Dipilih: <b>${name}</b> (${email})`;
+    document.getElementById('studentPreview').innerHTML =
+        `<div class="field-preview"><i class="bi bi-check-circle-fill text-success" style="font-size:11px;"></i> Dipilih: <b>${name}</b> &mdash; ${email}</div>`;
 }
 
 function searchProgram(keyword) {
@@ -641,21 +1262,22 @@ function searchProgram(keyword) {
                         </div>
                     </div>
                 </div>`).join('')
-            : `<div class="search-item text-muted">Tidak ditemukan</div>`;
+            : `<div class="search-item" style="color:#94a3b8;font-size:13px;">Tidak ditemukan</div>`;
     }, 300);
 }
 function selectProgram(id, name, code) {
     document.getElementById('inputProgram').value   = name;
     document.getElementById('inputProgramId').value = id;
     document.getElementById('programResult').innerHTML = '';
-    document.getElementById('programPreview').innerHTML = `Dipilih: <b>${name}</b> (${code})`;
+    document.getElementById('programPreview').innerHTML =
+        `<div class="field-preview"><i class="bi bi-check-circle-fill text-success" style="font-size:11px;"></i> Dipilih: <b>${name}</b> &mdash; ${code}</div>`;
 }
 
 async function onDetail(id) {
     currentDetailId = id;
     document.getElementById('detailBody').innerHTML = `
-        <div class="text-center py-3 text-muted">
-            <div class="spinner-border spinner-border-sm"></div>
+        <div class="loading-state">
+            <div class="spinner-border spinner-border-sm text-primary"></div>
         </div>`;
     document.getElementById('btnPrintFromDetail').style.display = 'none';
     modalDetail.show();
@@ -667,19 +1289,21 @@ async function onDetail(id) {
         const d = json.data;
 
         document.getElementById('detailBody').innerHTML = `
-            <div class=" mb-3">
-                ${d.file_path 
-                    ? `<img src="${d.file_path}" width="120" />` 
-                    : '-'}
+            <div style="display:flex;align-items:center;gap:16px;padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid #f1f5f9;">
+                ${d.file_path
+                    ? `<img src="${d.file_path}" class="cert-img-preview" alt="Sertifikat" />`
+                    : `<div class="cert-no-img"><i class="bi bi-award"></i></div>`}
+                <div>
+                    <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#0f172a;margin-bottom:3px;">${d.user_name}</div>
+                    <div style="font-size:12px;color:#64748b;">${d.user_email}</div>
+                    <div style="margin-top:8px;">${renderBadge(d.status)}</div>
+                </div>
             </div>
-            <div class="detail-row"><div class="detail-label">Nama Siswa</div><div class="detail-value">${d.user_name}</div></div>
-            <div class="detail-row"><div class="detail-label">Email</div><div class="detail-value">${d.user_email}</div></div>
-            <div class="detail-row"><div class="detail-label">No. Sertifikat</div><div class="detail-value"><code>${d.certificate_number}</code></div></div>
-            <div class="detail-row"><div class="detail-label">Program</div><div class="detail-value">${d.program_name} <span class="text-muted">(${d.program_code})</span></div></div>
+            <div class="detail-row"><div class="detail-label">No. Sertifikat</div><div class="detail-value"><code style="background:#f1f5f9;padding:2px 8px;border-radius:5px;font-size:12.5px;">${d.certificate_number}</code></div></div>
+            <div class="detail-row"><div class="detail-label">Program</div><div class="detail-value">${d.program_name} <span style="color:#94a3b8;">(${d.program_code})</span></div></div>
             <div class="detail-row"><div class="detail-label">Nilai</div><div class="detail-value">${d.grade}</div></div>
             <div class="detail-row"><div class="detail-label">Deskripsi</div><div class="detail-value">${d.description}</div></div>
             <div class="detail-row"><div class="detail-label">Tanggal Terbit</div><div class="detail-value">${d.issued_date}</div></div>
-            <div class="detail-row"><div class="detail-label">Status</div><div class="detail-value">${renderBadge(d.status)}</div></div>
         `;
 
         if (d.has_file && d.status === 'Di Terbitkan') {
@@ -687,13 +1311,14 @@ async function onDetail(id) {
         }
     } catch (e) {
         document.getElementById('detailBody').innerHTML =
-            `<div class="text-danger text-center py-3">Gagal memuat detail.</div>`;
+            `<div class="empty-state" style="color:#dc2626;"><i class="bi bi-exclamation-circle"></i><p>Gagal memuat detail.</p></div>`;
     }
 }
+
 async function generateCertNumber(certId) {
     const btn = document.getElementById('btnGenerate');
     if (btn) { btn.disabled = true; btn.textContent = '...'; }
- 
+
     try {
         const res  = await fetch(`${URL_UPDATE}/generate-cert-number`, {
             headers: {
@@ -714,7 +1339,7 @@ async function generateCertNumber(certId) {
         if (btn) { btn.disabled = false; btn.textContent = 'Generate'; }
     }
 }
- 
+
 async function onChangeStatus(id, userId) {
     currentDetailId = id;
     Swal.fire({
@@ -722,15 +1347,15 @@ async function onChangeStatus(id, userId) {
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
     });
- 
+
     try {
         const res  = await fetch(`${URL_SHOW}/${id}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
         const json = await res.json();
         if (!json.success) throw new Error();
         Swal.close();
- 
+
         const d        = json.data;
-        const programs = json.programs ?? [];   
+        const programs = json.programs ?? [];
         if (d.status === 'Di Terbitkan') {
             Swal.fire({
                 icon: 'info',
@@ -743,8 +1368,7 @@ async function onChangeStatus(id, userId) {
             });
             return;
         }
- 
-        // ── Radio status ─────────────────────────────────────────────────────
+
         const statuses     = ['Draft', 'Di Proses', 'Di Terbitkan'];
         const radioOptions = statuses.map(s => `
             <label style="
@@ -763,49 +1387,32 @@ async function onChangeStatus(id, userId) {
                 </span>
             </label>
         `).join('');
- 
-        // ── Options program ──────────────────────────────────────────────────
-        const programOptions = programs.map(p =>
-            `<option value="${p.id}"
-                ${p.name === d.program_name ? 'selected' : ''}>
-                ${p.name} (${p.code})
-             </option>`
-        ).join('');
- 
-        // ── Level options ────────────────────────────────────────────────────
-        const levels = ['Beginner', 'Intermediate', 'Advanced'];
-        const selectedLevel = (d.level && d.level !== '-' ? d.level : '')
-            .trim()
-            .toLowerCase();
 
+        const programOptions = programs.map(p =>
+            `<option value="${p.id}" ${p.name === d.program_name ? 'selected' : ''}>${p.name} (${p.code})</option>`
+        ).join('');
+
+        const levels = ['Beginner', 'Intermediate', 'Advanced'];
+        const selectedLevel = (d.level && d.level !== '-' ? d.level : '').trim().toLowerCase();
         const levelOptions = levels.map(lv => {
             const isSelected = selectedLevel === lv.toLowerCase();
             return `<option value="${lv}" ${isSelected ? 'selected' : ''}>${lv}</option>`;
         }).join('');
- 
-        // ── Style helpers ─────────────────────────────────────────────────────
+
         const inputStyle = 'width:100%;border:1.5px solid #e2e8f0;border-radius:9px;padding:8px 12px;font-size:13px;color:#374151;outline:none;background:#fff;';
         const labelStyle = 'font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;';
         const wrapStyle  = 'margin-bottom:10px;';
-        
+
         Swal.fire({
             title: `<span style="font-size:15px;font-weight:700;">Ubah Sertifikat</span>`,
             html: `
                 <p style="font-size:12px;color:#6b7280;margin-bottom:14px;">
                     Siswa: <b>${d.user_name}</b>
                 </p>
- 
-                <!-- Status -->
                 <div id="statusOptions" style="margin-bottom:14px;text-align:left;">${radioOptions}</div>
- 
-                <!-- Fields -->
                 <div style="text-align:left;">
- 
-                    <!-- Nomor Sertifikat -->
                     <div style="${wrapStyle}">
-                        <label style="${labelStyle}">
-                            Nomor Sertifikat
-                            <span style="color:#ef4444;">*</span>
+                        <label style="${labelStyle}">Nomor Sertifikat <span style="color:#ef4444;">*</span>
                             <span style="font-weight:400;color:#6b7280;"> (wajib jika Di Terbitkan)</span>
                         </label>
                         <div style="display:flex;gap:6px;">
@@ -820,27 +1427,17 @@ async function onChangeStatus(id, userId) {
                             </button>
                         </div>
                     </div>
- 
-                    <!-- Program -->
                     <div style="${wrapStyle}">
-                        <label style="${labelStyle}">
-                            Program
-                            <span style="color:#ef4444;">*</span>
-                            
-                        </label>
+                        <label style="${labelStyle}">Program <span style="color:#ef4444;">*</span></label>
                         <select id="swalProgramId" style="${inputStyle}">
                             <option value="">-- Pilih Program --</option>
                             ${programOptions}
                         </select>
                     </div>
- 
-                    <!-- Nilai & Level (2 kolom) -->
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;${wrapStyle}">
                         <div>
-                            <label style="${labelStyle}">
-                                Nilai
-                                <span style="color:#ef4444;">*</span>
-                                <span style="font-weight:400;color:#6b7280;"> (wajib Di Terbitkan)</span>
+                            <label style="${labelStyle}">Nilai <span style="color:#ef4444;">*</span>
+                                <span style="font-weight:400;color:#6b7280;">(wajib Di Terbitkan)</span>
                             </label>
                             <input id="swalGrade" type="text"
                                 value="${d.grade !== '-' ? d.grade : ''}"
@@ -848,10 +1445,8 @@ async function onChangeStatus(id, userId) {
                                 style="${inputStyle}">
                         </div>
                         <div>
-                            <label style="${labelStyle}">
-                                Level
-                                <span style="color:#ef4444;">*</span>
-                                <span style="font-weight:400;color:#6b7280;"> (wajib Di Terbitkan)</span>
+                            <label style="${labelStyle}">Level <span style="color:#ef4444;">*</span>
+                                <span style="font-weight:400;color:#6b7280;">(wajib Di Terbitkan)</span>
                             </label>
                             <select id="swalLevel" style="${inputStyle}">
                                 <option value="">-- Pilih Level --</option>
@@ -859,8 +1454,6 @@ async function onChangeStatus(id, userId) {
                             </select>
                         </div>
                     </div>
- 
-                    <!-- Deskripsi -->
                     <div>
                         <label style="${labelStyle}">Deskripsi</label>
                         <textarea id="swalDescription" rows="2"
@@ -868,7 +1461,6 @@ async function onChangeStatus(id, userId) {
                             style="${inputStyle}resize:vertical;"
                         >${d.description !== '-' ? d.description : ''}</textarea>
                     </div>
- 
                 </div>
             `,
             showCancelButton:   true,
@@ -896,18 +1488,12 @@ async function onChangeStatus(id, userId) {
                 }
 
                 const popup = Swal.getPopup();
- 
-                // const certNumber  = document.getElementById('swalCertNumber').value.trim();
-                // const programId   = document.getElementById('swalProgramId').value;
-                // const grade = document.getElementById('swalGrade')?.value ?? '';
-                // const level = document.getElementById('swalLevel')?.value ?? '';
-                // const description = document.getElementById('swalDescription').value.trim();
                 const certNumber  = popup.querySelector('#swalCertNumber')?.value.trim() ?? '';
                 const programId   = popup.querySelector('#swalProgramId')?.value ?? '';
                 const grade       = popup.querySelector('#swalGrade')?.value ?? '';
                 const level       = popup.querySelector('#swalLevel')?.value ?? '';
                 const description = popup.querySelector('#swalDescription')?.value.trim() ?? '';
-                // Validasi wajib jika Di Terbitkan
+
                 if (selected.value === 'Di Terbitkan') {
                     if (!certNumber) {
                         Swal.showValidationMessage('Nomor sertifikat wajib diisi untuk status Di Terbitkan.');
@@ -925,8 +1511,7 @@ async function onChangeStatus(id, userId) {
                         Swal.showValidationMessage('Level wajib dipilih untuk status Di Terbitkan.');
                         return false;
                     }
- 
-                    // Konfirmasi permanen
+
                     const konfirmasi = await Swal.fire({
                         icon: 'warning',
                         title: 'Yakin menerbitkan?',
@@ -945,7 +1530,7 @@ async function onChangeStatus(id, userId) {
                     });
                     if (!konfirmasi.isConfirmed) return false;
                 }
- 
+
                 Swal.showLoading();
                 try {
                     const r = await fetch(`${URL_UPDATE}/${id}`, {
@@ -990,7 +1575,7 @@ async function onChangeStatus(id, userId) {
                 fetchData();
             }
         });
- 
+
     } catch (e) {
         Swal.fire({
             icon:               'error',
@@ -1013,9 +1598,7 @@ async function onDelete(id, userId) {
         cancelButtonColor: '#e2e8f0',
         confirmButtonText: 'Ya, Hapus',
         cancelButtonText: 'Batal',
-        customClass: {
-            popup: 'swal-popup-custom'
-        }
+        customClass: { popup: 'swal-popup-custom' }
     });
 
     if (!confirm.isConfirmed) return;
@@ -1049,7 +1632,7 @@ async function onDelete(id, userId) {
             showConfirmButton: false
         });
 
-        fetchData(); 
+        fetchData();
 
     } catch (error) {
         Swal.fire({
@@ -1059,14 +1642,14 @@ async function onDelete(id, userId) {
         });
     }
 }
- 
+
 function statusDesc(s) {
     if (s === 'Draft')        return 'Sertifikat belum diproses';
     if (s === 'Di Proses')    return 'Sedang dalam proses penerbitan';
     if (s === 'Di Terbitkan') return 'Sertifikat resmi telah diterbitkan';
     return '';
 }
- 
+
 function highlightStatus(label) {
     document.querySelectorAll('#statusOptions label').forEach(l => {
         l.style.borderColor = '#e2e8f0';

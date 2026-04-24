@@ -132,6 +132,7 @@ class SertifikatController extends Controller
         ]);
     }
 
+    // old
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
@@ -238,6 +239,127 @@ class SertifikatController extends Controller
             ], 500);
         }
     }
+
+    // new
+    // public function update(Request $request, $id)
+    // {
+    //     $validated = $request->validate([
+    //         'status'             => ['required', Rule::in(['Draft', 'Di Proses', 'Di Terbitkan'])],
+    //         'user_id'            => 'required|exists:users,id',
+    //         'program_id'         => 'nullable|required_if:status,Di Terbitkan|exists:programs,id',
+    //         'grade'              => 'nullable|required_if:status,Di Terbitkan|string|max:10',
+    //         'level'              => 'nullable|required_if:status,Di Terbitkan|string|max:10',
+    //         'description'        => 'nullable|string',
+    //         'certificate_number' => 'nullable|required_if:status,Di Terbitkan',
+    //     ]);
+
+    //     $qrPathToCleanup = null;
+
+    //     try {
+    //         DB::transaction(function () use ($request, $id, &$qrPathToCleanup) {
+
+    //             $sertifikat = Certificate::findOrFail($id);
+
+    //             $dataUpdate = $request->only([
+    //                 'status',
+    //                 'user_id',
+    //                 'program_id',
+    //                 'grade',
+    //                 'level',
+    //                 'description',
+    //                 'certificate_number',
+    //             ]);
+
+    //             $user = User::findOrFail($request->user_id);
+
+    //             if ($request->status === 'Di Terbitkan') {
+    //                 $issuedDate = Carbon::now();
+    //                 $dataUpdate['issued_date'] = $issuedDate;
+
+    //                 $program = Program::findOrFail($request->program_id);
+
+    //                 $message = implode('|', [
+    //                     $request->certificate_number,
+    //                     $user->name ?? '-',
+    //                     $request->grade ?? '-',
+    //                     $program->name ?? '-',
+    //                     $issuedDate->format('Y-m-d H:i:s'),
+    //                 ]);
+
+    //                 $signatureResult = $this->ecdsa->sign($message);
+
+    //                 CertificateSignature::create([
+    //                     'id'             => (string) Str::uuid(),
+    //                     'certificate_id' => $sertifikat->id,
+    //                     'public_key'     => $signatureResult->publicKey,
+    //                     'signatures'     => $signatureResult->signature,
+    //                 ]);
+
+    //                 $qrValue  = url('/v/verify-qr/' . $sertifikat->id);
+    //                 $qrResult = $this->qrCodeService->generate($qrValue, 300);
+
+    //                 $qrPathToCleanup = $qrResult['path'];
+
+    //                 $dataUpdate['file_path'] = $qrResult['path'];
+    //             }
+
+    //             $sertifikat->update($dataUpdate);
+
+    //             $student = Student::where('user_id', $user->id)->firstOrFail();
+    //             $student->update([
+    //                 'status' => $request->status == "Draft" || $request->status == "Di Proses" ? 1 : 0,
+    //             ]);
+
+    //             $qrPathToCleanup = null;
+    //         });
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Data berhasil diperbarui.',
+    //         ]);
+
+    //     } catch (\Illuminate\Validation\ValidationException $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Validasi gagal.',
+    //             'errors'  => $e->errors(),
+    //         ], 422);
+
+    //     } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Data tidak ditemukan.',
+    //             'error'   => $e->getMessage(),
+    //         ], 404);
+
+    //     } catch (\Illuminate\Database\QueryException $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Terjadi kesalahan pada database.',
+    //             'error'   => $e->getMessage(),
+    //         ], 500);
+
+    //     } catch (\RuntimeException $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Terjadi kesalahan pada proses tanda tangan atau QR Code.',
+    //             'error'   => $e->getMessage(),
+    //         ], 500);
+
+    //     } catch (\Throwable $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Terjadi kesalahan tidak terduga.',
+    //             'error'   => $e->getMessage(),
+    //         ], 500);
+
+    //     } finally {
+    //         // Cleanup file QR jika transaksi gagal di tengah jalan
+    //         if ($qrPathToCleanup && Storage::exists($qrPathToCleanup)) {
+    //             Storage::delete($qrPathToCleanup);
+    //         }
+    //     }
+    // }
     
 
     public function show(string $id)

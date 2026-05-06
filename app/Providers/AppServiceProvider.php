@@ -13,12 +13,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(EcdsaService::class);
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         Schema::defaultStringLength(191);
-        $this->app->make(EcdsaService::class);
+        EcdsaService::ensureKeysExist();
     }
 }

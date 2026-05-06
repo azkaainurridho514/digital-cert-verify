@@ -71,22 +71,7 @@ final class EcdsaService
             'private_key' => $privateKeyPem,
         ];
     }
-
-    // menggunakan cache
-    // private function ensureKeyExists(): void
-    // {
-    //     $existing = config('ecdsa.private_key') ?? env(self::ENV_KEY_NAME);
     
-    //     if (!empty($existing)) {
-    //         return;
-    //     }
-    
-    //     $keyPair = $this->generateKeyPair();
-    //     $this->writePrivateKeyToEnv($keyPair['private_key']);
-    
-    //     config(['ecdsa.private_key' => $keyPair['private_key']]);
-    // }
-
     // tidak menggunakan cache
     private function ensureKeyExists(): void
     {

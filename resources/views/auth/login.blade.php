@@ -308,13 +308,9 @@
         {{-- Demo Accounts --}}
         <div class="divider-text">Akun Demo</div>
         <div class="demo-accounts">
-            <div class="demo-btn" onclick="fillDemo('admin@olc.id', 'password')">
+            <div class="demo-btn" onclick="fillDemo('ourlearningcenterkuningan@gmail.com', 'password')">
                 <strong><i class="bi bi-shield-fill-check me-1"></i>Admin</strong>
-                admin@olc.id
-            </div>
-            <div class="demo-btn" onclick="fillDemo('siswa@olc.id', 'password')">
-                <strong><i class="bi bi-person-fill me-1"></i>Siswa</strong>
-                siswa@olc.id
+               ourlearningcenterkuningan@gmail.com
             </div>
         </div>
 

@@ -16,6 +16,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Schema::defaultStringLength(191);
-        EcdsaService::ensureKeysExist();
+        $this->app->make(EcdsaService::class)->ensureKeysExist();
     }
 }

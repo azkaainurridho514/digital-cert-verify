@@ -215,31 +215,21 @@
     {{-- ── Navigation ──────────────────────────────────────── --}}
     <div class="sidebar-nav">
 
-        @if(auth()->user()->role === 'admin')
-        {{-- ====== MENU ADMIN ====== --}}
         <div class="nav-label">Main Menu</div>
 
-        <a href="{{ route('admin.dashboard') }}"
-           class="nav-item-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
+        <a href="{{ route('dashboard') }}"
+           class="nav-item-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"
            data-label="Dashboard">
             <i class="bi bi-grid-fill nav-icon"></i>
             <span class="nav-text">Dashboard</span>
         </a>
+        
 
-        <a href="{{ route('admin.siswa') }}"
-           class="nav-item-link {{ request()->routeIs('admin.siswa*') ? 'active' : '' }}"
-           data-label="Data Siswa">
-            <i class="bi bi-people-fill nav-icon"></i>
-            <span class="nav-text">Data Siswa</span>
-        </a>
-
-        <div class="nav-label">Sertifikat</div>
-
-        <a href="{{ route('admin.sertifikat') }}"
-           class="nav-item-link {{ request()->routeIs('admin.sertifikat*') ? 'active' : '' }}"
-           data-label="Manajemen Sertifikat">
+        <a href="{{ route('sertifikat') }}"
+           class="nav-item-link {{ request()->routeIs('sertifikat*') ? 'active' : '' }}"
+           data-label="Sertifikat">
             <i class="bi bi-award-fill nav-icon"></i>
-            <span class="nav-text">Manajemen Sertifikat</span>
+            <span class="nav-text">Sertifikat</span>
         </a>
 
         <a href="{{ route('verifikasi') }}"
@@ -249,37 +239,8 @@
             <span class="nav-text">Verifikasi</span>
         </a>
 
-        @else
-        {{-- ====== MENU SISWA ====== --}}
-        <div class="nav-label">Main Menu</div>
-
-        <a href="{{ route('siswa.dashboard') }}"
-           class="nav-item-link {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}"
-           data-label="Dashboard">
-            <i class="bi bi-grid-fill nav-icon"></i>
-            <span class="nav-text">Dashboard</span>
-        </a>
-
-        <div class="nav-label">Sertifikat</div>
-
-        <a href="{{ route('siswa.sertifikat') }}"
-           class="nav-item-link {{ request()->routeIs('siswa.sertifikat*') ? 'active' : '' }}"
-           data-label="Sertifikat Saya">
-            <i class="bi bi-award-fill nav-icon"></i>
-            <span class="nav-text">Sertifikat Saya</span>
-        </a>
-
-        <a href="{{ route('verifikasi') }}"
-           class="nav-item-link {{ request()->routeIs('verifikasi*') ? 'active' : '' }}"
-           data-label="Verifikasi Sertifikat">
-            <i class="bi bi-patch-check-fill nav-icon"></i>
-            <span class="nav-text">Verifikasi Sertifikat</span>
-        </a>
-        @endif
-
     </div>
 
-    {{-- ── Sidebar Footer ───────────────────────────────────── --}}
     <div class="sidebar-footer">
         <a href="#" class="nav-item-link btn-logout"
            data-url="{{ route('logout') }}"

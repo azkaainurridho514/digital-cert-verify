@@ -15,6 +15,7 @@ class CertificateVerification extends Model
         'certificate_id',
         'verified_at',
         'ip_address',
+        'address',
         'device_info',
         'result',
     ];
@@ -30,6 +31,6 @@ class CertificateVerification extends Model
     }
     public function certificate()
     {
-        return $this->belongsTo(Certificate::class);
+        return $this->belongsTo(Certificate::class, 'certificate_id');
     }
 }

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Services\EcdsaService;
 use App\Models\Certificate;
+use App\Models\CertificateVerification;
 use App\Constants\VerificationResult;
 use Carbon\Carbon;
 
@@ -26,46 +27,94 @@ class HomeController extends Controller
         return view('verifikasi');
     }
 
+    // public function verifyQr(Request $request)
+    // {
+    //     $url = $request->qr_code;
+
+    //     $parts = explode('/', $url);
+    //     $id = end($parts);
+    //     if (!Str::isUuid($id)) {
+    //         return response()->json([
+    //             'message' => VerificationResult::message(VerificationResult::QR_INVALID), 
+    //             'data'=>[]], 
+    //         400);
+    //     }
+    //     $certificate = Certificate::find($id);
+
+    //     if (!$certificate) {
+    //         return response()->json([
+    //             'message' => VerificationResult::message(VerificationResult::NOT_FOUND), 
+    //             'data'=>[]], 
+    //         404);
+    //     }
+    //     $signatureResult = $this->ecdsa->verify($certificate->id, $certificate->digital_signature);
+    //     if(!$signatureResult){
+    //         return response()->json([
+    //             'message' => VerificationResult::message(VerificationResult::VERIFY_FAILED), 
+    //             'data'=>[]
+    //             ], 
+    //         401);
+    //     }
+    //     return response()->json([
+    //         'message' => VerificationResult::message(VerificationResult::VALID),
+    //         'data' => $certificate
+    //     ], 200);
+    // }
+
     public function verifyQr(Request $request)
     {
-        $url = $request->qr_code;
-
+        $url   = $request->qr_code;
         $parts = explode('/', $url);
-        $id = end($parts);
+        $id    = end($parts);
+
         if (!Str::isUuid($id)) {
             return response()->json([
-                'message' => VerificationResult::message(VerificationResult::QR_INVALID), 
-                'data'=>[]], 
-            400);
+                'message' => VerificationResult::message(VerificationResult::QR_INVALID),
+                'data'    => [],
+            ], 400);
         }
+
         $certificate = Certificate::find($id);
 
         if (!$certificate) {
             return response()->json([
-                'message' => VerificationResult::message(VerificationResult::NOT_FOUND), 
-                'data'=>[]], 
-            404);
+                'message' => VerificationResult::message(VerificationResult::NOT_FOUND),
+                'data'    => [],
+            ], 404);
         }
-        $issuedDate = Carbon::parse($certificate->issued_date);
-        $message = implode('|', [
-            $certificate->certificate_number,
-            $certificate->user->name ?? '-',
-            $certificate->grade ?? '-',
-            $certificate->program->name ?? '-',
-            $issuedDate->format('Y-m-d H:i:s'),
+
+        try {
+            $signatureResult = $this->ecdsa->verify($certificate->id, $certificate->digital_signature);
+        } catch (RuntimeException $e) {
+            $signatureResult = false;
+        }
+
+        $result = $signatureResult ? VerificationResult::VALID : VerificationResult::VERIFY_FAILED;
+        $geo     = geoip($request->ip());
+        $address = collect([
+            $geo->city,
+            $geo->state,
+            $geo->country,
+        ])->filter()->implode(', ');
+        CertificateVerification::create([
+            'certificate_id' => $certificate->id,
+            'verified_at'    => Carbon::now(),
+            'ip_address'     => $request->ip(),
+            'address'        => $address ?: null,
+            'device_info'    => $request->device_info,
+            'result'         => $result,
         ]);
 
-        $signatureResult = $this->ecdsa->verify($message, $certificate->signature->signatures, $certificate->signature->public_key);
-        if(!$signatureResult){
+        if (!$signatureResult) {
             return response()->json([
-                'message' => VerificationResult::message(VerificationResult::VERIFY_FAILED), 
-                'data'=>[]
-                ], 
-            401);
+                'message' => VerificationResult::message(VerificationResult::VERIFY_FAILED),
+                'data'    => [],
+            ], 401);
         }
+
         return response()->json([
             'message' => VerificationResult::message(VerificationResult::VALID),
-            'data' => $certificate
+            'data'    => $certificate,
         ], 200);
     }
 }

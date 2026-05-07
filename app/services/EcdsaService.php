@@ -1,233 +1,204 @@
 <?php
 
-// Mendefinisikan namespace untuk service ini, sesuai struktur folder App/Services
 namespace App\Services;
 
-// Mengimpor kelas SignatureResult sebagai return type dari method sign()
 use App\DTOs\SignatureResult;
-// Mengimpor RuntimeException untuk melempar error saat terjadi kegagalan
 use RuntimeException;
 
-// Mendefinisikan kelas EcdsaService sebagai final (tidak bisa di-extend)
 final class EcdsaService
 {
-    // Nama kurva eliptik yang digunakan: prime256v1 (setara NIST P-256)
-    private const CURVE = 'prime256v1'; // NIST P-256 elliptic curve
+    // ── Konfigurasi ───────────────────────────────────────────────────────────
 
-    // Algoritma hash yang digunakan saat proses tanda tangan digital ECDSA
+    private const CURVE = 'prime256v1';
     private const ALGO  = OPENSSL_ALGO_SHA256;
 
-    // Nama variabel .env untuk menyimpan ECDSA private key
-    private const ENV_PRIVATE_KEY_NAME = 'ECDSA_PRIVATE_KEY';
+    // ── Runtime Cache ─────────────────────────────────────────────────────────
 
-    // Nama variabel .env untuk menyimpan ECDSA public key
-    private const ENV_PUBLIC_KEY_NAME  = 'ECDSA_PUBLIC_KEY';
+    // Menyimpan key yang sudah di-resolve agar tidak load ulang per request
+    private ?\OpenSSLAsymmetricKey $privateKey = null;
+    private ?string                $publicKey  = null;
 
-    // Constructor kosong, tidak ada inisialisasi khusus saat objek dibuat
-    public function __construct()
-    {
-        //
-    }
+    // ── 1. Key Generation ─────────────────────────────────────────────────────
 
-    // Method untuk menghasilkan tanda tangan digital ECDSA dari sebuah pesan
-    public function sign(string $message): SignatureResult
-    {
-        // Memuat ECDSA private key dari .env untuk digunakan dalam proses signing
-        $privateKey = $this->loadPrivateKey();
-
-        // Menyiapkan variabel kosong untuk menampung hasil tanda tangan dalam format binary
-        $binarySignature = '';
-
-        // Melakukan proses tanda tangan digital ECDSA menggunakan private key dan algoritma SHA-256
-        $success = openssl_sign($message, $binarySignature, $privateKey, self::ALGO);
-
-        // Jika proses signing gagal, lempar exception dengan pesan error dari OpenSSL
-        if (! $success) {
-            throw new RuntimeException('ECDSA signing gagal: ' . openssl_error_string());
-        }
-
-        // Mengubah hasil tanda tangan binary menjadi format base64 agar aman disimpan/dikirim
-        $signature = base64_encode($binarySignature);
-
-        // Mengambil public key yang berpadanan dengan private key yang digunakan
-        $publicKey = $this->derivePublicKey($privateKey);
-
-        // Mengembalikan hasil tanda tangan dan public key dalam bentuk DTO SignatureResult
-        return new SignatureResult(
-            signature: $signature,
-            publicKey: $publicKey,
-        );
-    }
-
-    // Method untuk memverifikasi keabsahan tanda tangan digital ECDSA
-    public function verify(string $message, string $signature, string $publicKey): bool
-    {
-        // Mendekode tanda tangan dari base64 kembali ke format binary; strict=true agar validasi ketat
-        $binarySignature = base64_decode($signature, strict: true);
-
-        // Jika hasil decode false, berarti format base64 tidak valid, lempar exception
-        if ($binarySignature === false) {
-            throw new RuntimeException('Signature bukan format base64 yang valid.');
-        }
-
-        // Memuat public key OpenSSL dari string PEM untuk digunakan dalam verifikasi
-        $pubKeyResource = openssl_get_publickey($publicKey);
-
-        // Jika public key tidak valid atau gagal dimuat, lempar exception
-        if ($pubKeyResource === false) {
-            throw new RuntimeException('Public key tidak valid: ' . openssl_error_string());
-        }
-
-        // Melakukan verifikasi tanda tangan ECDSA: mencocokkan pesan, tanda tangan binary, dan public key
-        $result = openssl_verify($message, $binarySignature, $pubKeyResource, self::ALGO);
-
-        // Mengembalikan hasil verifikasi: 1 = valid, 0 = tidak valid, selain itu = error
-        return match ($result) {
-            1       => true,   // Tanda tangan valid
-            0       => false,  // Tanda tangan tidak cocok
-            default => throw new RuntimeException('Verifikasi error: ' . openssl_error_string()),
-        };
-    }
-
-    // Method untuk membuat pasangan kunci ECDSA baru (private key + public key)
+    /**
+     * Generate pasangan kunci ECDSA baru.
+     * Hanya dipanggil jika .env kosong.
+     * Hasil hanya disimpan di runtime memory, tidak menulis ke .env.
+     *
+     * @return array{ private_key: string, public_key: string } format PEM
+     */
     public function generateKeyPair(): array
     {
-        // Membuat resource kunci baru menggunakan konfigurasi OpenSSL (ECDSA dengan kurva prime256v1)
-        $keyResource = openssl_pkey_new($this->opensslConfig());
+        $resource = openssl_pkey_new([
+            'curve_name'       => self::CURVE,
+            'private_key_type' => OPENSSL_KEYTYPE_EC,
+        ]);
 
-        // Jika gagal membuat kunci, lempar exception dengan pesan error OpenSSL
-        if ($keyResource === false) {
+        if ($resource === false) {
             throw new RuntimeException('Gagal generate ECDSA key: ' . openssl_error_string());
         }
 
-        // Mengekspor private key dari resource ke format string PEM, disimpan di $privateKeyPem
-        openssl_pkey_export($keyResource, $privateKeyPem);
+        openssl_pkey_export($resource, $privateKeyPem);
 
-        // Mengambil detail lengkap dari kunci, termasuk public key dalam format PEM
-        $details = openssl_pkey_get_details($keyResource);
-
-        // Jika gagal mengambil detail kunci, lempar exception
+        $details = openssl_pkey_get_details($resource);
         if ($details === false) {
             throw new RuntimeException('Gagal mengambil detail key: ' . openssl_error_string());
         }
 
-        // Mengembalikan array berisi private key dan public key dalam format PEM
         return [
-            'private_key' => $privateKeyPem,  // Private key PEM untuk signing
-            'public_key'  => $details['key'], // Public key PEM untuk verifikasi
+            'private_key' => $privateKeyPem,
+            'public_key'  => $details['key'],
         ];
     }
 
-    // Method static untuk memastikan pasangan kunci ECDSA sudah tersimpan di .env
-    public static function ensureKeysExist(): void
+    // ── 2. Sign ───────────────────────────────────────────────────────────────
+
+    /**
+     * Tanda tangani pesan menggunakan ECDSA private key.
+     * Key diambil dari .env jika ada, atau dari hasil generate jika .env kosong.
+     *
+     * @return SignatureResult berisi signature (base64) dan public key (PEM)
+     */
+    public function sign(string $message): SignatureResult
+{
+    $privateKeyPem = $this->resolvePrivateKey();
+    $privateKey    = openssl_get_privatekey($privateKeyPem);
+
+    if ($privateKey === false) {
+        throw new RuntimeException('Private key tidak valid: ' . openssl_error_string());
+    }
+
+    $binary = '';
+    if (! openssl_sign($message, $binary, $privateKey, self::ALGO)) {
+        throw new RuntimeException('ECDSA signing gagal: ' . openssl_error_string());
+    }
+
+    return new SignatureResult(
+        signature: base64_encode($binary),
+        publicKey: $this->resolvePublicKey(),
+    );
+}
+
+public function verify(string $message, string $signature): bool
+{
+    $binary = base64_decode($signature, strict: true);
+    if ($binary === false) {
+        throw new RuntimeException('Signature bukan format base64 yang valid.');
+    }
+
+    $publicKeyPem = $this->resolvePublicKey();
+    $publicKey    = openssl_get_publickey($publicKeyPem);
+
+    if ($publicKey === false) {
+        throw new RuntimeException('Public key tidak valid: ' . openssl_error_string());
+    }
+
+    $result = openssl_verify($message, $binary, $publicKey, self::ALGO);
+
+    // Bebaskan resource key dari memory
+    openssl_free_key($publicKey);
+
+    return match ($result) {
+        1       => true,
+        0       => false,
+        default => throw new RuntimeException('Verifikasi error: ' . openssl_error_string()),
+    };
+}
+
+    // ── Private: Key Resolution ───────────────────────────────────────────────
+
+    /**
+     * Ambil private key:
+     * 1. Dari runtime cache jika sudah pernah di-resolve
+     * 2. Dari ECDSA_PRIVATE_KEY di .env jika ada
+     * 3. Generate baru jika .env kosong (simpan ke runtime cache saja)
+     */
+    private function resolvePrivateKey(): string
     {
-        // Mengambil path absolut ke file .env milik aplikasi Laravel
-        $envPath  = base_path('.env');
+        $key = config('app.ecdsa_private_key');
 
-        // Membaca seluruh isi file .env sebagai string
-        $contents = file_get_contents($envPath);
-
-        // Mencari baris ECDSA_PRIVATE_KEY di dalam isi .env menggunakan regex
-        preg_match('/^ECDSA_PRIVATE_KEY=(.*)$/m', $contents, $privateMatches);
-
-        // Mencari baris ECDSA_PUBLIC_KEY di dalam isi .env menggunakan regex
-        preg_match('/^ECDSA_PUBLIC_KEY=(.*)$/m', $contents, $publicMatches);
-
-        // Mengambil nilai private key yang ditemukan, atau null jika tidak ada
-        $existingPrivate = $privateMatches[1] ?? null;
-
-        // Mengambil nilai public key yang ditemukan, atau null jika tidak ada
-        $existingPublic  = $publicMatches[1] ?? null;
-
-        // Jika kedua kunci ECDSA sudah ada di .env, tidak perlu melakukan apapun
-        if (!empty($existingPrivate) && !empty($existingPublic)) {
-            return;
+        if (!$key) {
+            throw new RuntimeException('ECDSA_PRIVATE_KEY tidak ditemukan di ENV.');
         }
 
-        // Membuat instance EcdsaService untuk memanggil generateKeyPair()
-        $instance = new self();
+        $decoded = base64_decode($key, strict: true);
 
-        // Membuat pasangan kunci ECDSA baru (private + public key dalam PEM)
-        $keyPair  = $instance->generateKeyPair();
+        return $decoded !== false ? $decoded : $key;
+    }
 
-        // Mengubah private key PEM ke format base64 agar aman disimpan di .env
-        $encodedPrivate = base64_encode($keyPair['private_key']);
+    private function resolvePublicKey(): string
+    {
+        $key = config('app.ecdsa_public_key');
 
-        // Mengubah public key PEM ke format base64 agar aman disimpan di .env
-        $encodedPublic  = base64_encode($keyPair['public_key']);
+        if (!$key) {
+            throw new RuntimeException('ECDSA_PUBLIC_KEY tidak ditemukan di ENV.');
+        }
 
-        // Memastikan file .env benar-benar ada sebelum mencoba menulis ke dalamnya
+        $decoded = base64_decode($key, strict: true);
+
+        return $decoded !== false ? $decoded : $key;
+    }
+
+
+    // ── Key Initialization ────────────────────────────────────────────────────
+
+    /**
+     * Dipanggil saat aplikasi boot (AppServiceProvider).
+     * Cek .env → jika kosong, generate key baru dan simpan ke .env.
+     * Jika sudah ada → tidak melakukan apapun.
+     */
+    public function ensureKeysExist(): void
+    {
+        $envPath = base_path('.env');
+
         if (! file_exists($envPath)) {
             throw new RuntimeException('.env file tidak ditemukan.');
         }
 
-        // Jika private key belum ada, tambahkan baris ECDSA_PRIVATE_KEY ke akhir .env
-        if (empty($existingPrivate)) {
-            $contents .= PHP_EOL . self::ENV_PRIVATE_KEY_NAME . '=' . $encodedPrivate . PHP_EOL;
+        // Baca langsung dari file .env (bukan env())
+        // env() membaca runtime cache → tidak reliable saat boot pertama kali
+        $contents = file_get_contents($envPath);
+
+        // Cek keberadaan key langsung dari isi file
+        preg_match('/^ECDSA_PRIVATE_KEY=(.+)$/m', $contents, $privateMatch);
+        preg_match('/^ECDSA_PUBLIC_KEY=(.+)$/m',  $contents, $publicMatch);
+
+        $hasPrivate = ! empty(trim($privateMatch[1] ?? ''));
+        $hasPublic  = ! empty(trim($publicMatch[1] ?? ''));
+
+        // Kedua key sudah ada di file .env → tidak perlu generate ulang
+        if ($hasPrivate && $hasPublic) {
+            return;
         }
 
-        // Jika public key belum ada, tambahkan baris ECDSA_PUBLIC_KEY ke akhir .env
-        if (empty($existingPublic)) {
-            $contents .= self::ENV_PUBLIC_KEY_NAME . '=' . $encodedPublic . PHP_EOL;
+        // Generate key pair baru
+        $pair = $this->generateKeyPair();
+
+        $encodedPrivate = base64_encode($pair['private_key']);
+        $encodedPublic  = base64_encode($pair['public_key']);
+
+        if (! $hasPrivate) {
+            $contents = $this->writeEnvValue($contents, 'ECDSA_PRIVATE_KEY', $encodedPrivate);
+        }
+        if (! $hasPublic) {
+            $contents = $this->writeEnvValue($contents, 'ECDSA_PUBLIC_KEY', $encodedPublic);
         }
 
-        // Menyimpan kembali isi .env yang sudah ditambahkan kunci ECDSA ke file
         file_put_contents($envPath, $contents);
     }
 
-    // Method private untuk memuat ECDSA private key dari .env
-    private function loadPrivateKey(): \OpenSSLAsymmetricKey
+    /**
+     * Update nilai key di .env jika baris sudah ada,
+     * atau append baris baru jika belum ada.
+     */
+    private function writeEnvValue(string $contents, string $key, string $value): string
     {
-        // Mengambil nilai ECDSA_PRIVATE_KEY dari .env (masih dalam format base64)
-        $encoded = env(self::ENV_PRIVATE_KEY_NAME);
-
-        // Jika nilai kosong, berarti private key belum dikonfigurasi, lempar exception
-        if (empty($encoded)) {
-            throw new RuntimeException('ECDSA private key tidak tersedia.');
+        // Jika baris key sudah ada → replace nilainya
+        if (preg_match("/^{$key}=.*$/m", $contents)) {
+            return preg_replace("/^{$key}=.*$/m", "{$key}={$value}", $contents);
         }
 
-        // Mendekode nilai base64 ke format PEM asli; strict=true agar validasi ketat
-        $pem = base64_decode($encoded, strict: true);
-
-        // Jika decode gagal (bukan base64 valid), gunakan nilai asli sebagai fallback
-        if ($pem === false) {
-            $pem = $encoded;
-        }
-
-        // Memuat private key OpenSSL dari string PEM untuk digunakan dalam signing
-        $key = openssl_pkey_get_private($pem);
-
-        // Jika private key gagal dimuat, lempar exception dengan pesan error OpenSSL
-        if ($key === false) {
-            throw new RuntimeException('Gagal load private key: ' . openssl_error_string());
-        }
-
-        // Mengembalikan resource OpenSSL private key siap pakai
-        return $key;
-    }
-
-    // Method private untuk mengekstrak public key dari resource private key
-    private function derivePublicKey(\OpenSSLAsymmetricKey $privateKey): string
-    {
-        // Mengambil semua detail kunci termasuk public key dalam format PEM
-        $details = openssl_pkey_get_details($privateKey);
-
-        // Jika gagal mengambil detail, lempar exception
-        if ($details === false) {
-            throw new RuntimeException('Gagal mengambil detail key: ' . openssl_error_string());
-        }
-
-        // Mengembalikan public key dalam format PEM dari array detail kunci
-        return $details['key'];
-    }
-
-    // Method private untuk menyediakan konfigurasi OpenSSL khusus ECDSA
-    private function opensslConfig(): array
-    {
-        // Mengembalikan array konfigurasi untuk generate kunci ECDSA dengan OpenSSL
-        return [
-            'curve_name'       => self::CURVE,        // Menggunakan kurva eliptik prime256v1 (NIST P-256)
-            'private_key_type' => OPENSSL_KEYTYPE_EC, // Tipe kunci Elliptic Curve (EC) untuk ECDSA
-        ];
+        // Belum ada → append ke akhir file
+        return rtrim($contents) . PHP_EOL . "{$key}={$value}" . PHP_EOL;
     }
 }

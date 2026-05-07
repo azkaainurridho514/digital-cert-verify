@@ -16,6 +16,7 @@ return new class extends Migration
             $table->uuid("certificate_id");
             $table->datetime("verified_at");
             $table->String("ip_address");
+            $table->String("address");
             $table->String("device_info");
             $table->tinyInteger("result");
             $table->timestamps();

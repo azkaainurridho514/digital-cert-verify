@@ -29,18 +29,16 @@ class AuthController extends Controller
         if (!Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()
                 ->withInput($request->only('email'))
-                ->with('login_error', 'Email atau password salah. Silakan coba lagi.');
+                ->with('login_error', 'Email atau password salah.');
         }
 
         $request->session()->regenerate();
 
-        $role = Auth::user()->role;
+        $user = Auth::user();
 
-        return match($role) {
-            'admin'  => redirect()->route('admin.dashboard')->with('success', 'Selamat datang kembali, ' . Auth::user()->name . '!'),
-            'siswa'  => redirect()->route('siswa.dashboard')->with('success', 'Selamat datang, ' . Auth::user()->name . '!'),
-            default  => redirect('/')->with('error', 'Role tidak dikenali.'),
-        };
+        return redirect()
+            ->route('dashboard')
+            ->with('success', 'Selamat datang, ' . $user->name . '!');
     }
 
     public function logout(Request $request)

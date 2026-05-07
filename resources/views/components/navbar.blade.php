@@ -201,14 +201,8 @@
 <div class="topbar-right">
 
     {{-- Role Chip --}}
-    <span class="role-chip d-none d-sm-inline-flex
-        {{ auth()->user()->role === 'admin' ? 'admin' : 'siswa' }}">
-        @if(auth()->user()->role === 'admin')
+    <span class="role-chip d-none d-sm-inline-flex admin">
             <i class="bi bi-shield-fill-check" style="font-size:.65rem;"></i>
-        @else
-            <i class="bi bi-mortarboard-fill" style="font-size:.65rem;"></i>
-        @endif
-        {{ ucfirst(auth()->user()->role) }}
     </span>
 
     <div class="topbar-divider d-none d-sm-block"></div>
@@ -236,13 +230,9 @@
                 <div class="dd-header">
                     <div class="dd-name">{{ auth()->user()->name }}</div>
                     <div class="dd-email">{{ auth()->user()->email }}</div>
-                    <span class="dd-role-pill {{ auth()->user()->role === 'admin' ? 'admin' : 'siswa' }}">
-                        @if(auth()->user()->role === 'admin')
+                    <span class="dd-role-pill admin">
+                       
                             <i class="bi bi-shield-fill-check"></i>
-                        @else
-                            <i class="bi bi-mortarboard-fill"></i>
-                        @endif
-                        {{ ucfirst(auth()->user()->role) }}
                     </span>
                 </div>
             </li>

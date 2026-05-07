@@ -10,13 +10,9 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->enum('role', ['admin', 'siswa'])->default('siswa');
             $table->string('name');
-            $table->string('email')->unique()->nullable();
+            $table->string('email')->unique();
             $table->string('password');
-            $table->string('phone')->nullable();
-            $table->string('photo')->nullable();
-            $table->text('address');
             $table->rememberToken();
             $table->timestamps();
         });

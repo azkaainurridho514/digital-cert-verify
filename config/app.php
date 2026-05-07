@@ -184,5 +184,7 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
     ])->toArray(),
+    'ecdsa_private_key' => env('ECDSA_PRIVATE_KEY'),
+    'ecdsa_public_key'  => env('ECDSA_PUBLIC_KEY'),
 
 ];

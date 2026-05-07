@@ -448,11 +448,11 @@
   let isStopping = false; 
 
   function showValid(data) {
-      $("#res-nama").text(data.user?.name ?? '-');
-      $("#res-program").text(data.program?.name ?? '-');
+      $("#res-nama").text(data.username ?? '-');
+      $("#res-program").text(data.program_name ?? '-');
       $("#res-nilai").text(data.grade ?? '-');
       $("#res-no").text(data.certificate_number ?? '-');
-      $("#res-tanggal").text(data.issued_date ?? '-');
+      $("#res-tanggal").text(data.publication_date ?? '-');
 
       $("#invalidCard").hide();
       $("#validCard").fadeIn();
@@ -561,6 +561,7 @@
         type: 'POST',
         data: {
           qr_code: qrCode,
+          device_info: navigator.userAgent,
           _token: $('meta[name="csrf-token"]').attr('content')
         },
         success: function (res) {

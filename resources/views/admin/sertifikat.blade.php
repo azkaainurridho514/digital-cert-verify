@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'Manajemen Sertifikat')
-@section('page-title', 'Manajemen Sertifikat')
+@section('title', 'Sertifikat')
+@section('page-title', 'Sertifikat')
 
 @push('styles')
 <style>
@@ -38,9 +38,7 @@
     }
 
     /* ── Page Header ───────────────────────────────────── */
-    .page-header {
-        margin-bottom: 24px;
-    }
+    .page-header { margin-bottom: 24px; }
     .page-header h4 {
         font-family: var(--font-display);
         font-size: 1.25rem;
@@ -48,11 +46,7 @@
         color: var(--c-slate-900);
         margin-bottom: 4px;
     }
-    .page-header p {
-        font-size: .85rem;
-        color: var(--c-slate-500);
-        margin: 0;
-    }
+    .page-header p { font-size: .85rem; color: var(--c-slate-500); margin: 0; }
 
     /* ── Main Card ─────────────────────────────────────── */
     .cert-card {
@@ -82,11 +76,7 @@
     }
 
     /* ── Search Input ──────────────────────────────────── */
-    .search-wrap {
-        position: relative;
-        display: flex;
-        align-items: center;
-    }
+    .search-wrap { position: relative; display: flex; align-items: center; }
     .search-icon {
         position: absolute;
         left: 11px;
@@ -98,7 +88,7 @@
     .search-input {
         border: 1.5px solid var(--c-slate-200);
         border-radius: var(--radius-sm);
-        padding: 8px 34px 8px 34px;
+        padding: 8px 34px;
         font-size: 13px;
         font-family: var(--font-sans);
         color: var(--c-slate-700);
@@ -199,7 +189,7 @@
     .cs-item.on .chk { opacity: 1; color: var(--c-blue); }
     .cs-sep { height: 1px; background: var(--c-slate-100); margin: 4px 0; }
 
-    /* ── Btn Save / Create ─────────────────────────────── */
+    /* ── Btn Create ────────────────────────────────────── */
     .btn-create {
         display: inline-flex;
         align-items: center;
@@ -226,11 +216,7 @@
 
     /* ── Table ─────────────────────────────────────────── */
     .cert-table-wrap { overflow-x: auto; }
-    .cert-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13px;
-    }
+    .cert-table { width: 100%; border-collapse: collapse; font-size: 13px; }
     .cert-table thead tr {
         background: var(--c-slate-50);
         border-bottom: 1px solid var(--c-slate-200);
@@ -253,24 +239,15 @@
     }
     .cert-table tbody tr:last-child { border-bottom: none; }
     .cert-table tbody tr:hover { background: var(--c-slate-50); }
-    .cert-table tbody td {
-        padding: 13px 14px;
-        color: var(--c-slate-700);
-        vertical-align: middle;
-    }
+    .cert-table tbody td { padding: 13px 14px; color: var(--c-slate-700); vertical-align: middle; }
     .cert-table tbody td:first-child { padding-left: 22px; }
     .cert-table tbody td:last-child  { padding-right: 22px; }
     .td-muted { color: var(--c-slate-400); font-size: 12.5px; }
 
-    /* ── User Avatar chip ──────────────────────────────── */
-    .user-chip {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-    }
+    /* ── User Avatar Chip ──────────────────────────────── */
+    .user-chip { display: flex; align-items: center; gap: 9px; }
     .user-avatar {
-        width: 30px;
-        height: 30px;
+        width: 30px; height: 30px;
         border-radius: 50%;
         background: linear-gradient(135deg, #6366f1, #2563eb);
         color: #fff;
@@ -296,18 +273,9 @@
         font-weight: 600;
         white-space: nowrap;
     }
-    .status-badge.published {
-        background: var(--c-green-soft);
-        color: var(--c-green);
-    }
-    .status-badge.process {
-        background: var(--c-yellow-soft);
-        color: var(--c-yellow);
-    }
-    .status-badge.draft {
-        background: var(--c-slate-100);
-        color: var(--c-slate-500);
-    }
+    .status-badge.published { background: var(--c-green-soft); color: var(--c-green); }
+    .status-badge.process   { background: var(--c-yellow-soft); color: var(--c-yellow); }
+    .status-badge.draft     { background: var(--c-slate-100); color: var(--c-slate-500); }
     .status-badge i { font-size: 10px; }
 
     /* ── Action Buttons ────────────────────────────────── */
@@ -325,15 +293,15 @@
         text-decoration: none;
         flex-shrink: 0;
     }
-    .act-btn-edit   { background: #eff6ff; color: #2563eb; }
+    .act-btn-edit         { background: #eff6ff; color: #2563eb; }
     .act-btn-edit:hover   { background: #2563eb; color: #fff; }
-    .act-btn-delete { background: #fef2f2; color: #dc2626; }
+    .act-btn-delete       { background: #fef2f2; color: #dc2626; }
     .act-btn-delete:hover { background: #dc2626; color: #fff; }
-    .act-btn-view   { background: #f0f9ff; color: #0284c7; }
+    .act-btn-view         { background: #f0f9ff; color: #0284c7; }
     .act-btn-view:hover   { background: #0284c7; color: #fff; }
-    .act-btn-print  { background: #fffbeb; color: #d97706; }
+    .act-btn-print        { background: #fffbeb; color: #d97706; }
     .act-btn-print:hover  { background: #d97706; color: #fff; }
-    .act-btn-disabled { background: var(--c-slate-100); color: var(--c-slate-400); cursor: not-allowed; opacity: .6; }
+    .act-btn-disabled     { background: var(--c-slate-100); color: var(--c-slate-400); cursor: not-allowed; opacity: .6; }
 
     /* ── Pagination ────────────────────────────────────── */
     .pagination-wrap {
@@ -348,12 +316,7 @@
     }
     .pagination-info { color: var(--c-slate-500); }
     .pagination-info b { color: var(--c-slate-700); font-weight: 600; }
-    .per-page-wrap {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: var(--c-slate-500);
-    }
+    .per-page-wrap { display: flex; align-items: center; gap: 8px; color: var(--c-slate-500); }
     .per-page-select {
         border: 1.5px solid var(--c-slate-200);
         border-radius: var(--radius-xs);
@@ -386,30 +349,30 @@
         background: var(--c-blue-soft);
     }
     .pg-btn:disabled { opacity: .35; cursor: not-allowed; }
-    .pg-active {
-        background: var(--c-blue) !important;
-        color: #fff !important;
-        border-color: var(--c-blue) !important;
-    }
+    .pg-active { background: var(--c-blue) !important; color: #fff !important; border-color: var(--c-blue) !important; }
     .pg-controls { display: flex; align-items: center; gap: 4px; }
 
     /* ── Empty / Loading State ─────────────────────────── */
-    .empty-state {
-        padding: 52px 20px;
-        text-align: center;
-        color: var(--c-slate-400);
-    }
+    .empty-state { padding: 52px 20px; text-align: center; color: var(--c-slate-400); }
     .empty-state i { font-size: 2.2rem; margin-bottom: 10px; display: block; }
     .empty-state p { font-size: 13.5px; margin: 0; }
-    .loading-state {
-        padding: 52px 20px;
-        text-align: center;
-        color: var(--c-slate-400);
+    .loading-state { padding: 52px 20px; text-align: center; color: var(--c-slate-400); }
+
+    /* ── Number Badge ──────────────────────────────────── */
+    .row-number {
+        width: 24px; height: 24px;
+        border-radius: 6px;
+        background: var(--c-slate-100);
+        color: var(--c-slate-500);
+        font-size: 11px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-display);
     }
 
-    /* ══════════════ MODAL STYLES ══════════════════════════════════════ */
-
-    /* Shared modal wrapper */
+    /* ══════════ MODAL STYLES ══════════════════════════════════════ */
     .modal-content {
         border: none;
         border-radius: var(--radius-xl) !important;
@@ -421,12 +384,7 @@
         border-bottom: 1px solid var(--c-slate-100);
         background: var(--c-white);
     }
-    .modal-title-row {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 3px;
-    }
+    .modal-title-row { display: flex; align-items: center; gap: 10px; margin-bottom: 3px; }
     .modal-main-title {
         font-family: var(--font-display);
         font-size: 15px;
@@ -434,11 +392,7 @@
         color: var(--c-slate-900);
         margin: 0;
     }
-    .modal-subtitle {
-        font-size: 12px;
-        color: var(--c-slate-400);
-        margin: 0;
-    }
+    .modal-subtitle { font-size: 12px; color: var(--c-slate-400); margin: 0; }
     .modal-body { padding: 22px 24px; background: var(--c-white); }
     .modal-footer {
         padding: 14px 24px;
@@ -476,11 +430,11 @@
         letter-spacing: .03em;
         text-transform: uppercase;
     }
-    .badge-add  { background: #dbeafe; color: #1d4ed8; }
+    .badge-add { background: #dbeafe; color: #1d4ed8; }
 
     /* Form field group */
     .field-group { display: flex; flex-direction: column; gap: 14px; }
-    .field-item { display: flex; flex-direction: column; gap: 5px; }
+    .field-item  { display: flex; flex-direction: column; gap: 5px; }
     .field-label {
         font-size: 12px;
         font-weight: 600;
@@ -500,8 +454,8 @@
         transition: var(--transition);
         width: 100%;
     }
-    .field-input:hover  { border-color: var(--c-blue-mid); }
-    .field-input:focus  { border-color: var(--c-blue); box-shadow: 0 0 0 3px rgba(37,99,235,.10); }
+    .field-input:hover { border-color: var(--c-blue-mid); }
+    .field-input:focus { border-color: var(--c-blue); box-shadow: 0 0 0 3px rgba(37,99,235,.10); }
     .field-input::placeholder { color: var(--c-slate-400); }
     .field-icon-wrap { position: relative; }
     .field-icon-wrap .f-icon {
@@ -522,52 +476,6 @@
     /* Textarea */
     textarea.field-input { resize: vertical; min-height: 72px; }
 
-    /* Search dropdown inside modal */
-    .search-dropdown {
-        position: absolute; top: 100%; left: 0; right: 0;
-        background: var(--c-white);
-        border: 1px solid var(--c-slate-200);
-        border-radius: var(--radius-md);
-        box-shadow: var(--shadow-lg);
-        margin-top: 4px;
-        max-height: 200px;
-        overflow-y: auto;
-        z-index: 9999;
-        animation: fadeDown .15s ease;
-    }
-    .search-item {
-        padding: 10px 13px;
-        cursor: pointer;
-        transition: background .15s;
-        border-radius: var(--radius-xs);
-        margin: 3px;
-    }
-    .search-item:hover { background: var(--c-slate-50); }
-    .si-main { display: flex; align-items: center; gap: 10px; }
-    .si-avatar {
-        width: 32px; height: 32px; border-radius: 50%;
-        background: linear-gradient(135deg, #a5b4fc, #6366f1);
-        color: #fff;
-        display: flex; align-items: center; justify-content: center;
-        font-family: var(--font-display); font-size: 12px; font-weight: 700;
-        flex-shrink: 0;
-    }
-    .si-info  { display: flex; flex-direction: column; gap: 1px; }
-    .si-name  { font-size: 13px; font-weight: 600; color: var(--c-slate-900); }
-    .si-meta  { font-size: 11px; color: var(--c-slate-400); }
-
-    /* Student / Program preview tag */
-    .field-preview {
-        font-size: 11.5px;
-        color: var(--c-slate-500);
-        padding: 5px 10px;
-        background: var(--c-slate-50);
-        border-radius: var(--radius-xs);
-        border: 1px solid var(--c-slate-100);
-        display: flex; align-items: center; gap: 5px;
-    }
-    .field-preview b { color: var(--c-slate-700); }
-
     /* Modal footer buttons */
     .btn-modal-cancel {
         border: 1.5px solid var(--c-slate-200);
@@ -581,10 +489,7 @@
         font-weight: 500;
         transition: var(--transition);
     }
-    .btn-modal-cancel:hover {
-        background: var(--c-slate-50);
-        border-color: var(--c-slate-300);
-    }
+    .btn-modal-cancel:hover { background: var(--c-slate-50); border-color: var(--c-slate-300); }
     .btn-modal-save {
         display: inline-flex; align-items: center; gap: 7px;
         border: none;
@@ -599,66 +504,16 @@
         transition: var(--transition);
         box-shadow: 0 2px 8px rgba(37,99,235,.2);
     }
-    .btn-modal-save:hover { background: #1d4ed8; }
-    .btn-modal-save:disabled { opacity: .6; cursor: not-allowed; }
+    .btn-modal-save:hover     { background: #1d4ed8; }
+    .btn-modal-save:disabled  { opacity: .6; cursor: not-allowed; }
 
-    /* Detail rows */
-    .detail-row {
-        display: flex;
-        gap: 12px;
-        padding: 10px 0;
-        border-bottom: 1px solid var(--c-slate-100);
-        font-size: 13px;
-        align-items: flex-start;
-    }
-    .detail-row:last-child { border-bottom: none; }
-    .detail-label {
-        width: 130px;
-        flex-shrink: 0;
-        font-size: 11.5px;
-        font-weight: 600;
-        color: var(--c-slate-400);
-        font-family: var(--font-display);
-        padding-top: 1px;
-    }
-    .detail-value { color: var(--c-slate-700); line-height: 1.5; }
-
-    /* QR / image preview in detail */
-    .cert-img-preview {
-        width: 110px; height: 110px;
-        border-radius: var(--radius-md);
-        object-fit: contain;
-        border: 1.5px solid var(--c-slate-200);
-        padding: 6px;
-        background: var(--c-slate-50);
-    }
-    .cert-no-img {
-        width: 110px; height: 110px;
-        border-radius: var(--radius-md);
-        background: var(--c-slate-100);
-        display: flex; align-items: center; justify-content: center;
-        color: var(--c-slate-400);
-        font-size: 28px;
-    }
-
-    /* Number badge */
-    .row-number {
-        width: 24px; height: 24px;
-        border-radius: 6px;
-        background: var(--c-slate-100);
-        color: var(--c-slate-500);
-        font-size: 11px;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center; justify-content: center;
-        font-family: var(--font-display);
-    }
-
-    /* ── Responsive tweaks ─────────────────────────────── */
+    /* ── Responsive ────────────────────────────────────── */
     @media (max-width: 640px) {
         .cert-card-header { padding: 14px 16px; gap: 10px; }
-        .cert-table thead th, .cert-table tbody td { padding: 10px 10px; }
-        .cert-table thead th:first-child, .cert-table tbody td:first-child { padding-left: 14px; }
+        .cert-table thead th,
+        .cert-table tbody td { padding: 10px; }
+        .cert-table thead th:first-child,
+        .cert-table tbody td:first-child { padding-left: 14px; }
         .pagination-wrap { padding: 14px 16px; }
         .search-input { width: 160px; }
         .search-input:focus { width: 180px; }
@@ -670,16 +525,26 @@
 
 {{-- Page Header --}}
 <div class="page-header">
-    <h4>Manajemen Sertifikat</h4>
+    <h4>Sertifikat</h4>
     <p>Buat dan kelola sertifikat siswa secara efisien.</p>
 </div>
 
-{{-- ═══════════ MAIN CARD ═══════════ --}}
+{{-- Main Card --}}
 <div class="cert-card">
 
     {{-- Card Header --}}
     <div class="cert-card-header">
         <div class="header-title">Semua Sertifikat</div>
+
+        <div id="bulkActionBar" style="display:none; padding:8px 22px; border-bottom:1px solid var(--c-slate-100);">
+            <span id="bulkCount" style="font-size:13px; color:var(--c-slate-500);"></span>
+            <button onclick="bulkUpdateStatus()" class="btn btn-primary btn-sm ms-3">
+                <i class="bi bi-arrow-repeat"></i> Update Status
+            </button>
+            <button onclick="clearSelection()" class="btn btn-secondary btn-sm ms-1">
+                <i class="bi bi-x"></i> Batal
+            </button>
+        </div>
 
         {{-- Search --}}
         <div class="search-wrap">
@@ -700,7 +565,7 @@
 
         {{-- Filter Tahun --}}
         <div class="cs" id="filterTahun">
-            <button class="cs-btn" type="button" onclick="tog('filterTahun')" style="min-width: 175px;">
+            <button class="cs-btn" type="button" onclick="tog('filterTahun')" style="min-width:175px;">
                 <svg class="ico" viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="#3b82f6">
                     <rect x="3" y="4" width="18" height="18" rx="3"/>
                     <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
@@ -726,7 +591,7 @@
             </div>
         </div>
 
-        <button class="btn-create" onclick="openModalTambah()">
+        <button class="btn-create" onclick="openCreateModal()">
             <i class="bi bi-plus-lg"></i> Buat Sertifikat
         </button>
     </div>
@@ -736,13 +601,12 @@
         <table class="cert-table">
             <thead>
                 <tr>
+                    <th></th>
                     <th>No</th>
                     <th>Nama Siswa</th>
                     <th>No. Sertifikat</th>
                     <th>Nilai</th>
                     <th>Program</th>
-                    <th>Level</th>
-                    <th>Deskripsi</th>
                     <th>Tgl. Terbit</th>
                     <th>Status</th>
                     <th>Aksi</th>
@@ -767,9 +631,9 @@
 </div>
 
 
-{{-- ══════════════════════════ MODAL TAMBAH SERTIFIKAT ════════════════════════ --}}
+{{-- Modal Tambah / Edit Sertifikat --}}
 <div class="modal fade" id="modalSertifikat" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:540px;">
         <div class="modal-content">
 
             <div class="modal-header">
@@ -788,65 +652,52 @@
             <div class="modal-body">
                 <div class="field-group">
 
-                    {{-- Nomor Sertifikat --}}
                     <div class="field-item">
                         <label class="field-label">Nomor Sertifikat</label>
                         <div class="field-icon-wrap">
                             <i class="bi bi-upc-scan f-icon"></i>
-                            <input type="text" class="field-input" id="inputCertificateNumber"
-                                   placeholder="Auto / Generate">
+                            <input type="text" class="field-input" id="inputCertificateNumber" placeholder="Auto / Generate">
                         </div>
                     </div>
 
-                    {{-- Nama Siswa --}}
                     <div class="field-item">
                         <label class="field-label">Nama Siswa <span class="req">*</span></label>
-                        <div class="field-icon-wrap position-relative">
+                        <div class="field-icon-wrap">
                             <i class="bi bi-person f-icon"></i>
-                            <input type="text" class="field-input" id="inputStudent"
-                                   placeholder="Cari nama siswa..."
-                                   onkeyup="searchStudent(this.value)" autocomplete="off">
-                            <div id="studentResult" class="search-dropdown"></div>
+                            <input type="text" class="field-input" id="inputStudent" placeholder="Input nama siswa...">
                         </div>
-                        <input type="hidden" id="inputStudentId">
-                        <div id="studentPreview"></div>
                     </div>
 
-                    {{-- Program --}}
                     <div class="field-item">
                         <label class="field-label">Program <span class="req">*</span></label>
-                        <div class="field-icon-wrap position-relative">
+                        <div class="field-icon-wrap">
                             <i class="bi bi-book f-icon"></i>
-                            <input type="text" class="field-input" id="inputProgram"
-                                   placeholder="Cari program..."
-                                   onkeyup="searchProgram(this.value)" autocomplete="off">
-                            <div id="programResult" class="search-dropdown"></div>
+                            <input type="text" class="field-input" id="inputProgram" placeholder="Input nama program">
                         </div>
-                        <input type="hidden" id="inputProgramId">
-                        <div id="programPreview"></div>
                     </div>
 
-                    {{-- Nilai & Level --}}
                     <div class="field-grid-2">
                         <div class="field-item">
                             <label class="field-label">Nilai</label>
-                            <input type="text" class="field-input" placeholder="A / B / C" id="inputGrade">
+                            <input type="text" class="field-input" id="inputGrade" placeholder="A / B / C">
                         </div>
                         <div class="field-item">
                             <label class="field-label">Level</label>
-                            <select class="field-input" id="inputLevel">
-                                <option value="">-- Pilih Level --</option>
-                                <option>Beginner</option>
-                                <option>Intermediate</option>
-                                <option>Advanced</option>
-                            </select>
+                            <input type="text" class="field-input" id="inputLevel">
                         </div>
                     </div>
 
-                    {{-- Deskripsi --}}
+                    <div class="field-item">
+                        <label class="field-label">Status</label>
+                        <select class="field-input" id="inputStatus">
+                            <option value="Draft" selected>Draft</option>
+                            <option value="Di Terbitkan">Di Terbitkan</option>
+                        </select>
+                    </div>
+
                     <div class="field-item">
                         <label class="field-label">Deskripsi</label>
-                        <textarea class="field-input" rows="3" placeholder="Deskripsi sertifikat..." id="inputDescription"></textarea>
+                        <textarea class="field-input" rows="3" id="inputDescription" placeholder="Deskripsi sertifikat..."></textarea>
                     </div>
 
                 </div>
@@ -854,7 +705,7 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn-modal-save" id="btnSave" onclick="confirmSubmit()">
+                <button type="button" class="btn-modal-save" id="btnSave" onclick="handleSubmit()">
                     <i class="bi bi-check-lg"></i>
                     <span id="btnSaveLabel">Simpan Sertifikat</span>
                 </button>
@@ -865,9 +716,9 @@
 </div>
 
 
-{{-- ══════════════════════════ MODAL DETAIL ═══════════════════════════════════ --}}
+{{-- Modal Detail --}}
 <div class="modal fade" id="modalDetail" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 460px;">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:460px;">
         <div class="modal-content">
 
             <div class="modal-header">
@@ -899,773 +750,753 @@
 
 @push('scripts')
 <script>
-// ── Konstanta URL ─────────────────────────────────────────────────────────────
-const URL_DATA     = "{{ route('admin.sertifikat.data') }}";
-const URL_STORE    = "{{ route('admin.sertifikat.store') }}";
-const URL_SHOW     = "{{ url('admin/sertifikat') }}";   // /{id}
-const URL_PRINT    = "{{ url('admin/sertifikat') }}";   // /{id}/print
-const URL_STUDENTS = "{{ route('admin.sertifikat.students') }}";
-const URL_PROGRAMS = "{{ route('admin.sertifikat.programs') }}";
-const CSRF         = "{{ csrf_token() }}";
-const URL_UPDATE   = "{{ url('admin/sertifikat') }}";   // /{id} PUT
+    // ── URL Constants ─────────────────────────────────────────────────────────
+    const URL_DATA         = "{{ route('sertifikat.data') }}";
+    const URL_STORE        = "{{ route('sertifikat.store') }}";
+    const URL_SHOW         = "{{ url('sertifikat') }}";
+    const URL_UPDATE       = "{{ url('sertifikat') }}";
+    const URL_PRINT        = "{{ url('sertifikat') }}";
+    const URL_BULK_UPDATE  = "{{ url('sertifikat/bulk-update') }}";
+    const URL_BULK_DESTROY = "{{ url('sertifikat/bulk-destroy') }}";
+    const CSRF             = "{{ csrf_token() }}";
 
-// ── State ─────────────────────────────────────────────────────────────────────
-let currentDetailId = null;
-let activeFilter    = '';
-let activeSearch    = '';
-let searchTimer     = null;
-let studentTimer    = null;
-let programTimer    = null;
+    // ── State ─────────────────────────────────────────────────────────────────
+    let currentDetailId = null;
+    let currentEditId   = null;
+    let activeFilter    = '';
+    let activeSearch    = '';
+    let searchTimer     = null;
+    let currentPage     = 1;
+    let totalPages      = 1;
+    let perPage         = 10;
+    let selectedIds     = new Set();
 
-// ── Bootstrap modals ──────────────────────────────────────────────────────────
-let modalSertifikat, modalDetail;
-document.addEventListener('DOMContentLoaded', () => {
-    modalSertifikat = new bootstrap.Modal(document.getElementById('modalSertifikat'));
-    modalDetail     = new bootstrap.Modal(document.getElementById('modalDetail'));
-    fetchData();
-});
-
-function renderTable(rows) {
-    const tbody = document.getElementById('tableBody');
-    if (!rows || rows.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10">
-            <div class="empty-state">
-                <i class="bi bi-inbox"></i>
-                <p>Tidak ada sertifikat ditemukan.</p>
-            </div>
-        </td></tr>`;
-        return;
-    }
-    tbody.innerHTML = rows.map(cert => `
-        <tr>
-            <td><span class="row-number">${cert.no}</span></td>
-            <td>
-                <div class="user-chip">
-                    <div class="user-avatar">${cert.user_name.substring(0, 2).toUpperCase()}</div>
-                    <span class="user-name">${cert.user_name}</span>
-                </div>
-            </td>
-            <td><code style="font-size:12px;background:#f1f5f9;padding:2px 7px;border-radius:5px;color:#334155;">${cert.certificate_number || "-"}</code></td>
-            <td class="td-muted">${cert.grade || "-"}</td>
-            <td class="td-muted">${cert.program_name || "-"}</td>
-            <td class="td-muted">${cert.level || "-"}</td>
-            <td class="td-muted" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${cert.description || ''}">${cert.description || "-"}</td>
-            <td class="td-muted">${cert.issued_date || "-"}</td>
-            <td>${renderBadge(cert.status)}</td>
-            <td>
-                <div class="action-wrap">
-                    <button class="act-btn act-btn-edit" onclick="onChangeStatus('${cert.id}','${cert.user_id}')" title="Ubah Status">
-                        <i class="bi bi-pencil-fill"></i>
-                    </button>
-                    <button class="act-btn act-btn-delete" onclick="onDelete('${cert.id}','${cert.user_id}')" title="Hapus">
-                        <i class="bi bi-trash-fill"></i>
-                    </button>
-                    <button class="act-btn act-btn-view" onclick="onDetail('${cert.id}')" title="Detail">
-                        <i class="bi bi-eye-fill"></i>
-                    </button>
-                    ${cert.has_file && cert.status === 'Di Terbitkan'
-                        ? `<button class="act-btn act-btn-print" onclick="onPrint('${cert.id}')" title="Cetak">
-                               <i class="bi bi-printer-fill"></i>
-                           </button>`
-                        : `<button class="act-btn act-btn-disabled" title="File belum tersedia" disabled>
-                               <i class="bi bi-printer-fill"></i>
-                           </button>`
-                    }
-                </div>
-            </td>
-        </tr>
-    `).join('');
-}
-
-function renderBadge(status) {
-    if (status === 'Di Terbitkan') return `<span class="status-badge published"><i class="bi bi-check-circle-fill"></i>${status}</span>`;
-    if (status === 'Di Proses')   return `<span class="status-badge process"><i class="bi bi-clock-fill"></i>${status}</span>`;
-    return `<span class="status-badge draft"><i class="bi bi-pencil-fill"></i>${status}</span>`;
-}
-
-let currentPage = 1;
-let totalPages  = 1;
-let perPage     = 10;
-
-async function fetchData(page = 1) {
-    currentPage = page;
-    const tbody = document.getElementById('tableBody');
-    tbody.innerHTML = `<tr><td colspan="10">
-        <div class="loading-state">
-            <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
-            Memuat data...
-        </div>
-    </td></tr>`;
-    try {
-        const params = new URLSearchParams();
-        if (activeSearch) params.set('search', activeSearch);
-        if (activeFilter) params.set('tahun',  activeFilter);
-        params.set('page',     page);
-        params.set('per_page', perPage);
-        const res  = await fetch(`${URL_DATA}?${params}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-        const json = await res.json();
-        renderTable(json.data);
-        renderPagination(json.meta);
-    } catch (e) {
-        tbody.innerHTML = `<tr><td colspan="10">
-            <div class="empty-state" style="color:#dc2626;">
-                <i class="bi bi-exclamation-circle" style="color:#dc2626;"></i>
-                <p>Gagal memuat data. Silakan refresh halaman.</p>
-            </div>
-        </td></tr>`;
-    }
-}
-
-function renderPagination(meta) {
-    if (!meta) return;
-    totalPages = meta.last_page;
-    const from  = meta.from ?? 0;
-    const to    = meta.to   ?? 0;
-    const total = meta.total ?? 0;
-
-    let pages = '';
-    const range = 2;
-    const start = Math.max(1, currentPage - range);
-    const end   = Math.min(totalPages, currentPage + range);
-
-    if (start > 1) {
-        pages += pageBtn(1, '1');
-        if (start > 2) pages += `<span style="padding:0 4px;color:#94a3b8;font-size:13px;">…</span>`;
-    }
-    for (let i = start; i <= end; i++) {
-        pages += pageBtn(i, i, i === currentPage);
-    }
-    if (end < totalPages) {
-        if (end < totalPages - 1) pages += `<span style="padding:0 4px;color:#94a3b8;font-size:13px;">…</span>`;
-        pages += pageBtn(totalPages, totalPages);
-    }
-
-    document.getElementById('paginationWrap').innerHTML = `
-        <div class="pagination-wrap">
-            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-                <span class="pagination-info">
-                    Menampilkan <b>${from}–${to}</b> dari <b>${total}</b> data
-                </span>
-                <div class="per-page-wrap">
-                    <span>Baris:</span>
-                    <select class="per-page-select" onchange="changePerPage(this.value)">
-                        ${[10, 25, 50, 100].map(n =>
-                            `<option value="${n}" ${n === perPage ? 'selected' : ''}>${n}</option>`
-                        ).join('')}
-                    </select>
-                </div>
-            </div>
-            <div class="pg-controls">
-                <button onclick="fetchData(1)" ${currentPage === 1 ? 'disabled' : ''} class="pg-btn" title="Pertama">
-                    <i class="bi bi-chevron-double-left"></i>
-                </button>
-                <button onclick="fetchData(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="pg-btn" title="Sebelumnya">
-                    <i class="bi bi-chevron-left"></i>
-                </button>
-                ${pages}
-                <button onclick="fetchData(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="pg-btn" title="Berikutnya">
-                    <i class="bi bi-chevron-right"></i>
-                </button>
-                <button onclick="fetchData(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''} class="pg-btn" title="Terakhir">
-                    <i class="bi bi-chevron-double-right"></i>
-                </button>
-            </div>
-        </div>
-    `;
-}
-
-function pageBtn(page, label, active = false) {
-    return `<button onclick="fetchData(${page})" class="pg-btn ${active ? 'pg-active' : ''}">${label}</button>`;
-}
-
-function changePerPage(val) {
-    perPage = parseInt(val);
-    fetchData(1);
-}
-
-function handleSearch(el) {
-    document.getElementById('clearSearch').style.display = el.value ? 'flex' : 'none';
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(() => { activeSearch = el.value.trim(); fetchData(); }, 500);
-}
-function clearSearchInput() {
-    document.getElementById('searchSertifikat').value = '';
-    document.getElementById('clearSearch').style.display = 'none';
-    clearTimeout(searchTimer);
-    activeSearch = '';
-    fetchData();
-}
-
-function tog(id) {
-    const btn  = document.querySelector('#' + id + ' .cs-btn');
-    const menu = document.getElementById(id + '-m');
-    const isOpen = menu.classList.contains('open');
-    closeAllCS();
-    if (!isOpen) { btn.classList.add('active'); menu.classList.add('open'); }
-}
-function pick(id, el) {
-    document.querySelectorAll('#' + id + '-m .cs-item').forEach(i => i.classList.remove('on'));
-    el.classList.add('on');
-    const val = el.getAttribute('data-value');
-    const lbl = val || 'Semua Tahun';
-    document.getElementById(id + '-lbl').textContent = lbl;
-    closeAllCS();
-    activeFilter = val;
-    fetchData();
-}
-function closeAllCS() {
-    document.querySelectorAll('.cs-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.cs-menu').forEach(m => m.classList.remove('open'));
-}
-document.addEventListener('click', e => { if (!e.target.closest('.cs')) closeAllCS(); });
-
-function openModalTambah() {
-    ['inputCertificateNumber','inputStudent','inputProgram','inputGrade','inputDescription','inputStudentId','inputProgramId']
-        .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-    document.getElementById('inputLevel').selectedIndex = 0;
-    document.getElementById('studentPreview').innerHTML = '';
-    document.getElementById('programPreview').innerHTML = '';
-    document.getElementById('studentResult').innerHTML  = '';
-    document.getElementById('programResult').innerHTML  = '';
-    modalSertifikat.show();
-}
-
-async function confirmSubmit() {
-    const userId    = document.getElementById('inputStudentId').value;
-    const programId = document.getElementById('inputProgramId').value;
-
-    if (!userId || !programId) {
-        await Swal.fire({
-            icon: 'warning',
-            title: 'Oops...',
-            text: 'Siswa dan Program wajib dipilih.',
-            confirmButtonColor: '#3b82f6',
-        });
-        return;
-    }
-    const result = await Swal.fire({
-        title: 'Simpan data?',
-        text: "Pastikan data sudah benar!",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Ya, Simpan!',
-        cancelButtonText: 'Batal',
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        reverseButtons: true,
+    // ── Bootstrap Modals ──────────────────────────────────────────────────────
+    let modalSertifikat, modalDetail;
+    document.addEventListener('DOMContentLoaded', () => {
+        modalSertifikat = new bootstrap.Modal(document.getElementById('modalSertifikat'));
+        modalDetail     = new bootstrap.Modal(document.getElementById('modalDetail'));
+        fetchData();
     });
 
-    if (!result.isConfirmed) return;
+    // ─────────────────────────────────────────────────────────────────────────
+    // TABLE
+    // ─────────────────────────────────────────────────────────────────────────
 
-    await submitFormSertifikat(userId, programId);
-}
+    function renderTable(rows) {
+        const tbody = document.getElementById('tableBody');
 
-async function submitFormSertifikat(userId, programId) {
-    const btn = document.getElementById('btnSave');
-    btn.disabled = true;
-    document.getElementById('btnSaveLabel').textContent = 'Menyimpan...';
-
-    try {
-        const res  = await fetch(URL_STORE, {
-            method: 'POST',
-            headers: {
-                'Content-Type':     'application/json',
-                'X-CSRF-TOKEN':     CSRF,
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-            body: JSON.stringify({
-                user_id:            userId,
-                program_id:         programId,
-                certificate_number: document.getElementById('inputCertificateNumber').value,
-                grade:              document.getElementById('inputGrade').value,
-                level:              document.getElementById('inputLevel').value,
-                description:        document.getElementById('inputDescription').value,
-            }),
-        });
-        const json = await res.json();
-        if (json.success) {
-            modalSertifikat.hide();
-            fetchData();
-        } else {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Peringatan',
-                text: json.message ?? 'Terjadi kesalahan.',
-                confirmButtonText: 'Oke',
-                confirmButtonColor: '#3b82f6',
-            });
-        }
-    } catch (e) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Peringatan',
-            text: 'Gagal menyimpan. Coba lagi.',
-            confirmButtonText: 'Oke',
-            confirmButtonColor: '#3b82f6',
-        });
-    } finally {
-        btn.disabled = false;
-        document.getElementById('btnSaveLabel').textContent = 'Simpan Sertifikat';
-    }
-}
-
-function searchStudent(keyword) {
-    clearTimeout(studentTimer);
-    const result = document.getElementById('studentResult');
-    if (!keyword) { result.innerHTML = ''; return; }
-
-    studentTimer = setTimeout(async () => {
-        const res   = await fetch(`${URL_STUDENTS}?search=${encodeURIComponent(keyword)}`, {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        });
-        const data  = await res.json();
-        result.innerHTML = data.length
-            ? data.map(s => `
-                <div class="search-item" onclick="selectStudent('${s.id}', '${s.name}', '${s.email}')">
-                    <div class="si-main">
-                        <div class="si-avatar">${s.name.charAt(0)}</div>
-                        <div class="si-info">
-                            <div class="si-name">${s.name}</div>
-                            <div class="si-meta">${s.email}</div>
-                        </div>
-                    </div>
-                </div>`).join('')
-            : `<div class="search-item" style="color:#94a3b8;font-size:13px;">Tidak ditemukan</div>`;
-    }, 300);
-}
-function selectStudent(id, name, email) {
-    document.getElementById('inputStudent').value   = name;
-    document.getElementById('inputStudentId').value = id;
-    document.getElementById('studentResult').innerHTML = '';
-    document.getElementById('studentPreview').innerHTML =
-        `<div class="field-preview"><i class="bi bi-check-circle-fill text-success" style="font-size:11px;"></i> Dipilih: <b>${name}</b> &mdash; ${email}</div>`;
-}
-
-function searchProgram(keyword) {
-    clearTimeout(programTimer);
-    const result = document.getElementById('programResult');
-    if (!keyword) { result.innerHTML = ''; return; }
-
-    programTimer = setTimeout(async () => {
-        const res  = await fetch(`${URL_PROGRAMS}?search=${encodeURIComponent(keyword)}`, {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        });
-        const data = await res.json();
-        result.innerHTML = data.length
-            ? data.map(p => `
-                <div class="search-item" onclick="selectProgram('${p.id}', '${p.name}', '${p.code}')">
-                    <div class="si-main">
-                        <div class="si-avatar">${p.name.charAt(0)}</div>
-                        <div class="si-info">
-                            <div class="si-name">${p.name}</div>
-                            <div class="si-meta">${p.code}</div>
-                        </div>
-                    </div>
-                </div>`).join('')
-            : `<div class="search-item" style="color:#94a3b8;font-size:13px;">Tidak ditemukan</div>`;
-    }, 300);
-}
-function selectProgram(id, name, code) {
-    document.getElementById('inputProgram').value   = name;
-    document.getElementById('inputProgramId').value = id;
-    document.getElementById('programResult').innerHTML = '';
-    document.getElementById('programPreview').innerHTML =
-        `<div class="field-preview"><i class="bi bi-check-circle-fill text-success" style="font-size:11px;"></i> Dipilih: <b>${name}</b> &mdash; ${code}</div>`;
-}
-
-async function onDetail(id) {
-    currentDetailId = id;
-    document.getElementById('detailBody').innerHTML = `
-        <div class="loading-state">
-            <div class="spinner-border spinner-border-sm text-primary"></div>
-        </div>`;
-    document.getElementById('btnPrintFromDetail').style.display = 'none';
-    modalDetail.show();
-
-    try {
-        const res  = await fetch(`${URL_SHOW}/${id}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-        const json = await res.json();
-        if (!json.success) throw new Error();
-        const d = json.data;
-
-        document.getElementById('detailBody').innerHTML = `
-            <div style="display:flex;align-items:center;gap:16px;padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid #f1f5f9;">
-                ${d.file_path
-                    ? `<img src="${d.file_path}" class="cert-img-preview" alt="Sertifikat" />`
-                    : `<div class="cert-no-img"><i class="bi bi-award"></i></div>`}
-                <div>
-                    <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#0f172a;margin-bottom:3px;">${d.user_name}</div>
-                    <div style="font-size:12px;color:#64748b;">${d.user_email}</div>
-                    <div style="margin-top:8px;">${renderBadge(d.status)}</div>
+        if (!rows || rows.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="11">
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <p>Tidak ada sertifikat ditemukan.</p>
                 </div>
-            </div>
-            <div class="detail-row"><div class="detail-label">No. Sertifikat</div><div class="detail-value"><code style="background:#f1f5f9;padding:2px 8px;border-radius:5px;font-size:12.5px;">${d.certificate_number}</code></div></div>
-            <div class="detail-row"><div class="detail-label">Program</div><div class="detail-value">${d.program_name} <span style="color:#94a3b8;">(${d.program_code})</span></div></div>
-            <div class="detail-row"><div class="detail-label">Nilai</div><div class="detail-value">${d.grade}</div></div>
-            <div class="detail-row"><div class="detail-label">Deskripsi</div><div class="detail-value">${d.description}</div></div>
-            <div class="detail-row"><div class="detail-label">Tanggal Terbit</div><div class="detail-value">${d.issued_date}</div></div>
-        `;
-
-        if (d.has_file && d.status === 'Di Terbitkan') {
-            document.getElementById('btnPrintFromDetail').style.display = 'inline-flex';
-        }
-    } catch (e) {
-        document.getElementById('detailBody').innerHTML =
-            `<div class="empty-state" style="color:#dc2626;"><i class="bi bi-exclamation-circle"></i><p>Gagal memuat detail.</p></div>`;
-    }
-}
-
-async function generateCertNumber(certId) {
-    const btn = document.getElementById('btnGenerate');
-    if (btn) { btn.disabled = true; btn.textContent = '...'; }
-
-    try {
-        const res  = await fetch(`${URL_UPDATE}/generate-cert-number`, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN':     CSRF,
-            },
-        });
-        const json = await res.json();
-        const input = document.getElementById('swalCertNumber');
-        if (json.success && input) {
-            input.value = json.certificate_number;
-        } else {
-            Swal.showValidationMessage(json.message ?? 'Gagal generate nomor.');
-        }
-    } catch {
-        Swal.showValidationMessage('Terjadi kesalahan saat generate nomor.');
-    } finally {
-        if (btn) { btn.disabled = false; btn.textContent = 'Generate'; }
-    }
-}
-
-async function onChangeStatus(id, userId) {
-    currentDetailId = id;
-    Swal.fire({
-        title: 'Memuat data...',
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading(),
-    });
-
-    try {
-        const res  = await fetch(`${URL_SHOW}/${id}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-        const json = await res.json();
-        if (!json.success) throw new Error();
-        Swal.close();
-
-        const d        = json.data;
-        const programs = json.programs ?? [];
-        if (d.status === 'Di Terbitkan') {
-            Swal.fire({
-                icon: 'info',
-                title: 'Tidak Dapat Diubah',
-                html: `Sertifikat <b>${d.certificate_number}</b> atas nama <b>${d.user_name}</b>
-                       sudah diterbitkan dan tidak dapat diubah kembali.`,
-                confirmButtonText: 'Mengerti',
-                confirmButtonColor: '#3b82f6',
-                customClass: { popup: 'swal-popup-custom' },
-            });
+            </td></tr>`;
+            toggleBulkActionBar();
             return;
         }
 
-        const statuses     = ['Draft', 'Di Proses', 'Di Terbitkan'];
-        const radioOptions = statuses.map(s => `
-            <label style="
-                display:flex; align-items:center; gap:12px;
-                padding:10px 14px; border-radius:10px; cursor:pointer;
-                border:1.5px solid ${d.status === s ? '#3b82f6' : '#e2e8f0'};
-                background:${d.status === s ? '#eff6ff' : '#fff'};
-                margin-bottom:8px; transition:all .2s;
-            " onclick="highlightStatus(this)">
-                <input type="radio" name="certStatus" value="${s}"
-                    ${d.status === s ? 'checked' : ''}
-                    style="accent-color:#3b82f6; width:16px; height:16px;">
-                <span style="display:flex; flex-direction:column; align-items:flex-start;">
-                    <span style="font-weight:600; font-size:13px; color:#111827;">${s}</span>
-                    <span style="font-size:11px; color:#6b7280;">${statusDesc(s)}</span>
-                </span>
-            </label>
-        `).join('');
+        tbody.innerHTML = rows.map(cert => {
+            const printable   = cert.file_path && cert.status === 'Di Terbitkan';
+            const isPublished = cert.status === 'Di Terbitkan';
 
-        const programOptions = programs.map(p =>
-            `<option value="${p.id}" ${p.name === d.program_name ? 'selected' : ''}>${p.name} (${p.code})</option>`
-        ).join('');
-
-        const levels = ['Beginner', 'Intermediate', 'Advanced'];
-        const selectedLevel = (d.level && d.level !== '-' ? d.level : '').trim().toLowerCase();
-        const levelOptions = levels.map(lv => {
-            const isSelected = selectedLevel === lv.toLowerCase();
-            return `<option value="${lv}" ${isSelected ? 'selected' : ''}>${lv}</option>`;
+            return `
+            <tr>
+                <td>
+                    <input type="checkbox" class="row-check" value="${cert.id}" onchange="handleSelect(this)">
+                </td>
+                <td><span class="row-number">${cert.no}</span></td>
+                <td>
+                    <div class="user-chip">
+                        <div class="user-avatar">${(cert.username || '-').substring(0, 2).toUpperCase()}</div>
+                        <span class="user-name">${cert.username || '-'}</span>
+                    </div>
+                </td>
+                <td><code style="font-size:12px;background:#f1f5f9;padding:2px 7px;border-radius:5px;color:#334155;">${cert.certificate_number || '-'}</code></td>
+                <td class="td-muted">${cert.grade || '-'}</td>
+                <td class="td-muted">${cert.program_name || '-'}</td>
+                <td class="td-muted">${cert.publication_date || '-'}</td>
+                <td>${renderBadge(cert.status)}</td>
+                <td>
+                    <div class="action-wrap">
+                        ${!isPublished
+                            ? `<button class="act-btn act-btn-edit" onclick="openEditModal('${cert.id}')" title="Edit">
+                                   <i class="bi bi-pencil-fill"></i>
+                               </button>`
+                            : ''}
+                        <button class="act-btn act-btn-delete" onclick="onDelete('${cert.id}')" title="Hapus">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
+                        <button class="act-btn act-btn-view" onclick="onDetail('${cert.id}')" title="Detail">
+                            <i class="bi bi-eye-fill"></i>
+                        </button>
+                        ${printable
+                            ? `<button class="act-btn act-btn-print" onclick="onPrint('${cert.id}')" title="Cetak">
+                                   <i class="bi bi-printer-fill"></i>
+                               </button>`
+                            : `<button class="act-btn act-btn-disabled" title="File belum tersedia" disabled>
+                                   <i class="bi bi-printer-fill"></i>
+                               </button>`}
+                    </div>
+                </td>
+            </tr>`;
         }).join('');
 
-        const inputStyle = 'width:100%;border:1.5px solid #e2e8f0;border-radius:9px;padding:8px 12px;font-size:13px;color:#374151;outline:none;background:#fff;';
-        const labelStyle = 'font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;';
-        const wrapStyle  = 'margin-bottom:10px;';
+        restoreCheckboxState();
+    }
 
-        Swal.fire({
-            title: `<span style="font-size:15px;font-weight:700;">Ubah Sertifikat</span>`,
-            html: `
-                <p style="font-size:12px;color:#6b7280;margin-bottom:14px;">
-                    Siswa: <b>${d.user_name}</b>
-                </p>
-                <div id="statusOptions" style="margin-bottom:14px;text-align:left;">${radioOptions}</div>
-                <div style="text-align:left;">
-                    <div style="${wrapStyle}">
-                        <label style="${labelStyle}">Nomor Sertifikat <span style="color:#ef4444;">*</span>
-                            <span style="font-weight:400;color:#6b7280;"> (wajib jika Di Terbitkan)</span>
-                        </label>
-                        <div style="display:flex;gap:6px;">
-                            <input id="swalCertNumber" type="text"
-                                value="${d.certificate_number !== '-' ? d.certificate_number : ''}"
-                                placeholder="Nomor sertifikat..."
-                                style="flex:1;border:1.5px solid #e2e8f0;border-radius:9px;padding:8px 12px;font-size:13px;color:#374151;outline:none;">
-                            <button id="btnGenerate" type="button"
-                                onclick="generateCertNumber(${id})"
-                                style="border:none;background:#3b82f6;color:#fff;border-radius:9px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">
-                                Generate
-                            </button>
-                        </div>
-                    </div>
-                    <div style="${wrapStyle}">
-                        <label style="${labelStyle}">Program <span style="color:#ef4444;">*</span></label>
-                        <select id="swalProgramId" style="${inputStyle}">
-                            <option value="">-- Pilih Program --</option>
-                            ${programOptions}
+    function renderBadge(status) {
+        if (status === 'Di Terbitkan') return `<span class="status-badge published"><i class="bi bi-check-circle-fill"></i>${status}</span>`;
+        if (status === 'Di Proses')    return `<span class="status-badge process"><i class="bi bi-clock-fill"></i>${status}</span>`;
+        return `<span class="status-badge draft"><i class="bi bi-pencil-fill"></i>${status}</span>`;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // FETCH & PAGINATION
+    // ─────────────────────────────────────────────────────────────────────────
+
+    async function fetchData(page = 1) {
+        currentPage = page;
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = `<tr><td colspan="10">
+            <div class="loading-state">
+                <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                Memuat data...
+            </div>
+        </td></tr>`;
+
+        try {
+            const params = new URLSearchParams();
+            if (activeSearch) params.set('search', activeSearch);
+            if (activeFilter) {
+                const tahun = activeFilter.split('/')[0].trim();
+                params.set('tahun', tahun);
+            }
+            params.set('page',     page);
+            params.set('per_page', perPage);
+
+            const res  = await fetch(`${URL_DATA}?${params}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            const json = await res.json();
+            renderTable(json.data);
+            renderPagination(json.meta);
+        } catch {
+            tbody.innerHTML = `<tr><td colspan="10">
+                <div class="empty-state" style="color:#dc2626;">
+                    <i class="bi bi-exclamation-circle" style="color:#dc2626;"></i>
+                    <p>Gagal memuat data. Silakan refresh halaman.</p>
+                </div>
+            </td></tr>`;
+        }
+    }
+
+    function renderPagination(meta) {
+        if (!meta) return;
+        totalPages = meta.last_page;
+        const from  = meta.from  ?? 0;
+        const to    = meta.to    ?? 0;
+        const total = meta.total ?? 0;
+
+        let pages = '';
+        const range = 2;
+        const start = Math.max(1, currentPage - range);
+        const end   = Math.min(totalPages, currentPage + range);
+
+        if (start > 1) {
+            pages += pageBtn(1, '1');
+            if (start > 2) pages += `<span style="padding:0 4px;color:#94a3b8;font-size:13px;">…</span>`;
+        }
+        for (let i = start; i <= end; i++) pages += pageBtn(i, i, i === currentPage);
+        if (end < totalPages) {
+            if (end < totalPages - 1) pages += `<span style="padding:0 4px;color:#94a3b8;font-size:13px;">…</span>`;
+            pages += pageBtn(totalPages, totalPages);
+        }
+
+        document.getElementById('paginationWrap').innerHTML = `
+            <div class="pagination-wrap">
+                <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+                    <span class="pagination-info">
+                        Menampilkan <b>${from}–${to}</b> dari <b>${total}</b> data
+                    </span>
+                    <div class="per-page-wrap">
+                        <span>Baris:</span>
+                        <select class="per-page-select" onchange="changePerPage(this.value)">
+                            ${[10, 25, 50, 100].map(n =>
+                                `<option value="${n}" ${n === perPage ? 'selected' : ''}>${n}</option>`
+                            ).join('')}
                         </select>
                     </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;${wrapStyle}">
-                        <div>
-                            <label style="${labelStyle}">Nilai <span style="color:#ef4444;">*</span>
-                                <span style="font-weight:400;color:#6b7280;">(wajib Di Terbitkan)</span>
-                            </label>
-                            <input id="swalGrade" type="text"
-                                value="${d.grade !== '-' ? d.grade : ''}"
-                                placeholder="A / B / C"
-                                style="${inputStyle}">
-                        </div>
-                        <div>
-                            <label style="${labelStyle}">Level <span style="color:#ef4444;">*</span>
-                                <span style="font-weight:400;color:#6b7280;">(wajib Di Terbitkan)</span>
-                            </label>
-                            <select id="swalLevel" style="${inputStyle}">
-                                <option value="">-- Pilih Level --</option>
-                                ${levelOptions}
-                            </select>
-                        </div>
-                    </div>
-                    <div>
-                        <label style="${labelStyle}">Deskripsi</label>
-                        <textarea id="swalDescription" rows="2"
-                            placeholder="Deskripsi sertifikat..."
-                            style="${inputStyle}resize:vertical;"
-                        >${d.description !== '-' ? d.description : ''}</textarea>
-                    </div>
                 </div>
-            `,
+                <div class="pg-controls">
+                    <button onclick="fetchData(1)" ${currentPage === 1 ? 'disabled' : ''} class="pg-btn" title="Pertama">
+                        <i class="bi bi-chevron-double-left"></i>
+                    </button>
+                    <button onclick="fetchData(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="pg-btn" title="Sebelumnya">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    ${pages}
+                    <button onclick="fetchData(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="pg-btn" title="Berikutnya">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                    <button onclick="fetchData(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''} class="pg-btn" title="Terakhir">
+                        <i class="bi bi-chevron-double-right"></i>
+                    </button>
+                </div>
+            </div>`;
+    }
+
+    function pageBtn(page, label, active = false) {
+        return `<button onclick="fetchData(${page})" class="pg-btn ${active ? 'pg-active' : ''}">${label}</button>`;
+    }
+
+    function changePerPage(val) {
+        perPage = parseInt(val);
+        fetchData(1);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // SEARCH & FILTER
+    // ─────────────────────────────────────────────────────────────────────────
+
+    function handleSearch(el) {
+        document.getElementById('clearSearch').style.display = el.value ? 'flex' : 'none';
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => { activeSearch = el.value.trim(); fetchData(); }, 500);
+    }
+
+    function clearSearchInput() {
+        document.getElementById('searchSertifikat').value = '';
+        document.getElementById('clearSearch').style.display = 'none';
+        clearTimeout(searchTimer);
+        activeSearch = '';
+        fetchData();
+    }
+
+    function tog(id) {
+        const btn    = document.querySelector('#' + id + ' .cs-btn');
+        const menu   = document.getElementById(id + '-m');
+        const isOpen = menu.classList.contains('open');
+        closeAllCS();
+        if (!isOpen) { btn.classList.add('active'); menu.classList.add('open'); }
+    }
+
+    function pick(id, el) {
+        document.querySelectorAll('#' + id + '-m .cs-item').forEach(i => i.classList.remove('on'));
+        el.classList.add('on');
+        const val = el.getAttribute('data-value');
+        document.getElementById(id + '-lbl').textContent = val || 'Semua Tahun';
+        closeAllCS();
+        activeFilter = val;
+        fetchData();
+    }
+
+    function closeAllCS() {
+        document.querySelectorAll('.cs-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.cs-menu').forEach(m => m.classList.remove('open'));
+    }
+
+    document.addEventListener('click', e => { if (!e.target.closest('.cs')) closeAllCS(); });
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // BULK SELECTION
+    // ─────────────────────────────────────────────────────────────────────────
+
+    function handleSelect(cb) {
+        if (cb.checked) selectedIds.add(cb.value);
+        else selectedIds.delete(cb.value);
+        toggleBulkActionBar();
+    }
+
+    function toggleBulkActionBar() {
+        const bar   = document.getElementById('bulkActionBar');
+        const count = document.getElementById('bulkCount');
+        if (!bar) return;
+
+        if (selectedIds.size > 0) {
+            bar.style.display  = 'block';
+            count.textContent  = `${selectedIds.size} item dipilih`;
+        } else {
+            bar.style.display = 'none';
+        }
+    }
+
+    function clearSelection() {
+        selectedIds.clear();
+        document.querySelectorAll('.row-check').forEach(cb => cb.checked = false);
+        toggleBulkActionBar();
+    }
+
+    function restoreCheckboxState() {
+        document.querySelectorAll('.row-check').forEach(cb => {
+            cb.checked = selectedIds.has(cb.value);
+        });
+        toggleBulkActionBar();
+    }
+
+    function afterBulkSuccess(message) {
+        selectedIds.clear();
+        document.querySelectorAll('.row-check').forEach(cb => cb.checked = false);
+        toggleBulkActionBar();
+        Swal.fire({
+            icon: 'success', title: 'Berhasil!', text: message,
+            timer: 1800, showConfirmButton: false,
+            customClass: { popup: 'swal-popup-custom' },
+        });
+        fetchData(currentPage);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // BULK ACTIONS
+    // ─────────────────────────────────────────────────────────────────────────
+
+    async function bulkUpdateStatus() {
+        if (selectedIds.size === 0) return;
+
+        await Swal.fire({
+            title: `<span style="font-size:15px;font-weight:700;">${selectedIds.size} Item Dipilih</span>`,
+            html: `
+                <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+                    <button style="padding:12px 16px;border-radius:10px;border:1.5px solid #e2e8f0;
+                                   background:#fff;cursor:pointer;font-size:13px;font-weight:600;
+                                   color:#1d4ed8;text-align:left;transition:all .2s;"
+                            onmouseenter="this.style.borderColor='#3b82f6';this.style.background='#eff6ff'"
+                            onmouseleave="this.style.borderColor='#e2e8f0';this.style.background='#fff'"
+                            onclick="Swal.close(); setTimeout(() => doBulkUpdateStatus(), 100)">
+                        <i class="bi bi-arrow-repeat me-2"></i> Update Status
+                    </button>
+                    <button style="padding:12px 16px;border-radius:10px;border:1.5px solid #e2e8f0;
+                                   background:#fff;cursor:pointer;font-size:13px;font-weight:600;
+                                   color:#dc2626;text-align:left;transition:all .2s;"
+                            onmouseenter="this.style.borderColor='#ef4444';this.style.background='#fef2f2'"
+                            onmouseleave="this.style.borderColor='#e2e8f0';this.style.background='#fff'"
+                            onclick="Swal.close(); setTimeout(() => doBulkDestroy(), 100)">
+                        <i class="bi bi-trash me-2"></i> Hapus Data
+                    </button>
+                    <button style="padding:12px 16px;border-radius:10px;border:1.5px solid #e2e8f0;
+                                   background:#fff;cursor:pointer;font-size:13px;font-weight:600;
+                                   color:#d97706;text-align:left;transition:all .2s;"
+                            onmouseenter="this.style.borderColor='#d97706';this.style.background='#fffbeb'"
+                            onmouseleave="this.style.borderColor='#e2e8f0';this.style.background='#fff'"
+                            onclick="Swal.close(); setTimeout(() => doBulkPrint(), 100)">
+                        <i class="bi bi-printer-fill me-2"></i> Print
+                    </button>
+                </div>`,
+            showConfirmButton: false,
+            showCancelButton:  true,
+            cancelButtonText:  'Batal',
+            customClass: { popup: 'swal-popup-custom', cancelButton: 'swal-cancel-custom' },
+        });
+    }
+
+    async function doBulkUpdateStatus() {
+        const statuses     = ['Draft', 'Di Terbitkan'];
+        const radioOptions = statuses.map(s => `
+            <label style="display:flex;align-items:center;gap:12px;padding:10px 14px;
+                   border-radius:10px;cursor:pointer;border:1.5px solid #e2e8f0;
+                   background:#fff;margin-bottom:8px;transition:all .2s;"
+                   onclick="highlightStatus(this)">
+                <input type="radio" name="bulkStatus" value="${s}" style="accent-color:#3b82f6;width:16px;height:16px;">
+                <span style="display:flex;flex-direction:column;">
+                    <span style="font-weight:600;font-size:13px;color:#111827;">${s}</span>
+                    <span style="font-size:11px;color:#6b7280;">${statusDesc(s)}</span>
+                </span>
+            </label>`).join('');
+
+        Swal.fire({
+            title: `<span style="font-size:15px;font-weight:700;">Update Status</span>`,
+            html: `
+                <p style="font-size:12px;color:#6b7280;margin-bottom:14px;">
+                    <b>${selectedIds.size}</b> sertifikat dipilih
+                </p>
+                <div id="statusOptions" style="text-align:left;">${radioOptions}</div>`,
             showCancelButton:   true,
-            confirmButtonText:  '<i class="bi bi-check-lg"></i> Simpan',
+            confirmButtonText:  '<i class="bi bi-check-lg"></i> Terapkan',
             cancelButtonText:   'Batal',
             confirmButtonColor: '#3b82f6',
             cancelButtonColor:  '#e2e8f0',
-            customClass: {
-                cancelButton: 'swal-cancel-custom',
-                popup:        'swal-popup-custom',
-            },
-            didOpen: () => {
-                const style = document.createElement('style');
-                style.innerHTML = `
-                    .swal-cancel-custom { color: #374151 !important; font-weight: 600 !important; }
-                    .swal-popup-custom  { border-radius: 16px !important; }
-                `;
-                document.head.appendChild(style);
-            },
+            customClass: { cancelButton: 'swal-cancel-custom', popup: 'swal-popup-custom' },
             preConfirm: async () => {
-                const selected = document.querySelector('input[name="certStatus"]:checked');
-                if (!selected) {
-                    Swal.showValidationMessage('Pilih salah satu status terlebih dahulu.');
-                    return false;
-                }
-
-                const popup = Swal.getPopup();
-                const certNumber  = popup.querySelector('#swalCertNumber')?.value.trim() ?? '';
-                const programId   = popup.querySelector('#swalProgramId')?.value ?? '';
-                const grade       = popup.querySelector('#swalGrade')?.value ?? '';
-                const level       = popup.querySelector('#swalLevel')?.value ?? '';
-                const description = popup.querySelector('#swalDescription')?.value.trim() ?? '';
+                const selected = document.querySelector('input[name="bulkStatus"]:checked');
+                if (!selected) { Swal.showValidationMessage('Pilih salah satu status.'); return false; }
 
                 if (selected.value === 'Di Terbitkan') {
-                    if (!certNumber) {
-                        Swal.showValidationMessage('Nomor sertifikat wajib diisi untuk status Di Terbitkan.');
-                        return false;
-                    }
-                    if (!programId) {
-                        Swal.showValidationMessage('Program wajib dipilih untuk status Di Terbitkan.');
-                        return false;
-                    }
-                    if (!grade) {
-                        Swal.showValidationMessage('Nilai wajib diisi untuk status Di Terbitkan.');
-                        return false;
-                    }
-                    if (!level) {
-                        Swal.showValidationMessage('Level wajib dipilih untuk status Di Terbitkan.');
-                        return false;
-                    }
-
                     const konfirmasi = await Swal.fire({
                         icon: 'warning',
                         title: 'Yakin menerbitkan?',
-                        html: `Status <b>Di Terbitkan</b> bersifat permanen dan
-                               <b>tidak dapat diubah kembali</b>.<br>
-                               Pastikan semua data sudah benar sebelum melanjutkan.`,
+                        html: 'Status <b>Di Terbitkan</b> bersifat permanen.',
                         showCancelButton:   true,
                         confirmButtonText:  'Ya, Terbitkan!',
                         cancelButtonText:   'Tinjau Ulang',
                         confirmButtonColor: '#22c55e',
                         cancelButtonColor:  '#e2e8f0',
-                        customClass: {
-                            cancelButton: 'swal-cancel-custom',
-                            popup:        'swal-popup-custom',
-                        },
+                        customClass: { cancelButton: 'swal-cancel-custom', popup: 'swal-popup-custom' },
                     });
                     if (!konfirmasi.isConfirmed) return false;
                 }
 
                 Swal.showLoading();
                 try {
-                    const r = await fetch(`${URL_UPDATE}/${id}`, {
-                        method: 'PUT',
+                    const res  = await fetch(URL_BULK_UPDATE, {
+                        method: 'POST',
                         headers: {
                             'Content-Type':     'application/json',
                             'X-CSRF-TOKEN':     CSRF,
                             'X-Requested-With': 'XMLHttpRequest',
                         },
-                        body: JSON.stringify({
-                            status:             selected.value,
-                            user_id:            userId,
-                            program_id:         programId || d.program_id,
-                            certificate_number: certNumber,
-                            grade:              grade,
-                            level:              level,
-                            description:        description,
-                        }),
+                        body: JSON.stringify({ ids: Array.from(selectedIds), status: selected.value }),
                     });
-                    const j = await r.json();
-                    if (!j.success) {
-                        Swal.showValidationMessage(j.message ?? 'Gagal menyimpan perubahan.');
-                        return false;
-                    }
-                    return j;
+                    const json = await res.json();
+                    if (!json.success) { Swal.showValidationMessage(json.message ?? 'Gagal update status.'); return false; }
+                    return json;
                 } catch {
                     Swal.showValidationMessage('Terjadi kesalahan. Coba lagi.');
                     return false;
                 }
             },
         }).then(result => {
-            if (result.isConfirmed && result.value) {
-                Swal.fire({
-                    icon:              'success',
-                    title:             'Berhasil disimpan!',
-                    text:              `Status diubah menjadi "${result.value.data?.status ?? ''}"`,
-                    timer:             1800,
-                    showConfirmButton: false,
-                    iconColor:         '#22c55e',
-                    customClass:       { popup: 'swal-popup-custom' },
-                });
-                fetchData();
-            }
-        });
-
-    } catch (e) {
-        Swal.fire({
-            icon:               'error',
-            title:              'Gagal',
-            text:               'Tidak dapat memuat data sertifikat.',
-            confirmButtonColor: '#3b82f6',
+            if (result.isConfirmed && result.value) afterBulkSuccess('Status berhasil diperbarui.');
         });
     }
-}
 
-async function onDelete(id, userId) {
-    currentDetailId = id;
-
-    const confirm = await Swal.fire({
-        title: 'Hapus Data?',
-        text: "Data sertifikat akan dihapus permanen!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#ef4444',
-        cancelButtonColor: '#e2e8f0',
-        confirmButtonText: 'Ya, Hapus',
-        cancelButtonText: 'Batal',
-        customClass: { popup: 'swal-popup-custom' }
-    });
-
-    if (!confirm.isConfirmed) return;
-
-    Swal.fire({
-        title: 'Menghapus...',
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading(),
-    });
-
-    try {
-        const res = await fetch(`${URL_UPDATE}/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': CSRF,
-                'X-Requested-With': 'XMLHttpRequest',
-            }
+    async function doBulkDestroy() {
+        const konfirmasi = await Swal.fire({
+            icon: 'warning',
+            title: 'Hapus Data?',
+            html: `<b>${selectedIds.size}</b> sertifikat akan dihapus permanen.`,
+            showCancelButton:   true,
+            confirmButtonText:  'Ya, Hapus!',
+            cancelButtonText:   'Batal',
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor:  '#e2e8f0',
+            customClass: { cancelButton: 'swal-cancel-custom', popup: 'swal-popup-custom' },
         });
+        if (!konfirmasi.isConfirmed) return;
 
-        const json = await res.json();
+        Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-        if (!json.success) {
-            throw new Error(json.message || 'Gagal menghapus data');
+        try {
+            const res  = await fetch(URL_BULK_DESTROY, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type':     'application/json',
+                    'X-CSRF-TOKEN':     CSRF,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({ ids: Array.from(selectedIds) }),
+            });
+            const json = await res.json();
+            if (!json.success) throw new Error(json.message ?? 'Gagal menghapus.');
+            afterBulkSuccess('Data berhasil dihapus.');
+        } catch (e) {
+            Swal.fire({ icon: 'error', title: 'Gagal', text: e.message });
+        }
+    }
+
+    async function doBulkPrint() {
+        const konfirmasi = await Swal.fire({
+            icon: 'info',
+            title: 'Print Data?',
+            html: `<b>${selectedIds.size}</b> sertifikat yang di pilih akan di print.`,
+            showCancelButton:   true,
+            confirmButtonText:  'Ya!',
+            cancelButtonText:   'Batal',
+            confirmButtonColor: '#3b82f6',
+            cancelButtonColor:  '#e2e8f0',
+            customClass: { cancelButton: 'swal-cancel-custom', popup: 'swal-popup-custom' },
+        });
+        if (!konfirmasi.isConfirmed) return;
+
+        Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        try {
+            const res  = await fetch(URL_BULK_DESTROY, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type':     'application/json',
+                    'X-CSRF-TOKEN':     CSRF,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({ ids: Array.from(selectedIds) }),
+            });
+            const json = await res.json();
+            if (!json.success) throw new Error(json.message ?? 'Gagal menghapus.');
+            afterBulkSuccess('Data berhasil dihapus.');
+        } catch (e) {
+            Swal.fire({ icon: 'error', title: 'Gagal', text: e.message });
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // FORM (Create / Edit)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    function getFormData() {
+        return {
+            certificateNumber: document.getElementById('inputCertificateNumber').value.trim(),
+            username:          document.getElementById('inputStudent').value.trim(),
+            programName:       document.getElementById('inputProgram').value.trim(),
+            grade:             document.getElementById('inputGrade').value.trim(),
+            level:             document.getElementById('inputLevel').value.trim(),
+            status:            document.getElementById('inputStatus').value.trim(),
+            desc:              document.getElementById('inputDescription').value.trim(),
+        };
+    }
+
+    function resetForm() {
+        ['inputCertificateNumber', 'inputStudent', 'inputProgram',
+         'inputGrade', 'inputLevel', 'inputDescription']
+            .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+        document.getElementById('inputStatus').value = 'Draft';
+    }
+
+    function openCreateModal() {
+        currentEditId = null;
+        resetForm();
+        modalSertifikat.show();
+    }
+
+    async function openEditModal(id) {
+        currentEditId = id;
+
+        Swal.fire({ title: 'Memuat data...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        try {
+            const res  = await fetch(`${URL_SHOW}/${id}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            const json = await res.json();
+            if (!json.success) throw new Error();
+            Swal.close();
+
+            const d = json.data;
+
+            if (d.status === 'Di Terbitkan') {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Tidak Bisa Diedit',
+                    html: `Sertifikat <b>${d.certificate_number}</b> sudah diterbitkan.`,
+                });
+                return;
+            }
+
+            document.getElementById('inputCertificateNumber').value = d.certificate_number || '';
+            document.getElementById('inputStudent').value           = d.username           || '';
+            document.getElementById('inputProgram').value           = d.program_name       || '';
+            document.getElementById('inputGrade').value             = d.grade              || '';
+            document.getElementById('inputLevel').value             = d.level              || '';
+            document.getElementById('inputDescription').value       = d.description        || '';
+            document.getElementById('inputStatus').value            = d.status             || 'Draft';
+
+            modalSertifikat.show();
+        } catch {
+            Swal.fire({ icon: 'error', title: 'Gagal', text: 'Tidak dapat memuat data.' });
+        }
+    }
+
+    async function handleSubmit() {
+        const { certificateNumber, username, programName, grade, level, status, desc } = getFormData();
+
+        if (!username || !programName) {
+            await Swal.fire({ icon: 'warning', title: 'Oops...', text: 'Nama siswa dan Program wajib diisi.' });
+            return;
         }
 
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: 'Data berhasil dihapus',
-            timer: 1500,
-            showConfirmButton: false
+        const isEdit = !!currentEditId;
+        const result = await Swal.fire({
+            title: isEdit ? 'Update data?' : 'Simpan data?',
+            icon: 'question',
+            showCancelButton:  true,
+            confirmButtonText: isEdit ? 'Ya, Update!' : 'Ya, Simpan!',
         });
+        if (!result.isConfirmed) return;
 
-        fetchData();
+        if (status === 'Di Terbitkan') {
+            const confirmPublish = await Swal.fire({
+                icon: 'warning',
+                title: 'Yakin menerbitkan?',
+                html: 'Status ini permanen & tidak bisa diedit lagi.',
+                showCancelButton:  true,
+                confirmButtonText: 'Ya, Terbitkan!',
+            });
+            if (!confirmPublish.isConfirmed) return;
+        }
 
-    } catch (error) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Gagal',
-            text: error.message || 'Terjadi kesalahan saat menghapus data'
-        });
+        await submitData({ certificateNumber, username, programName, grade, level, status, desc });
     }
-}
 
-function statusDesc(s) {
-    if (s === 'Draft')        return 'Sertifikat belum diproses';
-    if (s === 'Di Proses')    return 'Sedang dalam proses penerbitan';
-    if (s === 'Di Terbitkan') return 'Sertifikat resmi telah diterbitkan';
-    return '';
-}
+    async function submitData(data) {
+        const btn = document.getElementById('btnSave');
+        btn.disabled = true;
+        document.getElementById('btnSaveLabel').textContent = 'Menyimpan...';
 
-function highlightStatus(label) {
-    document.querySelectorAll('#statusOptions label').forEach(l => {
-        l.style.borderColor = '#e2e8f0';
-        l.style.background  = '#fff';
-    });
-    label.style.borderColor = '#3b82f6';
-    label.style.background  = '#eff6ff';
-}
+        const isEdit = !!currentEditId;
+        const url    = isEdit ? `${URL_UPDATE}/${currentEditId}` : URL_STORE;
+        const method = isEdit ? 'PUT' : 'POST';
 
-function onPrint(id) {
-    currentDetailId = id;
-    doPrint();
-}
-function doPrint() {
-    if (!currentDetailId) return;
-    window.open(`${URL_PRINT}/${currentDetailId}/print`, '_blank');
-}
+        try {
+            const res  = await fetch(url, {
+                method,
+                headers: {
+                    'Content-Type':     'application/json',
+                    'X-CSRF-TOKEN':     CSRF,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({
+                    certificate_number: data.certificateNumber,
+                    username:           data.username,
+                    program_name:       data.programName,
+                    grade:              data.grade,
+                    level:              data.level,
+                    status:             data.status,
+                    description:        data.desc,
+                }),
+            });
+            const json = await res.json();
+
+            if (json.success) {
+                modalSertifikat.hide();
+                fetchData();
+            } else {
+                Swal.fire({ icon: 'warning', title: 'Peringatan', text: json.message ?? 'Terjadi kesalahan.' });
+            }
+        } catch {
+            Swal.fire({ icon: 'error', title: 'Error', text: 'Gagal menyimpan.' });
+        } finally {
+            btn.disabled = false;
+            document.getElementById('btnSaveLabel').textContent = 'Simpan Sertifikat';
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // DETAIL
+    // ─────────────────────────────────────────────────────────────────────────
+
+    async function onDetail(id) {
+        Swal.fire({ title: 'Memuat data...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        try {
+            const res  = await fetch(`${URL_SHOW}/${id}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            const json = await res.json();
+            if (!json.success) throw new Error();
+
+            const d = json.data;
+
+            Swal.fire({
+                title: 'Detail Sertifikat',
+                width: 700,
+                showCloseButton:   true,
+                confirmButtonText: 'Tutup',
+                customClass: { popup: 'swal-wide' },
+                html: `
+                    <div style="text-align:left;font-size:13px;line-height:1.6">
+                        <p><b>Username:</b> ${d.username || '-'}</p>
+                        <p><b>Certificate Number:</b> ${d.certificate_number || '-'}</p>
+                        <p><b>Program Name:</b> ${d.program_name || '-'}</p>
+                        <p><b>Grade:</b> ${d.grade || '-'}</p>
+                        <p><b>Level:</b> ${d.level || '-'}</p>
+                        <p><b>Status:</b> ${renderBadge(d.status)}</p>
+                        <hr>
+                        <p><b>Publication Date:</b> ${d.publication_date || '-'}</p>
+                        <p><b>Created At:</b> ${d.created_at || '-'}</p>
+                        <hr>
+                        <p><b>Description:</b></p>
+                        <div style="background:#f8fafc;padding:10px;border-radius:8px;">${d.description || '-'}</div>
+                        <hr>
+                        <div class="row g-3 align-items-start">
+                            <div class="col-md-4 text-center">
+                                <p class="mb-2"><b>QR Code</b></p>
+                                ${d.file_path
+                                    ? `<img src="${d.file_path}" 
+                                            alt="QR Code" 
+                                            class="img-thumbnail"
+                                            style="width:150px;height:150px;object-fit:contain;" />`
+                                    : `<span class="text-muted">-</span>`
+                                }
+                            </div>
+                            <div class="col-md-8">
+                                <p class="mb-2"><b>Digital Signature</b></p>
+
+                                <textarea class="form-control" 
+                                        readonly 
+                                        rows="5"
+                                        style="font-size:11px;resize:none;">
+                                        ${d.digital_signature || '-'}
+                                </textarea>
+                            </div>
+                        </div>
+                    </div>`
+            });
+        } catch {
+            Swal.fire({ icon: 'error', title: 'Gagal', text: 'Tidak dapat memuat detail data.' });
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // DELETE
+    // ─────────────────────────────────────────────────────────────────────────
+
+    async function onDelete(id) {
+        currentDetailId = id;
+
+        const confirm = await Swal.fire({
+            title: 'Hapus Data?',
+            text: 'Data sertifikat akan dihapus permanen!',
+            icon: 'warning',
+            showCancelButton:   true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor:  '#e2e8f0',
+            confirmButtonText:  'Ya, Hapus',
+            cancelButtonText:   'Batal',
+            customClass: { popup: 'swal-popup-custom' },
+        });
+        if (!confirm.isConfirmed) return;
+
+        Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        try {
+            const res  = await fetch(`${URL_UPDATE}/${id}`, {
+                method: 'DELETE',
+                headers: { 'X-CSRF-TOKEN': CSRF, 'X-Requested-With': 'XMLHttpRequest' },
+            });
+            const json = await res.json();
+            if (!json.success) throw new Error(json.message || 'Gagal menghapus data');
+
+            Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Data berhasil dihapus', timer: 1500, showConfirmButton: false });
+            fetchData();
+        } catch (error) {
+            Swal.fire({ icon: 'error', title: 'Gagal', text: error.message || 'Terjadi kesalahan saat menghapus data' });
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // PRINT
+    // ─────────────────────────────────────────────────────────────────────────
+
+    function onPrint(id) {
+        currentDetailId = id;
+        doPrint();
+    }
+
+    function doPrint() {
+        if (!currentDetailId) return;
+        window.open(`${URL_PRINT}/${currentDetailId}/print`, '_blank');
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // HELPERS
+    // ─────────────────────────────────────────────────────────────────────────
+
+    function statusDesc(s) {
+        if (s === 'Draft')        return 'Sertifikat belum diproses';
+        if (s === 'Di Terbitkan') return 'Sertifikat resmi telah diterbitkan';
+        return '';
+    }
+
+    function highlightStatus(label) {
+        document.querySelectorAll('#statusOptions label').forEach(l => {
+            l.style.borderColor = '#e2e8f0';
+            l.style.background  = '#fff';
+        });
+        label.style.borderColor = '#3b82f6';
+        label.style.background  = '#eff6ff';
+    }
 </script>
 @endpush

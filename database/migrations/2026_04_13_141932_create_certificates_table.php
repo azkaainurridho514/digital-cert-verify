@@ -6,30 +6,24 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('certificates', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('user_id');
+            $table->string('username');
             $table->string('certificate_number')->nullable()->unique();
-            $table->uuid('program_id')->nullable();
-            $table->text('description')->nullable();
+            $table->string('program_name');
             $table->string('grade')->nullable();
             $table->string('level')->nullable();
-            $table->dateTime('issued_date')->nullable();
+            $table->dateTime('publication_date')->nullable();
             $table->string('file_path')->nullable();
-            $table->enum('status', ['Draft', 'Di Proses', 'Di Terbitkan'])->default('Draft');
-            $table->string('created_by');
-            $table->timestamps();
+            $table->text('digital_signature')->nullable();
+            $table->enum('status', ['Draft', 'Di Terbitkan'])->default('Draft');
+            $table->text('description')->nullable();
+            $table->dateTime('created_at');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('certificates');

@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('certificates', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->uuid('ids');
             $table->string('username');
             $table->string('certificate_number')->nullable()->unique();
             $table->string('program_name');
@@ -20,6 +21,7 @@ return new class extends Migration
             $table->text('digital_signature')->nullable();
             $table->enum('status', ['Draft', 'Di Terbitkan'])->default('Draft');
             $table->text('description')->nullable();
+            $table->boolean('is_delete')->default(false);
             $table->dateTime('created_at');
         });
     }

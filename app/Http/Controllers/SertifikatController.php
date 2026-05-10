@@ -103,7 +103,8 @@ class SertifikatController extends Controller
             // ]);
             $text = (string) $cert->id;
             $signature = $this->ecdsa->sign($text);
-            $qr = $this->qrCodeService->generate($text);
+            $url = url('/scan?id=' . $text);
+            $qr = $this->qrCodeService->generate($url);
             $cert->update([
                 'file_path' => $qr['path'],
                 'digital_signature' => $signature->signature,
@@ -151,16 +152,17 @@ class SertifikatController extends Controller
 
             $now = now();
 
-            $message = implode('|', [
-                $request->certificate_number,
-                $request->username,
-                $request->program_name,
-                $request->grade,
-                $now->format('Y-m-d H:i:s'),
-            ]);
-
-            $signature = $this->ecdsa->sign($message);
-            $qr = $this->qrCodeService->generate($cert->id);
+            // $message = implode('|', [
+            //     $request->certificate_number,
+            //     $request->username,
+            //     $request->program_name,
+            //     $request->grade,
+            //     $now->format('Y-m-d H:i:s'),
+            // ]);
+            $text = (string) $cert->id;
+            $url = url('/scan?id=' . $text);
+            $signature = $this->ecdsa->sign($text);
+            $qr = $this->qrCodeService->generate($text);
 
             $dataUpdate['file_path'] = $qr['path'];
             $dataUpdate['digital_signature'] = $signature->signature;
@@ -201,8 +203,11 @@ class SertifikatController extends Controller
                     //     $now->format('Y-m-d H:i:s'),
                     // ]);
 
-                    $signature = $this->ecdsa->sign($cert->id);
-                    $qr = $this->qrCodeService->generate($cert->id);
+                    $text = (string) $cert->id;
+                    $signature = $this->ecdsa->sign($text);
+                    $url = url('/scan?id=' . $text);
+
+                    $qr = $this->qrCodeService->generate($url);
 
                     $dataUpdate['file_path'] = $qr['path'];
                     $dataUpdate['digital_signature'] = $signature->signature;

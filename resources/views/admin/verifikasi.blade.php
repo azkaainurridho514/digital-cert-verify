@@ -519,6 +519,188 @@
         .search-input { width: 160px; }
         .search-input:focus { width: 180px; }
     }
+
+    /* filter */
+    /* Date Wrap */
+    .date-wrap {
+        position: relative;
+    }
+
+    .date-wrap input[type="date"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+        pointer-events: none;
+    }
+
+    .date-display {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: #fff;
+        cursor: pointer;
+        font-size: 13px;
+        color: #374151;
+        min-width: 145px;
+        user-select: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
+        height: 36px;
+        box-sizing: border-box;
+    }
+
+    .date-display:hover {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
+
+    /* Custom Select */
+    .cs {
+        position: relative;
+    }
+
+    .cs-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: #fff;
+        cursor: pointer;
+        font-size: 13px;
+        color: #374151;
+        min-width: 130px;
+        height: 36px;
+        box-sizing: border-box;
+        transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .cs-btn:hover {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
+
+    .cs-btn .ico {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+    }
+
+    .cs-btn .lbl {
+        flex: 1;
+        text-align: left;
+    }
+
+    .cs-btn .arr {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+        transition: transform 0.2s;
+    }
+
+    .cs.open .arr {
+        transform: rotate(180deg);
+    }
+
+    .cs-menu {
+        display: none;
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        min-width: 160px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        z-index: 999;
+        padding: 4px;
+        max-height: 240px;
+        overflow-y: auto;
+    }
+
+    .cs.open .cs-menu {
+        display: block;
+    }
+
+    .cs-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: 6px;
+        font-size: 13px;
+        color: #374151;
+        cursor: pointer;
+        transition: background 0.1s;
+    }
+
+    .cs-item:hover {
+        background: #f3f4f6;
+    }
+
+    .cs-item.on {
+        color: #3b82f6;
+        font-weight: 500;
+    }
+
+    .cs-item .idot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: transparent;
+        flex-shrink: 0;
+    }
+
+    .cs-item.on .idot {
+        background: #3b82f6;
+    }
+
+    .cs-item .chk {
+        width: 14px;
+        height: 14px;
+        margin-left: auto;
+        opacity: 0;
+        flex-shrink: 0;
+    }
+
+    .cs-item.on .chk {
+        opacity: 1;
+    }
+
+    .cs-sep {
+        height: 1px;
+        background: #f3f4f6;
+        margin: 4px 0;
+    }
+    .btn-filter {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 16px;
+        height: 36px;
+        border: none;
+        border-radius: 8px;
+        background: #3b82f6;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.15s, box-shadow 0.15s;
+        box-sizing: border-box;
+    }
+
+    .btn-filter:hover {
+        background: #2563eb;
+        box-shadow: 0 2px 8px rgba(59,130,246,0.3);
+    }
+
+    .btn-filter:active {
+        background: #1d4ed8;
+    }
 </style>
 @endpush
 
@@ -536,32 +718,89 @@
     <div class="cert-card-header">
         <div class="header-title">Semua Verifikasi</div>
 
-        {{-- Filter Tahun --}}
-        <div class="cs" id="filterTahun">
-            <button class="cs-btn" type="button" onclick="tog('filterTahun')" style="min-width:175px;">
-                <svg class="ico" viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="#3b82f6">
-                    <rect x="3" y="4" width="18" height="18" rx="3"/>
-                    <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
-                    <line x1="3" y1="10" x2="21" y2="10"/>
-                </svg>
-                <span class="lbl" id="filterTahun-lbl">Semua Tahun</span>
-                <svg class="arr" viewBox="0 0 24 24" stroke-width="2.5" fill="none" stroke="currentColor">
-                    <polyline points="6 9 12 15 18 9"/>
-                </svg>
-            </button>
-            <div class="cs-menu" id="filterTahun-m">
-                <div class="cs-item on" data-value="" onclick="pick('filterTahun', this)">
-                    <span class="idot"></span> Semua Tahun
-                    <svg class="chk" viewBox="0 0 24 24" stroke-width="2.5" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+        @php
+            $currentYear = now()->year;
+        @endphp
+
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+
+            {{-- Filter Tahun --}}
+            <div class="cs" id="filterTahun">
+                <button class="cs-btn" type="button" onclick="tog('filterTahun')">
+                    <svg class="ico" viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="#3b82f6">
+                        <rect x="3" y="4" width="18" height="18" rx="3"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    <span class="lbl" id="filterTahun-lbl">Semua Tahun</span>
+                    <svg class="arr" viewBox="0 0 24 24" stroke-width="2.5" fill="none" stroke="currentColor">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </button>
+                <div class="cs-menu" id="filterTahun-m">
+                    <div class="cs-item on" data-value="" onclick="pick('filterTahun', this)">
+                        <span class="idot"></span> Semua Tahun
+                        <svg class="chk" viewBox="0 0 24 24" stroke-width="2.5" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <div class="cs-sep"></div>
+                    @for($y = $currentYear; $y >= 2022; $y--)
+                    <div class="cs-item" data-value="{{ $y }}" onclick="pick('filterTahun', this)">
+                        <span class="idot"></span> {{ $y }}
+                        <svg class="chk" viewBox="0 0 24 24" stroke-width="2.5" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    @endfor
                 </div>
-                <div class="cs-sep"></div>
-                @foreach(['2022 / 2023', '2023 / 2024', '2024 / 2025', '2025 / 2026'] as $tahun)
-                <div class="cs-item" data-value="{{ $tahun }}" onclick="pick('filterTahun', this)">
-                    <span class="idot"></span> {{ $tahun }}
-                    <svg class="chk" viewBox="0 0 24 24" stroke-width="2.5" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
-                </div>
-                @endforeach
             </div>
+
+            {{-- Separator --}}
+            <span style="color:#d1d5db; font-size:20px; font-weight:300;">|</span>
+
+            {{-- Start Date --}}
+            <div class="date-wrap" id="wrapStartDate">
+                <div class="date-display" id="startDisplay"
+                    onclick="document.getElementById('startDate').showPicker()"
+                    style="pointer-events:none; opacity:0.45; cursor:not-allowed;">
+                    <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="#3b82f6" width="16" height="16">
+                        <rect x="3" y="4" width="18" height="18" rx="3"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    <span id="startLabel">Pilih Tanggal</span>
+                    <svg viewBox="0 0 24 24" stroke-width="2.5" fill="none" stroke="currentColor" width="14" height="14">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </div>
+                <input type="date" id="startDate" name="start_date" disabled>
+            </div>
+
+            <span style="color:#6b7280; font-size:13px;">s/d</span>
+
+            {{-- End Date --}}
+            <div class="date-wrap" id="wrapEndDate">
+                <div class="date-display" id="endDisplay"
+                    onclick="document.getElementById('endDate').showPicker()"
+                    style="pointer-events:none; opacity:0.45; cursor:not-allowed;">
+                    <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="#3b82f6" width="16" height="16">
+                        <rect x="3" y="4" width="18" height="18" rx="3"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    <span id="endLabel">Pilih Tanggal</span>
+                    <svg viewBox="0 0 24 24" stroke-width="2.5" fill="none" stroke="currentColor" width="14" height="14">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </div>
+                <input type="date" id="endDate" name="end_date" disabled>
+            </div>
+
+            {{-- Tombol Filter --}}
+            <button type="button" class="btn-filter" onclick="triggerFetch()">
+                <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" width="15" height="15">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                Filter
+            </button>
+
         </div>
     </div>
 
@@ -574,7 +813,6 @@
                     <th>No. Sertifikat</th>
                     <th>Tanggal</th>
                     <th>IP Address</th>
-                    <th>Alamat</th>
                     <th>Device Info</th>
                     <th>Hasil</th>
                 </tr>
@@ -599,7 +837,7 @@
 @endsection
 
 @push('scripts')
-<script>
+{{-- <script>
 const URL_DATA = "{{ route('verifikasi.data') }}";
 const CSRF     = "{{ csrf_token() }}";
 
@@ -614,7 +852,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchData();
 });
 
-async function fetchData(page = 1) {
+async function fetchData(page = 1, startDate = "", endDate = "", year = "") {
     currentPage = page;
     const tbody = document.getElementById('tableBody');
 
@@ -628,10 +866,9 @@ async function fetchData(page = 1) {
     try {
         const params = new URLSearchParams();
         if (activeSearch) params.set('search', activeSearch);
-        if (activeFilter) {
-            const tahun = activeFilter.split('/')[0].trim();
-            params.set('tahun', tahun);
-        }
+        if (year)         params.set('year', year);
+        if (startDate)    params.set('start_date', startDate);
+        if (endDate)      params.set('end_date', endDate);
         params.set('page',     page);
         params.set('per_page', perPage);
 
@@ -692,8 +929,7 @@ function renderTable(rows) {
             </td>
             <td class="td-muted">${item.verified_at || '-'}</td>
             <td class="td-muted">${item.ip_address || '-'}</td>
-            <td class="td-muted">${item.address || '-'}</td>
-            <td class="td-muted">${item.device_info || '-'}</td>
+            <td class="td-muted" width="30%">${item.device_info || '-'}</td>
             <td>${getResultBadge(item.result)}</td>
         </tr>`).join('');
 }
@@ -775,5 +1011,389 @@ function changePerPage(val) {
     perPage = parseInt(val);
     fetchData(1);
 }
+
+// filter
+const BULAN = [
+    'Januari','Februari','Maret','April','Mei','Juni',
+    'Juli','Agustus','September','Oktober','November','Desember'
+];
+
+function formatTanggal(val) {
+    if (!val) return 'Pilih Tanggal';
+    const [y, m, d] = val.split('-');
+    return `${d} ${BULAN[parseInt(m) - 1]}`;
+}
+
+function tog(id) {
+    const el     = document.getElementById(id);
+    const isOpen = el.classList.contains('open');
+    document.querySelectorAll('.cs.open').forEach(e => e.classList.remove('open'));
+    if (!isOpen) el.classList.add('open');
+}
+
+function pick(id, el) {
+    const cs    = document.getElementById(id);
+    const label = document.getElementById(id + '-lbl');
+    cs.querySelectorAll('.cs-item').forEach(i => i.classList.remove('on'));
+    el.classList.add('on');
+    label.textContent = el.dataset.value
+        ? el.dataset.value
+        : (id === 'filterTahun' ? 'Semua Tahun' : 'Semua');
+    cs.classList.remove('open');
+    // tidak langsung fetch
+}
+
+document.addEventListener('click', function (e) {
+    if (!e.target.closest('.cs')) {
+        document.querySelectorAll('.cs.open').forEach(el => el.classList.remove('open'));
+    }
+});
+
+function getFilterValues() {
+    const startDate = document.getElementById('startDate').value;
+    const endDate   = document.getElementById('endDate').value;
+    const yearEl    = document.querySelector('#filterTahun .cs-item.on');
+    const year      = yearEl ? yearEl.dataset.value : '';
+    return { startDate, endDate, year };
+}
+
+function triggerFetch(page = 1) {
+    const { startDate, endDate, year } = getFilterValues();
+    fetchData(page, startDate, endDate, year);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const startDate = document.getElementById('startDate');
+    const endDate   = document.getElementById('endDate');
+    const startLbl  = document.getElementById('startLabel');
+    const endLbl    = document.getElementById('endLabel');
+
+    const today = new Date().toISOString().split('T')[0];
+
+    if (!startDate.value) startDate.value = today;
+    if (!endDate.value)   endDate.value   = today;
+
+    startLbl.textContent = formatTanggal(startDate.value);
+    endLbl.textContent   = formatTanggal(endDate.value);
+
+    // Fetch pertama saat load
+    triggerFetch();
+
+    startDate.addEventListener('change', function () {
+        startLbl.textContent = formatTanggal(this.value);
+        if (!endDate.value || endDate.value < this.value) {
+            endDate.value      = this.value;
+            endLbl.textContent = formatTanggal(this.value);
+        }
+        // tidak langsung fetch
+    });
+
+    endDate.addEventListener('change', function () {
+        if (!this.value) this.value = startDate.value;
+        endLbl.textContent = formatTanggal(this.value);
+        // tidak langsung fetch
+    });
+});
+// end filter
+</script> --}}
+
+<script>
+    const URL_DATA = "{{ route('verifikasi.data') }}";
+const CSRF     = "{{ csrf_token() }}";
+
+let activeSearch  = '';
+let searchTimer   = null;
+let currentPage   = 1;
+let totalPages    = 1;
+let perPage       = 10;
+
+// ── Filter State ──────────────────────────────────────────
+let filterStartDate = '';
+let filterEndDate   = '';
+let filterYear      = '';
+
+// ── BULAN ─────────────────────────────────────────────────
+const BULAN = [
+    'Januari','Februari','Maret','April','Mei','Juni',
+    'Juli','Agustus','September','Oktober','November','Desember'
+];
+
+function formatTanggal(val) {
+    if (!val) return '-';
+    const [y, m, d] = val.split('-');
+    return `${d} ${BULAN[parseInt(m) - 1]}`;
+}
+
+// ── Custom Select ─────────────────────────────────────────
+function tog(id) {
+    const el     = document.getElementById(id);
+    const isOpen = el.classList.contains('open');
+    document.querySelectorAll('.cs.open').forEach(e => e.classList.remove('open'));
+    if (!isOpen) el.classList.add('open');
+}
+
+function pick(id, el) {
+    const cs    = document.getElementById(id);
+    const label = document.getElementById(id + '-lbl');
+    cs.querySelectorAll('.cs-item').forEach(i => i.classList.remove('on'));
+    el.classList.add('on');
+    label.textContent = el.dataset.value
+        ? el.dataset.value
+        : (id === 'filterTahun' ? 'Semua Tahun' : 'Semua');
+    cs.classList.remove('open');
+
+    // Jika filter tahun berubah, atur enable/disable input tanggal
+    if (id === 'filterTahun') {
+        const yearSelected = !!el.dataset.value;
+        setDateInputState(yearSelected);
+    }
+}
+
+
+function setDateInputState(yearSelected) {
+    const startDisplay = document.getElementById('startDisplay');
+    const endDisplay   = document.getElementById('endDisplay');
+    const startDate    = document.getElementById('startDate');
+    const endDate      = document.getElementById('endDate');
+    const startLbl     = document.getElementById('startLabel');
+    const endLbl       = document.getElementById('endLabel');
+
+    if (!yearSelected) {
+        // Disable keduanya, reset nilai
+        startDisplay.style.pointerEvents = 'none';
+        startDisplay.style.opacity       = '0.45';
+        startDisplay.style.cursor        = 'not-allowed';
+        endDisplay.style.pointerEvents   = 'none';
+        endDisplay.style.opacity         = '0.45';
+        endDisplay.style.cursor          = 'not-allowed';
+        startDate.disabled = true;
+        endDate.disabled   = true;
+        startDate.value    = '';
+        endDate.value      = '';
+        startLbl.textContent = 'Pilih Tanggal';
+        endLbl.textContent   = 'Pilih Tanggal';
+    } else {
+        // Enable start date
+        startDisplay.style.pointerEvents = 'auto';
+        startDisplay.style.opacity       = '1';
+        startDisplay.style.cursor        = 'pointer';
+        startDate.disabled = false;
+        // End date tetap disabled sampai start date dipilih
+        if (!startDate.value) {
+            endDisplay.style.pointerEvents = 'none';
+            endDisplay.style.opacity       = '0.45';
+            endDisplay.style.cursor        = 'not-allowed';
+            endDate.disabled = true;
+        }
+    }
+}
+
+
+
+document.addEventListener('click', function (e) {
+    if (!e.target.closest('.cs')) {
+        document.querySelectorAll('.cs.open').forEach(el => el.classList.remove('open'));
+    }
+});
+
+// ── Filter ────────────────────────────────────────────────
+function getFilterValues() {
+    const startDate = document.getElementById('startDate').value;
+    const endDate   = document.getElementById('endDate').value;
+    const yearEl    = document.querySelector('#filterTahun .cs-item.on');
+    const year      = yearEl ? yearEl.dataset.value : '';
+    return { startDate, endDate, year };
+}
+
+function triggerFetch(page = 1) {
+    const { startDate, endDate, year } = getFilterValues();
+    filterStartDate = startDate;
+    filterEndDate   = endDate;
+    filterYear      = year;
+    fetchData(page);
+}
+
+// ── Fetch Data ────────────────────────────────────────────
+async function fetchData(page = 1) {
+    currentPage = page;
+    const tbody = document.getElementById('tableBody');
+
+    tbody.innerHTML = `<tr><td colspan="9">
+        <div class="loading-state">
+            <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+            Memuat data...
+        </div>
+    </td></tr>`;
+
+    try {
+        const params = new URLSearchParams();
+        if (activeSearch)   params.set('search',     activeSearch);
+        if (filterYear)     params.set('year',        filterYear);
+        if (filterStartDate) params.set('start_date', filterStartDate);
+        if (filterEndDate)   params.set('end_date',   filterEndDate);
+        params.set('page',     page);
+        params.set('per_page', perPage);
+
+        const res  = await fetch(`${URL_DATA}?${params}`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const json = await res.json();
+
+        renderTable(json.data);
+        renderPagination(json.meta);
+
+    } catch {
+        tbody.innerHTML = `<tr><td colspan="9">
+            <div class="empty-state" style="color:#dc2626;">
+                <i class="bi bi-exclamation-circle"></i>
+                <p>Gagal memuat data. Silakan refresh halaman.</p>
+            </div>
+        </td></tr>`;
+    }
+}
+
+// ── Render Table ──────────────────────────────────────────
+function getResultBadge(code) {
+    const map = {
+        1: { label: 'QR Tidak Valid',     cls: 'danger'    },
+        2: { label: 'Tidak Ditemukan',    cls: 'warning'   },
+        3: { label: 'Verifikasi Gagal',   cls: 'secondary' },
+        4: { label: 'Verifikasi Berhasil',cls: 'success'   },
+    };
+    const r = map[code];
+    return r
+        ? `<span class="badge bg-${r.cls}">${r.label}</span>`
+        : `<span class="badge bg-secondary">-</span>`;
+}
+
+function renderTable(rows) {
+    const tbody = document.getElementById('tableBody');
+
+    if (!rows || rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9">
+            <div class="empty-state">
+                <i class="bi bi-inbox"></i>
+                <p>Tidak ada data verifikasi ditemukan.</p>
+            </div>
+        </td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = rows.map(item => `
+        <tr>
+            <td><span class="row-number">${item.no}</span></td>
+            <td>
+                <code style="font-size:12px;background:#f1f5f9;
+                             padding:2px 7px;border-radius:5px;color:#334155;">
+                    ${item.certificate_number || '-'}
+                </code>
+            </td>
+            <td class="td-muted">${item.verified_at || '-'}</td>
+            <td class="td-muted">${item.ip_address || '-'}</td>
+            <td class="td-muted" width="30%">${item.device_info || '-'}</td>
+            <td>${getResultBadge(item.result)}</td>
+        </tr>`).join('');
+}
+
+// ── Render Pagination ─────────────────────────────────────
+function renderPagination(meta) {
+    if (!meta) return;
+    totalPages = meta.last_page;
+    const from  = meta.from  ?? 0;
+    const to    = meta.to    ?? 0;
+    const total = meta.total ?? 0;
+
+    let pages = '';
+    const range = 2;
+    const start = Math.max(1, currentPage - range);
+    const end   = Math.min(totalPages, currentPage + range);
+
+    if (start > 1) {
+        pages += pageBtn(1, '1');
+        if (start > 2) pages += `<span style="padding:0 4px;color:#94a3b8;font-size:13px;">…</span>`;
+    }
+    for (let i = start; i <= end; i++)
+        pages += pageBtn(i, i, i === currentPage);
+    if (end < totalPages) {
+        if (end < totalPages - 1) pages += `<span style="padding:0 4px;color:#94a3b8;font-size:13px;">…</span>`;
+        pages += pageBtn(totalPages, totalPages);
+    }
+
+    document.getElementById('paginationWrap').innerHTML = `
+    <div class="pagination-wrap">
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+            <span class="pagination-info">
+                Menampilkan <b>${from}–${to}</b> dari <b>${total}</b> data
+            </span>
+            <div class="per-page-wrap">
+                <span>Baris:</span>
+                <select class="per-page-select" onchange="changePerPage(this.value)">
+                    ${[10, 25, 50, 100].map(n =>
+                        `<option value="${n}" ${n === perPage ? 'selected' : ''}>${n}</option>`
+                    ).join('')}
+                </select>
+            </div>
+        </div>
+        <div class="pg-controls">
+            <button onclick="fetchData(1)" ${currentPage === 1 ? 'disabled' : ''} class="pg-btn" title="Pertama">
+                <i class="bi bi-chevron-double-left"></i>
+            </button>
+            <button onclick="fetchData(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="pg-btn" title="Sebelumnya">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            ${pages}
+            <button onclick="fetchData(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="pg-btn" title="Berikutnya">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+            <button onclick="fetchData(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''} class="pg-btn" title="Terakhir">
+                <i class="bi bi-chevron-double-right"></i>
+            </button>
+        </div>
+    </div>`;
+}
+
+function pageBtn(page, label, active = false) {
+    return `<button onclick="fetchData(${page})"
+        class="pg-btn ${active ? 'pg-active' : ''}">${label}</button>`;
+}
+
+function changePerPage(val) {
+    perPage = parseInt(val);
+    fetchData(1);
+}
+
+// ── Init ──────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', function () {
+    const startDate = document.getElementById('startDate');
+    const endDate   = document.getElementById('endDate');
+    const startLbl  = document.getElementById('startLabel');
+    const endLbl    = document.getElementById('endLabel');
+
+    startDate.addEventListener('change', function () {
+        startLbl.textContent = formatTanggal(this.value);
+
+        // Aktifkan end date setelah start date dipilih
+        const endDisplay = document.getElementById('endDisplay');
+        endDisplay.style.pointerEvents = 'auto';
+        endDisplay.style.opacity       = '1';
+        endDisplay.style.cursor        = 'pointer';
+        endDate.disabled = false;
+        endDate.min      = this.value; // end date tidak boleh sebelum start date
+
+        // Reset end date jika lebih kecil dari start date
+        if (endDate.value && endDate.value < this.value) {
+            endDate.value        = '';
+            endLbl.textContent   = 'Pilih Tanggal';
+        }
+    });
+
+    endDate.addEventListener('change', function () {
+        endLbl.textContent = formatTanggal(this.value);
+    });
+
+    // Load awal: semua data tanpa filter
+    fetchData(1);
+});
 </script>
 @endpush

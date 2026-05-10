@@ -66,8 +66,23 @@ class HomeController extends Controller
         $url   = $request->qr_code;
         $parts = explode('/', $url);
         $id    = end($parts);
+        $now = Carbon::now();
+        $geo     = geoip($request->ip());
+        $address = collect([
+            $geo->city,
+            $geo->state,
+            $geo->country,
+        ])->filter()->implode(', ');
 
         if (!Str::isUuid($id)) {
+            CertificateVerification::create([
+                'certificate_id' => null,
+                'verified_at'    => $now,
+                'ip_address'     => $request->ip(),
+                'address'        => $address ?: null,
+                'device_info'    => $request->device_info,
+                'result'         => VerificationResult::QR_INVALID,
+            ]);
             return response()->json([
                 'message' => VerificationResult::message(VerificationResult::QR_INVALID),
                 'data'    => [],
@@ -77,6 +92,14 @@ class HomeController extends Controller
         $certificate = Certificate::find($id);
 
         if (!$certificate) {
+            CertificateVerification::create([
+                'certificate_id' => null,
+                'verified_at'    => $now,
+                'ip_address'     => $request->ip(),
+                'address'        => $address ?: null,
+                'device_info'    => $request->device_info,
+                'result'         =>  VerificationResult::NOT_FOUND,
+            ]);
             return response()->json([
                 'message' => VerificationResult::message(VerificationResult::NOT_FOUND),
                 'data'    => [],
@@ -90,15 +113,10 @@ class HomeController extends Controller
         }
 
         $result = $signatureResult ? VerificationResult::VALID : VerificationResult::VERIFY_FAILED;
-        $geo     = geoip($request->ip());
-        $address = collect([
-            $geo->city,
-            $geo->state,
-            $geo->country,
-        ])->filter()->implode(', ');
+       
         CertificateVerification::create([
             'certificate_id' => $certificate->id,
-            'verified_at'    => Carbon::now(),
+            'verified_at'    => $now,
             'ip_address'     => $request->ip(),
             'address'        => $address ?: null,
             'device_info'    => $request->device_info,

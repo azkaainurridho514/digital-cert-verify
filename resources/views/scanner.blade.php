@@ -441,11 +441,208 @@
     </div>
   </section>
 
+
   <script>
 
   let scanner = null;
   let scanning = false;
+  let isStopping = false;
+  let isProcessed = false;
+
+  // ✅ Jalankan otomatis saat halaman dimuat jika ada ?id= di URL
+  window.addEventListener('DOMContentLoaded', function () {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    if (id) {
+      verifyQr(id);
+    }
+  });
+
+  function onScanSuccess(decodedText) {
+    if (isProcessed) return;
+    isProcessed = true;
+
+    stopScanner();
+
+    let qrCode = decodedText;
+
+    try {
+      const url = new URL(decodedText);
+      const id = url.searchParams.get("id");
+      if (id) qrCode = id;
+    } catch (e) {
+      // Bukan URL, pakai decodedText langsung
+    }
+
+    verifyQr(qrCode);
+  }
+
+  function showValid(data) {
+    $("#res-nama").text(data.username ?? '-');
+    $("#res-program").text(data.program_name ?? '-');
+    $("#res-nilai").text(data.grade ?? '-');
+    $("#res-no").text(data.certificate_number ?? '-');
+    $("#res-tanggal").text(data.publication_date ?? '-');
+
+    $("#invalidCard").hide();
+    $("#validCard").fadeIn();
+  }
+
+  function showInvalid(message = 'QR Code tidak terdaftar dalam sistem verifikasi OLC.') {
+    $("#validCard").hide();
+    $("#invalidCard").find('.invalid-message').text(message);
+    $("#invalidCard").fadeIn();
+  }
+
+  function stopScanner() {
+    if (!scanner || isStopping) return;
+    isStopping = true;
+    scanner.stop()
+      .then(() => {
+        scanning = false;
+        isStopping = false;
+        $("#toggleScan").text("Start Scan").removeClass("stop");
+        $("#scannerWrapper").hide();
+        $("#scanLine").hide();
+      })
+      .catch(err => {
+        console.warn("Stop error:", err);
+        scanning = false;
+        isStopping = false;
+      });
+  }
+
+  function verifyQr(qrCode) {
+    if (!qrCode) return;
+
+    Swal.fire({
+      title: 'Memverifikasi...',
+      text: 'Mohon tunggu sebentar',
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading()
+    });
+
+    $.ajax({
+      url: '/v/verify-qr',
+      type: 'POST',
+      data: {
+        qr_code: qrCode,
+        device_info: navigator.userAgent,
+        _token: $('meta[name="csrf-token"]').attr('content')
+      },
+      success: function (res) {
+        Swal.close();
+        showValid(res.data ?? {});
+      },
+      error: function (err) {
+        const msg = err.responseJSON?.message || 'Terjadi kesalahan';
+        const status = err.status;
+        setTimeout(() => {
+          Swal.close();
+          if (status === 400 || status === 404 || status === 401) {
+            showInvalid(msg);
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Gagal!',
+              text: msg,
+              confirmButtonColor: '#ef4444'
+            });
+          }
+        }, 1000);
+      }
+    });
+  }
+
+  $(document).ready(function () {
+    scanner = new Html5Qrcode("qr-reader");
+
+    $("#toggleScan").click(function () {
+      if (!scanning) {
+        $("#validCard").hide();
+        $("#invalidCard").hide();
+
+        Html5Qrcode.getCameras().then(devices => {
+          if (!devices || devices.length === 0) {
+            Swal.fire({ icon: 'error', title: 'Kamera tidak ditemukan', text: 'Pastikan device memiliki kamera dan izin sudah diberikan.' });
+            return;
+          }
+
+          $("#scannerWrapper").show();
+          $("#scanLine").show();
+          scanning = true;
+          isProcessed = false;
+          $("#toggleScan").text("Stop Scan").addClass("stop");
+
+          setTimeout(() => {
+            const backCamera = devices.find(d =>
+              d.label.toLowerCase().includes("back") ||
+              d.label.toLowerCase().includes("rear") ||
+              d.label.toLowerCase().includes("environment")
+            ) || devices[0];
+
+            scanner.start(
+              { deviceId: { exact: backCamera.id } },
+              {
+                fps: 15,
+                qrbox: { width: 250, height: 250 },
+                aspectRatio: 1.333,
+                disableFlip: false,
+                experimentalFeatures: { useBarCodeDetectorIfSupported: true }
+              },
+              function (decodedText) {
+                onScanSuccess(decodedText);
+              },
+              function (_errorMsg) { }
+            ).catch(err => {
+              console.error("❌ Scanner start failed:", err);
+              scanning = false;
+              isStopping = false;
+              isProcessed = false;
+              $("#toggleScan").text("Start Scan").removeClass("stop");
+              $("#scannerWrapper").hide();
+              $("#scanLine").hide();
+              Swal.fire({ icon: 'error', title: 'Gagal membuka kamera', text: String(err) });
+            });
+          }, 300);
+
+        }).catch(err => {
+          console.error("Gagal akses kamera:", err);
+          Swal.fire({ icon: 'error', title: 'Akses kamera ditolak', text: 'Berikan izin kamera pada browser Anda.' });
+        });
+
+      } else {
+        isProcessed = false;
+        stopScanner();
+      }
+    });
+  });
+
+</script>
+
+</body>
+</html>
+
+
+
+
+{{--  ==================== OLD ======================= --}}
+
+
+  {{-- <script>
+
+  let scanner = null;
+  let scanning = false;
   let isStopping = false; 
+  let isScanningUrl = true;
+
+  function onScanSuccess(decodedText) {
+      if (!isScanning) return;
+      isScanning = false;
+      const url = new URL(decodedText);
+      const id = url.searchParams.get("id");
+      verifyQr(id);
+  }
 
   function showValid(data) {
       $("#res-nama").text(data.username ?? '-');
@@ -590,7 +787,4 @@
 
   });
 
-  </script>
-
-</body>
-</html>
+  </script> --}}

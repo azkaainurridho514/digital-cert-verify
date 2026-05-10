@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('certificate_verifications', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid("certificate_id");
+            $table->uuid("certificate_id")->nullable();
             $table->datetime("verified_at");
             $table->String("ip_address");
             $table->String("address");

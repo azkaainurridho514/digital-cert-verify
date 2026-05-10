@@ -13,7 +13,6 @@ class Certificate extends Model
     public $incrementing = false; 
     public $timestamps = false;
     protected $fillable = [
-        'ids',
         'username',
         'certificate_number',
         'program_name',

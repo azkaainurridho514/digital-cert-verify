@@ -261,7 +261,7 @@ class SertifikatController extends Controller
         if ($cert->file_path) {
             
             $isProduction = app()->environment('production');
-            $templatePath = $isProduction ? '/home/cery9751/public_html/v/qrcode' : public_path($cert->file_path); 
+            $templatePath = $isProduction ? '/home/cery9751/public_html/'.$cert->file_path : public_path($cert->file_path); 
 
             if (file_exists($filePath)) {
                 unlink($filePath);
@@ -348,7 +348,7 @@ class SertifikatController extends Controller
         $qrPath = null;
         if ($cert->file_path) {
             $isProduction = app()->environment('production');
-            $qrPath = $isProduction ? '/home/cery9751/public_html/v/qrcode' : public_path($cert->file_path); 
+            $qrPath = $isProduction ? '/home/cery9751/public_html/'.$cert->file_path : public_path($cert->file_path); 
             if (!file_exists($qrPath)) {
                 $qrPath = null;
             }

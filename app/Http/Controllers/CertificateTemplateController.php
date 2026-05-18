@@ -218,7 +218,7 @@ class CertificateTemplateController extends Controller
     private function deleteImage(?string $path): void
     {
         $isProduction = app()->environment('production');
-        $fullPath = $isProduction ? '/home/cery9751/public_html/cert-templates' : public_path($path); 
+        $fullPath = $isProduction ? '/home/cery9751/public_html/'.$path : public_path($path); 
         if (file_exists($fullPath)) {
             unlink($fullPath);
         }

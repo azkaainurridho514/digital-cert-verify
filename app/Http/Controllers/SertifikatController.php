@@ -261,7 +261,7 @@ class SertifikatController extends Controller
         if ($cert->file_path) {
             
             $isProduction = app()->environment('production');
-            $templatePath = $isProduction ? '/home/cery9751/public_html/'.$cert->file_path : public_path($cert->file_path); 
+            $filePath = $isProduction ? '/home/cery9751/public_html/'.$cert->file_path : public_path($cert->file_path); 
 
             if (file_exists($filePath)) {
                 unlink($filePath);

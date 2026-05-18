@@ -339,7 +339,7 @@ class SertifikatController extends Controller
 
         // ── 3. Resolve path file template ─────────────────────────────────
         $isProduction = app()->environment('production');
-        $templatePath = $isProduction ? '/home/cery9751/public_html/cert-templates' : public_path($template->path); 
+        $templatePath = $isProduction ? '/home/cery9751/public_html/'.$template->path : public_path($template->path); 
         if (!file_exists($templatePath)) {
             return response()->json(['success' => false, 'message' => 'File template tidak ditemukan di server.'], 404);
         }

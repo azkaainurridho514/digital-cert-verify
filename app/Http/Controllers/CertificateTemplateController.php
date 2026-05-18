@@ -161,16 +161,6 @@ class CertificateTemplateController extends Controller
             'height_qr_code'           => 'required|integer',
         ]);
 
-        // ── $request->only() — GANTI yang lama dengan ini (dipakai di store & update):
-        // $request->only([
-        //     'width_template', 'height_template',
-        //     'x_position_name',         'y_position_name',         'width_position_name',     'height_position_name',
-        //     'x_position_cert_number',  'y_position_cert_number',  'width_cert_number',       'height_cert_number',
-        //     'x_position_grade',        'y_position_grade',        'width_grade',             'height_grade',
-        //     'x_position_program_name', 'y_position_program_name', 'width_program_name',      'height_program_name',
-        //     'x_position_publish_date', 'y_position_publish_date', 'width_publish_date',      'height_publish_date',
-        //     'x_position_qr_code',      'y_position_qr_code',      'width_qr_code',           'height_qr_code',
-        // ])
 
         if ($request->hasFile('image')) {
             // Hapus file lama dulu
@@ -213,7 +203,7 @@ class CertificateTemplateController extends Controller
     private function uploadImage($file): string
     {
         $isProduction = app()->environment('production');
-        $folder = $isProduction ? '/home/cery9751/public_html/v/qrcode' : public_path('v/qrcode'); 
+        $folder = $isProduction ? '/home/cery9751/public_html/cert-templates' : public_path('cert-templates'); 
 
         if (!file_exists($folder)) {
             mkdir($folder, 0755, true);
@@ -228,7 +218,7 @@ class CertificateTemplateController extends Controller
     private function deleteImage(?string $path): void
     {
         $isProduction = app()->environment('production');
-        $fullPath = $isProduction ? '/home/cery9751/public_html/v/qrcode' : public_path($path); 
+        $fullPath = $isProduction ? '/home/cery9751/public_html/cert-templates' : public_path($path); 
         if (file_exists($fullPath)) {
             unlink($fullPath);
         }

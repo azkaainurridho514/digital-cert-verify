@@ -259,7 +259,9 @@ class SertifikatController extends Controller
     {
         $cert = Certificate::findOrFail($id);
         if ($cert->file_path) {
-            $filePath = public_path($cert->file_path);
+            
+            $isProduction = app()->environment('production');
+            $templatePath = $isProduction ? '/home/cery9751/public_html/v/qrcode' : public_path($cert->file_path); 
 
             if (file_exists($filePath)) {
                 unlink($filePath);
@@ -336,7 +338,8 @@ class SertifikatController extends Controller
         
 
         // ── 3. Resolve path file template ─────────────────────────────────
-        $templatePath = public_path($template->path);
+        $isProduction = app()->environment('production');
+        $templatePath = $isProduction ? '/home/cery9751/public_html/cert-templates' : public_path($template->path); 
         if (!file_exists($templatePath)) {
             return response()->json(['success' => false, 'message' => 'File template tidak ditemukan di server.'], 404);
         }
@@ -344,7 +347,8 @@ class SertifikatController extends Controller
         // ── 4. Resolve path QR Code ───────────────────────────────────────
         $qrPath = null;
         if ($cert->file_path) {
-            $qrPath = public_path($cert->file_path);
+            $isProduction = app()->environment('production');
+            $qrPath = $isProduction ? '/home/cery9751/public_html/v/qrcode' : public_path($cert->file_path); 
             if (!file_exists($qrPath)) {
                 $qrPath = null;
             }
@@ -352,45 +356,45 @@ class SertifikatController extends Controller
 
         // ── 4b. Konversi SVG → PNG jika QR Code berformat SVG ────────────
         if ($qrPath && str_ends_with(strtolower($qrPath), '.svg')) {
-    $tmpPng = sys_get_temp_dir() . '/qr_' . $cert->id . '.png';
+            $tmpPng = sys_get_temp_dir() . '/qr_' . $cert->id . '.png';
 
-    // Baca dimensi asli SVG
-    $svgContent = file_get_contents($qrPath);
-    preg_match('/width=["\']?(\d+)["\']?/i', $svgContent, $wm);
-    preg_match('/height=["\']?(\d+)["\']?/i', $svgContent, $hm);
-    $svgW = !empty($wm) ? (int)$wm[1] : 300;
-    $svgH = !empty($hm) ? (int)$hm[1] : 300;
+            // Baca dimensi asli SVG
+            $svgContent = file_get_contents($qrPath);
+            preg_match('/width=["\']?(\d+)["\']?/i', $svgContent, $wm);
+            preg_match('/height=["\']?(\d+)["\']?/i', $svgContent, $hm);
+            $svgW = !empty($wm) ? (int)$wm[1] : 300;
+            $svgH = !empty($hm) ? (int)$hm[1] : 300;
 
-    // Render 2x ukuran asli SVG
-    $renderW = $svgW * 2;
-    $renderH = $svgH * 2;
+            // Render 2x ukuran asli SVG
+            $renderW = $svgW * 2;
+            $renderH = $svgH * 2;
 
-    $svgImage    = \SVG\SVG::fromFile($qrPath);
-    $rasterImage = $svgImage->toRasterImage($renderW, $renderH);
+            $svgImage    = \SVG\SVG::fromFile($qrPath);
+            $rasterImage = $svgImage->toRasterImage($renderW, $renderH);
 
-    $transparent = imagecreatetruecolor($renderW, $renderH);
-    imagealphablending($transparent, false);
-    imagesavealpha($transparent, true);
-    $clear = imagecolorallocatealpha($transparent, 0, 0, 0, 127);
-    imagefill($transparent, 0, 0, $clear);
+            $transparent = imagecreatetruecolor($renderW, $renderH);
+            imagealphablending($transparent, false);
+            imagesavealpha($transparent, true);
+            $clear = imagecolorallocatealpha($transparent, 0, 0, 0, 127);
+            imagefill($transparent, 0, 0, $clear);
 
-    for ($px = 0; $px < $renderW; $px++) {
-        for ($py = 0; $py < $renderH; $py++) {
-            $color = imagecolorat($rasterImage, $px, $py);
-            $r = ($color >> 16) & 0xFF;
-            $g = ($color >> 8)  & 0xFF;
-            $b =  $color        & 0xFF;
-            if ($r > 240 && $g > 240 && $b > 240) continue;
-            imagesetpixel($transparent, $px, $py, imagecolorallocate($transparent, $r, $g, $b));
+            for ($px = 0; $px < $renderW; $px++) {
+                for ($py = 0; $py < $renderH; $py++) {
+                    $color = imagecolorat($rasterImage, $px, $py);
+                    $r = ($color >> 16) & 0xFF;
+                    $g = ($color >> 8)  & 0xFF;
+                    $b =  $color        & 0xFF;
+                    if ($r > 240 && $g > 240 && $b > 240) continue;
+                    imagesetpixel($transparent, $px, $py, imagecolorallocate($transparent, $r, $g, $b));
+                }
+            }
+
+            imagepng($transparent, $tmpPng);
+            imagedestroy($rasterImage);
+            imagedestroy($transparent);
+
+            $qrPath = file_exists($tmpPng) ? $tmpPng : null;
         }
-    }
-
-    imagepng($transparent, $tmpPng);
-    imagedestroy($rasterImage);
-    imagedestroy($transparent);
-
-    $qrPath = file_exists($tmpPng) ? $tmpPng : null;
-}
 
 
         // ── 5. Generate PDF ───────────────────────────────────────────────

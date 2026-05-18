@@ -7,8 +7,8 @@ class QrCodeService
 {
     public function generate(string $text, int $size = 300): array
     {
-        // $folder   = public_path('v/qrcode'); // develpment
-        $folder = '/home/cery9751/public_html/v/qrcode'; // production
+        $isProduction = app()->environment('production');
+        $folder = $isProduction ? '/home/cery9751/public_html/v/qrcode' : public_path('v/qrcode'); 
         $filename = 'qrcode_' . uniqid() . '.svg'; 
         $filePath = $folder . DIRECTORY_SEPARATOR . $filename;
 

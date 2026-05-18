@@ -212,7 +212,8 @@ class CertificateTemplateController extends Controller
 
     private function uploadImage($file): string
     {
-        $folder = public_path('cert-templates'); // ← folder baru
+        $isProduction = app()->environment('production');
+        $folder = $isProduction ? '/home/cery9751/public_html/v/qrcode' : public_path('v/qrcode'); 
 
         if (!file_exists($folder)) {
             mkdir($folder, 0755, true);
@@ -226,8 +227,8 @@ class CertificateTemplateController extends Controller
 
     private function deleteImage(?string $path): void
     {
-        if (!$path) return;
-        $fullPath = public_path($path);
+        $isProduction = app()->environment('production');
+        $fullPath = $isProduction ? '/home/cery9751/public_html/v/qrcode' : public_path($path); 
         if (file_exists($fullPath)) {
             unlink($fullPath);
         }

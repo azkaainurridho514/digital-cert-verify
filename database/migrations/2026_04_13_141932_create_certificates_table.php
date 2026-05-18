@@ -14,9 +14,9 @@ return new class extends Migration
             $table->string('certificate_number')->nullable()->unique();
             $table->string('program_name');
             $table->string('grade')->nullable();
-            $table->string('level')->nullable();
             $table->dateTime('publication_date')->nullable();
             $table->string('file_path')->nullable();
+            $table->string('level')->nullable();
             $table->text('digital_signature')->nullable();
             $table->enum('status', ['Draft', 'Di Terbitkan'])->default('Draft');
             $table->text('description')->nullable();

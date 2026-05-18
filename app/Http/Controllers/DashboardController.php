@@ -10,6 +10,11 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
+    
+    public function template()
+    {
+        return view('admin.template');
+    }
     public function index()
     {
         // ===== CARD =====
@@ -56,4 +61,5 @@ class DashboardController extends Controller
     {
         return view('admin.verifikasi');
     }
+
 }

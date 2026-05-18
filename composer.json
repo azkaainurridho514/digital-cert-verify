@@ -10,8 +10,10 @@
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
+        "meyfa/php-svg": "^0.16.1",
         "phpseclib/phpseclib": "^3.0",
         "simplesoftwareio/simple-qrcode": "~4",
+        "tecnickcom/tcpdf": "^6.11",
         "torann/geoip": "^3.0"
     },
     "require-dev": {

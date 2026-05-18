@@ -507,6 +507,91 @@
     .btn-modal-save:hover     { background: #1d4ed8; }
     .btn-modal-save:disabled  { opacity: .6; cursor: not-allowed; }
 
+    /* ══════════ TEMPLATE MODAL STYLES ══════════════════════════════ */
+    /* Upload Zone */
+    .upload-zone {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 8px; width: 100%; min-height: 150px;
+        border: 2px dashed var(--c-slate-200); border-radius: var(--radius-md);
+        cursor: pointer; transition: border-color .15s, background .15s;
+        padding: 24px; text-align: center; background: var(--c-slate-50);
+    }
+    .upload-zone:hover, .upload-zone.drag-over { border-color: var(--c-blue); background: var(--c-blue-soft); }
+    .upload-zone p     { font-size: 13px; color: var(--c-slate-500); margin: 0; }
+    .upload-zone small { font-size: 11.5px; color: var(--c-slate-400); }
+    .upload-zone input { display: none; }
+
+    /* Position Finder layout */
+    #tplPfContainer { display: none; flex-direction: row; gap: 16px; align-items: flex-start; }
+    #tplPfLeft  { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+    #tplPfRight { width: 220px; flex-shrink: 0; }
+
+    .tpl-change-img-btn {
+        font-size: 12px; color: var(--c-blue); background: none;
+        border: none; cursor: pointer; padding: 0; text-decoration: underline; align-self: flex-start;
+    }
+
+    #tplPfImgWrap {
+        position: relative; display: block; width: 100%;
+        border-radius: 6px; overflow: hidden;
+        box-shadow: var(--shadow-sm); cursor: crosshair;
+    }
+    #tplPfImgWrap img { 
+        display: block; 
+        width: 100%; 
+        height: auto; 
+        user-select: none; 
+        pointer-events: none;
+        max-width: 619px; /* tambah ini — atau pakai nilai tetap */
+    }
+
+    /* Drag boxes */
+    .pf-drag-box {
+        position: absolute; border-width: 2px; border-style: solid; border-radius: 3px;
+        cursor: move; touch-action: none; user-select: none; z-index: 10;
+    }
+    .pf-drag-box.active-box { z-index: 20; outline: 2px solid #fbbf24; outline-offset: 2px; }
+    .pf-resize-handle {
+        position: absolute; right: 0; bottom: 0; width: 14px; height: 14px;
+        cursor: se-resize; background: rgba(255,255,255,.8);
+        border-top: 2px solid currentColor; border-left: 2px solid currentColor; border-radius: 2px 0 0 0;
+    }
+    .pf-box-label {
+        position: absolute; top: -20px; left: 0; font-size: 10px; font-weight: 600;
+        font-family: var(--font-display); white-space: nowrap;
+        background: rgba(0,0,0,.55); color: #fff; padding: 1px 5px; border-radius: 3px; pointer-events: none;
+    }
+
+    /* Right panel */
+    #tplPfBoxPanel {
+        background: var(--c-slate-50); border: 1px solid var(--c-slate-200);
+        border-radius: var(--radius-md); padding: 12px 14px;
+    }
+    #tplPfBoxPanel .panel-title {
+        font-size: 11px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: .8px; color: var(--c-slate-400); margin-bottom: 10px;
+    }
+    #tplPfBoxList { display: flex; flex-direction: column; gap: 5px; }
+
+    .pf-box-item {
+        display: flex; align-items: center; gap: 8px; padding: 7px 9px;
+        border-radius: 6px; border: 1px solid var(--c-slate-200);
+        background: var(--c-white); font-size: 12px; cursor: pointer; transition: background .12s;
+    }
+    .pf-box-item:hover    { background: var(--c-slate-100); }
+    .pf-box-item.selected { background: var(--c-blue-soft); border-color: var(--c-blue-mid); }
+    .pf-box-swatch { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+    .pf-box-name   { flex: 1; color: var(--c-slate-700); font-family: var(--font-display); font-weight: 600; }
+    .pf-box-coords { color: var(--c-slate-400); font-size: 11px; font-family: monospace; }
+
+    .pf-hint       { font-size: 11.5px; color: var(--c-slate-400); text-align: center; margin: 0; }
+    .pf-panel-hint { font-size: 11px; color: var(--c-slate-400); margin-top: 10px; line-height: 1.5; }
+
+    @media (max-width: 640px) {
+        #tplPfContainer { flex-direction: column; }
+        #tplPfRight { width: 100%; }
+    }
+
     /* ── Responsive ────────────────────────────────────── */
     @media (max-width: 640px) {
         .cert-card-header { padding: 14px 16px; gap: 10px; }
@@ -594,6 +679,10 @@
         <button class="btn-create" onclick="openCreateModal()">
             <i class="bi bi-plus-lg"></i> Buat Sertifikat
         </button>
+
+        <button class="btn-create" onclick="openTemplateCertificateModal()">
+            Template Sertifikat
+        </button>
     </div>
 
     {{-- Table --}}
@@ -630,6 +719,73 @@
 
 </div>
 
+{{-- ══ Modal Template Sertifikat ══════════════════════════════════════════ --}}
+<div class="modal fade" id="modalTemplateSertifikat" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <div style="flex:1;">
+                    <h5 class="modal-main-title">Template Sertifikat</h5>
+                    <p class="modal-subtitle">Upload gambar lalu drag setiap box ke posisi yang sesuai</p>
+                </div>
+                <button type="button" class="modal-close-btn" data-bs-dismiss="modal">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                {{-- Upload Zone --}}
+                <div id="tplUploadStep">
+                    <label class="upload-zone" for="tplInputImage" id="tplUploadZoneLabel">
+                        <input type="file" id="tplInputImage" accept="image/*">
+                        <i class="bi bi-cloud-arrow-up" style="font-size:2rem;color:var(--c-slate-400);"></i>
+                        <p>Seret gambar ke sini atau klik untuk memilih</p>
+                        <small>PNG · JPG · WebP &nbsp;·&nbsp; Maks 5 MB</small>
+                    </label>
+                    <div id="tplExistingImgHint" style="display:none;margin-top:8px;font-size:12px;color:var(--c-slate-500);">
+                        <i class="bi bi-info-circle"></i> Gambar saat ini sudah dimuat. Upload baru hanya jika ingin menggantinya.
+                    </div>
+                </div>
+
+                {{-- Position Finder — Fixed 5 boxes --}}
+                <div id="tplPfContainer">
+                    <div id="tplPfLeft">
+                        <button class="tpl-change-img-btn" type="button" onclick="tplResetImage()">
+                            <i class="bi bi-arrow-left"></i> Ganti Gambar
+                        </button>
+                        <div id="tplPfImgWrap">
+                            <img id="tplPfImg" src="" alt="template">
+                        </div>
+                        <p class="pf-hint">Klik field di kanan untuk fokus · Drag box · Tarik sudut untuk resize</p>
+                    </div>
+
+                    <div id="tplPfRight">
+                        <div id="tplPfBoxPanel">
+                            <div class="panel-title">Field Posisi</div>
+                            <div id="tplPfBoxList"></div>
+                            <p class="pf-panel-hint">
+                                <i class="bi bi-info-circle"></i>
+                                Klik field untuk aktifkan, lalu drag box ke posisi yang diinginkan.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn-modal-save" id="tplBtnSave" onclick="tplHandleSubmit()">
+                    <i class="bi bi-check-lg"></i>
+                    <span id="tplBtnSaveLabel">Simpan Template</span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 {{-- Modal Tambah / Edit Sertifikat --}}
 <div class="modal fade" id="modalSertifikat" tabindex="-1" aria-hidden="true">
@@ -759,6 +915,27 @@
     const URL_BULK_UPDATE  = "{{ url('sertifikat/bulk-update') }}";
     const URL_BULK_DESTROY = "{{ url('sertifikat/bulk-destroy') }}";
     const CSRF             = "{{ csrf_token() }}";
+
+    // ── URL Template ───────────────────────────────────────────────────────────────
+    const URL_TPL_ACTIVE = "{{ route('template.active') }}";
+    const URL_TPL_STORE  = "{{ route('template.store') }}";
+    const URL_TPL_UPDATE = "{{ url('template') }}";
+
+    const PREDEFINED_FIELDS = [
+        { key: 'name',         label: 'Name',            color: '#3b82f6', widthKey: 'width_position_name',    heightKey: 'height_position_name'    },
+        { key: 'cert_number',  label: 'Certificate No.', color: '#ef4444', widthKey: 'width_cert_number',      heightKey: 'height_cert_number'      },
+        { key: 'grade',        label: 'Grade',            color: '#22c55e', widthKey: 'width_grade',            heightKey: 'height_grade'            },
+        { key: 'program_name', label: 'Program Name',     color: '#f59e0b', widthKey: 'width_program_name',     heightKey: 'height_program_name'     },
+        { key: 'publish_date', label: 'Publish Date',     color: '#8b5cf6', widthKey: 'width_publish_date',     heightKey: 'height_publish_date'     },
+        { key: 'qr_code',      label: 'QR Code',          color: '#0ea5e9', widthKey: 'width_qr_code',          heightKey: 'height_qr_code'          },
+    ];
+    // ── Template State ─────────────────────────────────────────────────────────────
+    let tplModalBS    = null;
+    let tplEditId     = null;   // null = create, string = update
+    let tplFile       = null;
+    let tplNatW       = 0, tplNatH = 0;
+    let tplBoxes      = [];
+    let tplActiveKey  = null;
 
     // ── State ─────────────────────────────────────────────────────────────────
     let currentDetailId = null;
@@ -1498,5 +1675,391 @@
         label.style.borderColor = '#3b82f6';
         label.style.background  = '#eff6ff';
     }
+
+    //  ====================================================================
+    //  ====================================================================
+    //  ====================================================================
+    //  ====================================================================
+    // template ============================================================
+    //  ====================================================================
+    //  ====================================================================
+    //  ====================================================================
+    //  ====================================================================
+
+    // Init modal Bootstrap — tambahkan ke DOMContentLoaded existing
+    document.addEventListener('DOMContentLoaded', () => {
+        tplModalBS = new bootstrap.Modal(document.getElementById('modalTemplateSertifikat'));
+        tplInitFileInput();
+
+        // Click area gambar → pindah box aktif ke titik klik
+        document.getElementById('tplPfImgWrap').addEventListener('click', e => {
+            if (e.target.closest('.pf-drag-box')) return;
+            const b = tplGetBox(tplActiveKey);
+            if (!b) return;
+            const rect = document.getElementById('tplPfImgWrap').getBoundingClientRect();
+            b.px = (e.clientX - rect.left) - b.bw / 2;
+            b.py = (e.clientY - rect.top)  - b.bh / 2;
+            tplApplyDOM(b);
+            tplRenderList();
+        });
+    });
+
+    window.addEventListener('resize', () => {
+        if (!tplNatW) return;
+        const s = tplScale();
+        tplBoxes.forEach(b => {
+            // Konversi balik ke real → scale ulang dengan s baru
+            const realX = tplToReal(b.px); // ini SALAH kalau s sudah berubah
+            // Simpan real coords di object b agar bisa rescale
+            b.px = (b.realX ?? tplToReal(b.px)) * s;
+            b.py = (b.realY ?? tplToReal(b.py)) * s;
+            b.bw = (b.realW ?? tplToReal(b.bw)) * s;
+            b.bh = (b.realH ?? tplToReal(b.bh)) * s;
+            tplApplyDOM(b);
+        });
+        tplRenderList();
+    });
+
+    // ── Entry Point ────────────────────────────────────────────────────────────────
+    async function openTemplateCertificateModal() {
+        Swal.fire({ title: 'Memuat template...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        try {
+            const res  = await fetch(URL_TPL_ACTIVE, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            const json = await res.json();
+            Swal.close();
+
+            tplResetState();
+
+            if (json.success && json.data) {
+                console.log("INI")
+                console.log(json.data)
+                // Template sudah ada → edit mode
+                tplEditId = json.data.id;
+                document.getElementById('tplExistingImgHint').style.display = 'block';
+                tplShowWithImage(json.data.path, json.data);
+            }
+            // Template belum ada → create mode, upload zone tampil (sudah default)
+
+            tplModalBS.show();
+        } catch {
+            Swal.fire({ icon: 'error', title: 'Gagal', text: 'Tidak dapat memuat template.' });
+        }
+    }
+
+    // ── Scale & Math ───────────────────────────────────────────────────────────────
+    function tplScale()          { return tplNatW ? document.getElementById('tplPfImg').getBoundingClientRect().width / tplNatW : 1; }
+    function tplToReal(v)        { return Math.round(v / tplScale()); }
+    function tplClamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+    function tplGetBox(key)      { return tplBoxes.find(b => b.key === key); }
+
+    // ── DOM Apply ──────────────────────────────────────────────────────────────────
+    // function tplApplyDOM(b) {
+    //     const wrap = document.getElementById('tplPfImgWrap');
+    //     b.px = tplClamp(b.px, 0, wrap.clientWidth  - b.bw);
+    //     b.py = tplClamp(b.py, 0, wrap.clientHeight - b.bh);
+    //     b.el.style.left   = b.px + 'px';
+    //     b.el.style.top    = b.py + 'px';
+    //     b.el.style.width  = b.bw + 'px';
+    //     b.el.style.height = b.bh + 'px';
+    // }
+    function tplApplyDOM(b) {
+    const wrap = document.getElementById('tplPfImgWrap');
+    b.px = tplClamp(b.px, 0, wrap.clientWidth  - b.bw);
+    b.py = tplClamp(b.py, 0, wrap.clientHeight - b.bh);
+    b.el.style.left   = b.px + 'px';
+    b.el.style.top    = b.py + 'px';
+    b.el.style.width  = b.bw + 'px';
+    b.el.style.height = b.bh + 'px';
+
+    // Simpan nilai real setiap update
+    b.realX = tplToReal(b.px);
+    b.realY = tplToReal(b.py);
+    b.realW = tplToReal(b.bw);
+    b.realH = tplToReal(b.bh);
+}
+
+    function tplApplyColor(el, color) {
+        const r = parseInt(color.slice(1,3),16);
+        const g = parseInt(color.slice(3,5),16);
+        const b = parseInt(color.slice(5,7),16);
+        el.style.borderColor = color;
+        el.style.background  = `rgba(${r},${g},${b},0.13)`;
+    }
+
+    // ── Active box ─────────────────────────────────────────────────────────────────
+    function tplSetActive(key) {
+        tplActiveKey = key;
+        tplBoxes.forEach(b => b.el.classList.toggle('active-box', b.key === key));
+        tplRenderList();
+    }
+
+    // ── Render panel kanan ─────────────────────────────────────────────────────────
+    function tplRenderList() {
+        const list = document.getElementById('tplPfBoxList');
+        list.innerHTML = '';
+        tplBoxes.forEach(b => {
+            const item = document.createElement('div');
+            item.className = 'pf-box-item' + (b.key === tplActiveKey ? ' selected' : '');
+
+            const sw = document.createElement('div');
+            sw.className = 'pf-box-swatch';
+            sw.style.background = b.color;
+
+            const name = document.createElement('span');
+            name.className   = 'pf-box-name';
+            name.textContent = b.label;
+
+            const coords = document.createElement('span');
+            coords.className   = 'pf-box-coords';
+            coords.textContent = `(${b.realX ?? tplToReal(b.px)}, ${b.realY ?? tplToReal(b.py)})`;
+
+            item.appendChild(sw);
+            item.appendChild(name);
+            item.appendChild(coords);
+            item.addEventListener('click', () => tplSetActive(b.key));
+            list.appendChild(item);
+        });
+    }
+
+    // ── Create box element ─────────────────────────────────────────────────────────
+    function tplCreateBox(field, px, py, bw, bh) {
+        const el = document.createElement('div');
+        el.className = 'pf-drag-box';
+        tplApplyColor(el, field.color);
+
+        const lbl = document.createElement('div');
+        lbl.className   = 'pf-box-label';
+        lbl.textContent = field.label;
+        el.appendChild(lbl);
+
+        const handle = document.createElement('div');
+        handle.className   = 'pf-resize-handle';
+        handle.style.color = field.color;
+        el.appendChild(handle);
+
+        document.getElementById('tplPfImgWrap').appendChild(el);
+
+        const b = { key: field.key, label: field.label, color: field.color, field, px, py, bw, bh, el };
+        tplBoxes.push(b);
+        tplApplyDOM(b);
+        tplAttachEvents(b, handle);
+        return b;
+    }
+
+    // ── Drag & Resize events ───────────────────────────────────────────────────────
+    function tplAttachEvents(b, handle) {
+        const wrap = document.getElementById('tplPfImgWrap');
+        let dragging = false, offX = 0, offY = 0;
+        let resizing = false, rsX = 0, rsY = 0, rsW = 0, rsH = 0;
+
+        b.el.addEventListener('pointerdown', e => {
+            if (e.target === handle) return;
+            e.preventDefault();
+            tplSetActive(b.key);
+            dragging = true;
+            const rect = wrap.getBoundingClientRect();
+            offX = e.clientX - rect.left - b.px;
+            offY = e.clientY - rect.top  - b.py;
+            b.el.setPointerCapture(e.pointerId);
+        });
+        b.el.addEventListener('pointermove', e => {
+            if (!dragging) return;
+            const rect = wrap.getBoundingClientRect();
+            b.px = e.clientX - rect.left - offX;
+            b.py = e.clientY - rect.top  - offY;
+            tplApplyDOM(b);
+            tplRenderList();
+        });
+        b.el.addEventListener('pointerup',     () => dragging = false);
+        b.el.addEventListener('pointercancel', () => dragging = false);
+
+        handle.addEventListener('pointerdown', e => {
+            e.preventDefault(); e.stopPropagation();
+            tplSetActive(b.key);
+            resizing = true;
+            rsX = e.clientX; rsY = e.clientY;
+            rsW = b.bw;      rsH = b.bh;
+            handle.setPointerCapture(e.pointerId);
+        });
+        handle.addEventListener('pointermove', e => {
+            if (!resizing) return;
+            b.bw = Math.max(20, rsW + (e.clientX - rsX));
+            b.bh = Math.max(20, rsH + (e.clientY - rsY));
+            tplApplyDOM(b);
+            tplRenderList();
+        });
+        handle.addEventListener('pointerup',     () => resizing = false);
+        handle.addEventListener('pointercancel', () => resizing = false);
+    }
+
+    // ── Show image + spawn boxes ───────────────────────────────────────────────────
+    function tplShowWithImage(src, savedData) {
+        const img = document.getElementById('tplPfImg');
+
+        img.onload = function () {
+            tplNatW = img.naturalWidth;
+            tplNatH = img.naturalHeight;
+            img.style.maxWidth = tplNatW + 'px';
+            document.getElementById('tplUploadStep').style.display  = 'none';
+            document.getElementById('tplPfContainer').style.display = 'flex';
+
+            // Bersihkan boxes lama dulu
+            tplBoxes.forEach(b => { if (b.el.parentNode) b.el.parentNode.removeChild(b.el); });
+            tplBoxes     = [];
+            tplActiveKey = null;
+
+            // Tunggu layout selesai & gambar punya clientWidth > 0
+            function spawnWhenReady(attempt) {
+                const w = img.getBoundingClientRect().width;
+                if (w > 0) {
+                    spawnBoxes(savedData);
+                } else if (attempt < 20) {
+                    // Coba lagi di frame berikutnya (maks 20x ~ 333ms)
+                    requestAnimationFrame(() => spawnWhenReady(attempt + 1));
+                }
+            }
+            requestAnimationFrame(() => spawnWhenReady(0));
+        };
+
+        img.src = src;
+    }
+
+    function spawnBoxes(savedData) {
+        const s = tplScale();
+
+        PREDEFINED_FIELDS.forEach((field, i) => {
+            const px = savedData ? (savedData[`x_position_${field.key}`] ?? 0) * s : 10 * s;
+            const py = savedData ? (savedData[`y_position_${field.key}`] ?? 0) * s : (10 + i * 40) * s;
+            const bw = savedData && savedData[field.widthKey]  ? savedData[field.widthKey]  * s : 120 * s;
+            const bh = savedData && savedData[field.heightKey] ? savedData[field.heightKey] * s : 24  * s;
+            tplCreateBox(field, px, py, bw, bh);
+        });
+
+        tplSetActive(PREDEFINED_FIELDS[0].key);
+    }
+
+    // ── File input ─────────────────────────────────────────────────────────────────
+    function tplInitFileInput() {
+        const input = document.getElementById('tplInputImage');
+        const zone  = document.getElementById('tplUploadZoneLabel');
+
+        input.addEventListener('change', e => {
+            if (e.target.files[0]) tplLoadFile(e.target.files[0]);
+        });
+        zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
+        zone.addEventListener('dragleave', ()  => zone.classList.remove('drag-over'));
+        zone.addEventListener('drop', e => {
+            e.preventDefault(); zone.classList.remove('drag-over');
+            if (e.dataTransfer.files[0]) tplLoadFile(e.dataTransfer.files[0]);
+        });
+    }
+
+    function tplLoadFile(file) {
+        if (!file.type.startsWith('image/')) return;
+        tplFile = file;
+        tplShowWithImage(URL.createObjectURL(file), null);
+    }
+
+    // ── Reset ──────────────────────────────────────────────────────────────────────
+    function tplResetState() {
+        tplFile      = null;
+        tplNatW      = tplNatH = 0;
+        tplEditId    = null;
+        tplBoxes.forEach(b => { if (b.el.parentNode) b.el.parentNode.removeChild(b.el); });
+        tplBoxes     = [];
+        tplActiveKey = null;
+
+        document.getElementById('tplPfImg').src                      = '';
+        document.getElementById('tplInputImage').value               = '';
+        document.getElementById('tplUploadStep').style.display       = 'block';
+        document.getElementById('tplPfContainer').style.display      = 'none';
+        document.getElementById('tplExistingImgHint').style.display  = 'none';
+        tplRenderList();
+    }
+
+    function tplResetImage() {
+        tplFile  = null;
+        tplNatW  = tplNatH = 0;
+        tplBoxes.forEach(b => { if (b.el.parentNode) b.el.parentNode.removeChild(b.el); });
+        tplBoxes     = [];
+        tplActiveKey = null;
+
+        document.getElementById('tplPfImg').src             = '';
+        document.getElementById('tplInputImage').value      = '';
+        document.getElementById('tplUploadStep').style.display    = 'block';
+        document.getElementById('tplPfContainer').style.display   = 'none';
+        tplRenderList();
+    }
+
+    // ── Collect fields ─────────────────────────────────────────────────────────────
+    function tplCollectFields() {
+        const out = {};
+        tplBoxes.forEach(b => {
+            out[`x_position_${b.key}`] = b.realX ?? tplToReal(b.px);
+            out[`y_position_${b.key}`] = b.realY ?? tplToReal(b.py);
+            out[b.field.widthKey]      = b.realW ?? tplToReal(b.bw);
+            out[b.field.heightKey]     = b.realH ?? tplToReal(b.bh);
+        });
+        return out;
+    }
+
+    // ── Submit ─────────────────────────────────────────────────────────────────────
+    async function tplHandleSubmit() {
+        const isEdit = !!tplEditId;
+
+        if (!isEdit && !tplFile) {
+            Swal.fire({ icon: 'warning', title: 'Oops...', text: 'Gambar template wajib dipilih.' });
+            return;
+        }
+        if (!tplNatW) {
+            Swal.fire({ icon: 'warning', title: 'Oops...', text: 'Silakan muat gambar template terlebih dahulu.' });
+            return;
+        }
+
+        const result = await Swal.fire({
+            title: isEdit ? 'Update template?' : 'Simpan template?',
+            icon: 'question', showCancelButton: true,
+            confirmButtonText: isEdit ? 'Ya, Update!' : 'Ya, Simpan!',
+            cancelButtonText: 'Batal',
+        });
+        if (!result.isConfirmed) return;
+
+        const btn = document.getElementById('tplBtnSave');
+        btn.disabled = true;
+        document.getElementById('tplBtnSaveLabel').textContent = 'Menyimpan...';
+
+        try {
+            const fields = tplCollectFields();
+            const form   = new FormData();
+
+            if (tplFile) form.append('image', tplFile);
+            form.append('width_template',  tplNatW);
+            form.append('height_template', tplNatH);
+            Object.entries(fields).forEach(([k, v]) => form.append(k, v));
+            if (isEdit) form.append('_method', 'PUT');
+
+            const url = isEdit ? `${URL_TPL_UPDATE}/${tplEditId}` : URL_TPL_STORE;
+            const res = await fetch(url, {
+                method:  'POST',
+                headers: { 'X-CSRF-TOKEN': CSRF, 'X-Requested-With': 'XMLHttpRequest' },
+                body:    form,
+            });
+            const json = await res.json();
+
+            if (json.success) {
+                tplModalBS.hide();
+                Swal.fire({ icon: 'success', title: 'Berhasil!', text: json.message, timer: 1500, showConfirmButton: false });
+            } else {
+                Swal.fire({ icon: 'warning', title: 'Peringatan', text: json.message ?? 'Terjadi kesalahan.' });
+            }
+        } catch {
+            Swal.fire({ icon: 'error', title: 'Error', text: 'Gagal menyimpan template.' });
+        } finally {
+            btn.disabled = false;
+            document.getElementById('tplBtnSaveLabel').textContent = 'Simpan Template';
+        }
+    }
+
 </script>
 @endpush

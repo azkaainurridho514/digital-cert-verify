@@ -7,6 +7,12 @@ use App\Http\Controllers\SertifikatController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\VerifikasiController;
 use App\Http\Controllers\CertificateTemplateController;
+use App\Http\Controllers\EcdsaController;
+// ECDSA integer
+Route::get('/ecdsa-real-output',  [EcdsaController::class, "signRealOutput"]);
+Route::get('/ecdsa-same-message',  [EcdsaController::class, "signSameMessage"]);
+Route::get('/ecdsa-real-implement',  [EcdsaController::class, "signRealImplement"]);
+
 
 Route::get('/',  [HomeController::class, 'index']);
 Route::get('/scan', [HomeController::class, 'scannerHome']);

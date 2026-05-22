@@ -1,5 +1,5 @@
 <?php
-
+// output base64
 namespace App\Services;
 
 use App\DTOs\SignatureResult;

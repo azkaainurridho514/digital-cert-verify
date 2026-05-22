@@ -239,9 +239,29 @@
 <div class="login-wrapper">
     <div class="login-card">
 
-        <div class="login-logo">
-            <i class="bi bi-mortarboard-fill"></i>
-        </div>
+        <div class="d-flex justify-content-evenly align-items-center mb-3">
+            <div class="bg-white rounded-circle p-2 d-flex align-items-center justify-content-center"
+                style="width: 80px; height: 80px;">
+                <img src="{{ asset('uniku_logo.png') }}"
+                    alt="Foto Uniku"
+                    class="img-fluid"
+                    style="max-width: 50px; max-height: 50px;">
+            </div>
+            <div class="bg-white rounded-circle p-2 d-flex align-items-center justify-content-center"
+                style="width: 80px; height: 80px;">
+                <img src="{{ asset('fkom_logo.png') }}"
+                    alt="Foto Fkom"
+                    class="img-fluid"
+                    style="max-width: 50px; max-height: 50px;">
+            </div>
+            <div class="bg-white rounded-circle p-2 d-flex align-items-center justify-content-center"
+                style="width: 80px; height: 80px;">
+                <img src="{{ asset('olc_logo_text.png') }}"
+                    alt="Foto OLC"
+                    class="img-fluid"
+                    style="max-width: 60px; max-height: 60px;">
+            </div>
+        </div>  
 
         <h2>Selamat Datang</h2>
         <p class="subtitle">Masuk ke OLC System untuk melanjutkan</p>
@@ -293,16 +313,24 @@
                 @enderror
             </div>
 
-            <button type="submit" class="btn btn-login" id="btnLogin">
-                <span id="btnText">
-                    <i class="bi bi-box-arrow-in-right me-2"></i>Masuk ke Sistem
-                </span>
-                <span id="btnLoading" class="d-none">
-                    <span class="spinner-border spinner-border-sm me-2"></span>
-                    Memproses...
-                </span>
-            </button>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary py-2" id="btnLogin">
+                    <span id="btnText">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>
+                        Masuk ke Sistem
+                    </span>
 
+                    <span id="btnLoading" class="d-none">
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        Memproses...
+                    </span>
+                </button>
+
+                <button type="reset" class="btn btn-outline-secondary py-2">
+                    <i class="bi bi-arrow-counterclockwise me-2"></i>
+                    Reset Form
+                </button>
+            </div>
         </form>
 
         {{-- Demo Accounts --}}

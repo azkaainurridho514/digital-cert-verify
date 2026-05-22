@@ -231,38 +231,10 @@
                     <div class="dd-name">{{ auth()->user()->name }}</div>
                     <div class="dd-email">{{ auth()->user()->email }}</div>
                     <span class="dd-role-pill admin">
-                       
                             <i class="bi bi-shield-fill-check"></i>
                     </span>
                 </div>
             </li>
-
-            {{-- Menu Items --}}
-            <li>
-                <a class="dd-item" href="#">
-                    <div class="dd-icon" style="background: rgba(37,99,235,.1); color: #2563eb;">
-                        <i class="bi bi-person-fill"></i>
-                    </div>
-                    <div>
-                        <div class="dd-item-label">Profil Saya</div>
-                        <div class="dd-item-sub">Kelola informasi akun</div>
-                    </div>
-                </a>
-            </li>
-            <li>
-                <a class="dd-item" href="#">
-                    <div class="dd-icon" style="background: rgba(100,116,139,.1); color: #64748b;">
-                        <i class="bi bi-gear-fill"></i>
-                    </div>
-                    <div>
-                        <div class="dd-item-label">Pengaturan</div>
-                        <div class="dd-item-sub">Preferensi & keamanan</div>
-                    </div>
-                </a>
-            </li>
-
-            <li><div class="dd-divider"></div></li>
-
             {{-- Logout --}}
             <li>
                 <a class="dd-item logout btn-logout"

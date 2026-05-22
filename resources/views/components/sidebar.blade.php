@@ -202,16 +202,20 @@
 <nav id="sidebar">
 
     {{-- ── Brand ────────────────────────────────────────────── --}}
-    <a class="sidebar-brand" href="#">
-        <div class="brand-icon">
-            <i class="bi bi-mortarboard-fill"></i>
+    <a class=" d-flex align-items-center text-decoration-none ms-2 mt-2" href="#">
+        <div class="bg-white rounded-circle d-flex align-items-center justify-content-center me-2 ms-2 mt-2"
+            style="width: 55px; height: 55px;">
+            
+            <img src="{{ asset('olc_logo_text.png') }}"
+                alt="Foto OLC"
+                class="img-fluid"
+                style="max-width: 50px; max-height: 50px;">
         </div>
-        <div class="brand-text">
-            OLC System
-            <small>Learning Center</small>
+        <div class="brand-text text-white mt-2">
+            <div class="fw-bold">OLC System</div>
+            <small class="text-light">Certificate Validator</small>
         </div>
     </a>
-
     {{-- ── Navigation ──────────────────────────────────────── --}}
     <div class="sidebar-nav">
 

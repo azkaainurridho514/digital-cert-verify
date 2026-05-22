@@ -562,7 +562,7 @@
             </a>
             <a href="#about" class="btn-ghost-olc">Learn More</a>
           </div>
-          <div class="hero-stats">
+          {{-- <div class="hero-stats">
             <div>
               <div class="stat-num">2K<span>+</span></div>
               <div class="stat-label">Certificates Issued</div>
@@ -575,7 +575,7 @@
               <div class="stat-num">5<span>+</span></div>
               <div class="stat-label">Programs Available</div>
             </div>
-          </div>
+          </div> --}}
         </div>
 
         <div class="col-lg-6">

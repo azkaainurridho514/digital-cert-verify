@@ -96,16 +96,9 @@ class SertifikatController extends Controller
 
         if ($request->status === 'Di Terbitkan') {
             $now = now();
-            // $message = implode('|', [
-            //     $request->certificate_number,
-            //     $request->username,
-            //     $request->program_name,
-            //     $request->grade,
-            //     $now->format('Y-m-d H:i:s'),
-            // ]);
-            $text = (string) $cert->id;
+            $text = (string) $cert->certificate_number;
+            $url = url('/scan?id=' . $cert->id);
             $signature = $this->ecdsa->sign($text);
-            $url = url('/scan?id=' . $text);
             $qr = $this->qrCodeService->generate($url);
             $cert->update([
                 'file_path' => $qr['path'],
@@ -154,15 +147,8 @@ class SertifikatController extends Controller
 
             $now = now();
 
-            // $message = implode('|', [
-            //     $request->certificate_number,
-            //     $request->username,
-            //     $request->program_name,
-            //     $request->grade,
-            //     $now->format('Y-m-d H:i:s'),
-            // ]);
-            $text = (string) $cert->id;
-            $url = url('/scan?id=' . $text);
+            $text = (string) $cert->certificate_number;
+            $url = url('/scan?id=' . $cert->id);
             $signature = $this->ecdsa->sign($text);
             $qr = $this->qrCodeService->generate($text);
 
@@ -197,17 +183,9 @@ class SertifikatController extends Controller
 
                 if ($request->status === 'Di Terbitkan') {
                     $now     = now();
-                    // $message = implode('|', [
-                    //     $cert->certificate_number,
-                    //     $cert->username,
-                    //     $cert->program_name,
-                    //     $cert->grade,
-                    //     $now->format('Y-m-d H:i:s'),
-                    // ]);
-
-                    $text = (string) $cert->id;
+                    $text = (string) $cert->certificate_number;
+                    $url = url('/scan?id=' . $cert->id);
                     $signature = $this->ecdsa->sign($text);
-                    $url = url('/scan?id=' . $text);
 
                     $qr = $this->qrCodeService->generate($url);
 

@@ -39,7 +39,7 @@ class EcdsaController extends Controller
     public function signRealOutput(): JsonResponse
     {
         // ── Hard-coded inputs (as per the task specification) ─────────────────
-        $message = 'AHU-0006744.AH.01.04';
+        $message = 'LV /07-02-2026';
         $k       = 111;                     // Fixed nonce — educational use only
 
         // ── Sign ──────────────────────────────────────────────────────────────

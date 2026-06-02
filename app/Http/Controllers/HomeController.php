@@ -27,40 +27,6 @@ class HomeController extends Controller
         return view('verifikasi');
     }
 
-    // public function verifyQr(Request $request)
-    // {
-    //     $url = $request->qr_code;
-
-    //     $parts = explode('/', $url);
-    //     $id = end($parts);
-    //     if (!Str::isUuid($id)) {
-    //         return response()->json([
-    //             'message' => VerificationResult::message(VerificationResult::QR_INVALID), 
-    //             'data'=>[]], 
-    //         400);
-    //     }
-    //     $certificate = Certificate::find($id);
-
-    //     if (!$certificate) {
-    //         return response()->json([
-    //             'message' => VerificationResult::message(VerificationResult::NOT_FOUND), 
-    //             'data'=>[]], 
-    //         404);
-    //     }
-    //     $signatureResult = $this->ecdsa->verify($certificate->id, $certificate->digital_signature);
-    //     if(!$signatureResult){
-    //         return response()->json([
-    //             'message' => VerificationResult::message(VerificationResult::VERIFY_FAILED), 
-    //             'data'=>[]
-    //             ], 
-    //         401);
-    //     }
-    //     return response()->json([
-    //         'message' => VerificationResult::message(VerificationResult::VALID),
-    //         'data' => $certificate
-    //     ], 200);
-    // }
-
     public function verifyQr(Request $request)
     {
         $url   = $request->qr_code;
@@ -107,7 +73,7 @@ class HomeController extends Controller
         }
 
         try {
-            $signatureResult = $this->ecdsa->verify($certificate->id, $certificate->digital_signature);
+            $signatureResult = $this->ecdsa->verify($certificate->certificate_number, $certificate->digital_signature);
         } catch (RuntimeException $e) {
             $signatureResult = false;
         }

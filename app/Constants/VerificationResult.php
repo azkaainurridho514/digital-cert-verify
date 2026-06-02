@@ -13,7 +13,7 @@ class VerificationResult
         return match ($code) {
             self::QR_INVALID => 'QR code tidak valid',
             self::NOT_FOUND => 'Sertifikat tidak ditemukan',
-            self::VERIFY_FAILED => 'Verifikasi gagal',
+            self::VERIFY_FAILED => 'Digital signature tidak valid',
             self::VALID => 'Verifikasi Berhasil',
             default => '-',
         };

@@ -1531,6 +1531,11 @@
             if (json.success) {
                 modalSertifikat.hide();
                 fetchData();
+                Swal.fire({
+                    icon: 'success', title: 'Berhasil!', text: json.message,
+                    timer: 1800, showConfirmButton: false,
+                    customClass: { popup: 'swal-popup-custom' },
+                });
             } else {
                 Swal.fire({ icon: 'warning', title: 'Peringatan', text: json.message ?? 'Terjadi kesalahan.' });
             }

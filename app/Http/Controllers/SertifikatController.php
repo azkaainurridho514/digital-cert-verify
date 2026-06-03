@@ -379,7 +379,13 @@ class SertifikatController extends Controller
         $pdf = $this->generateCertificatePdf($cert, $template, $templatePath, $qrPath);
 
         // ── 6. Output sebagai download ────────────────────────────────────
-        $filename = 'certificate-' . ($cert->certificate_number ?? $cert->id) . '.pdf';
+        $certificateNumber = preg_replace(
+            '/[\/\\\\:*?"<>|]/',
+            '-',
+            $cert->certificate_number ?? $cert->id
+        );
+
+        $filename = 'certificate-' . $certificateNumber . '.pdf';
 
         return response()->streamDownload(function () use ($pdf, $filename) {
             echo $pdf->Output($filename, 'S');

@@ -398,22 +398,132 @@ class SertifikatController extends Controller
      * Build TCPDF dengan template sebagai background
      * dan tempel semua field sesuai koordinat dari database.
      */
+    // private function generateCertificatePdf(
+    // Certificate         $cert,
+    // CertificateTemplate $template,
+    // string              $templatePath,
+    // ?string             $qrPath
+    // ): TCPDF {
+    //     $natW = (int) $template->width_template;
+    //     $natH = (int) $template->height_template;
+
+    //     // ── Gunakan A4 Landscape sebagai ukuran PDF ───────────────────
+    //     $pdfW = 297; // mm
+    //     $pdfH = 210; // mm
+
+    //     // ── Scale factor: template pixel → PDF mm ─────────────────────
+    //     $scaleX = $pdfW / $natW;
+    //     $scaleY = $pdfH / $natH;
+
+    //     $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
+    //     $pdf->setPrintHeader(false);
+    //     $pdf->setPrintFooter(false);
+    //     $pdf->SetAutoPageBreak(false);
+    //     $pdf->SetMargins(0, 0, 0);
+    //     $pdf->AddPage();
+
+    //     // ── Background ────────────────────────────────────────────────
+    //     $pdf->Image($templatePath, 0, 0, $pdfW, $pdfH, '', '', '', false, 300, '', false, false, 0);
+
+    //     $pdf->SetFont('helvetica', '', 12);
+    //     $pdf->SetTextColor(0, 0, 0);
+
+    //     // ── Helper scale px → mm ──────────────────────────────────────
+    //     $sx = fn(int $px) => round($px * $scaleX, 4);
+    //     $sy = fn(int $px) => round($px * $scaleY, 4);
+
+    //     // 1. Nama
+    //     $this->putTextMm($pdf,
+    //         $cert->username ?? '',
+    //         $sx($template->x_position_name), $sy($template->y_position_name),
+    //         $sx($template->width_position_name), $sy($template->height_position_name),
+    //         35,
+    //         [31, 41, 55],  
+    //         true 
+    //     );
+
+    //     // 2. Nomor Sertifikat
+    //     $this->putTextMm($pdf,
+    //         $cert->certificate_number ?? '',
+    //         $sx($template->x_position_cert_number), $sy($template->y_position_cert_number),
+    //         $sx($template->width_cert_number), $sy($template->height_cert_number),
+    //         18,
+    //         [31, 41, 55],
+    //         false
+    //     );
+
+    //     // 3. Nilai
+    //     $this->putTextMm($pdf,
+    //         $cert->grade ?? '',
+    //         $sx($template->x_position_grade), $sy($template->y_position_grade),
+    //         $sx($template->width_grade), $sy($template->height_grade),
+    //         25,
+    //         [255, 255, 255],
+    //         false
+
+    //     );
+
+    //     // 4. Program
+    //     $this->putTextMm($pdf,
+    //         $cert->level ?? '',
+    //         $sx($template->x_position_program_name), $sy($template->y_position_program_name),
+    //         $sx($template->width_program_name), $sy($template->height_program_name),
+    //         18,
+    //         [31, 41, 55],
+    //         false,
+    //     );
+
+    //     // 5. Tanggal Terbit
+    //     $publishDate = $cert->publication_date
+    //         ? \Carbon\Carbon::parse($cert->publication_date)->format('d F Y')
+    //         : '';
+    //     $this->putTextMm($pdf,
+    //         $publishDate,
+    //         $sx($template->x_position_publish_date), $sy($template->y_position_publish_date),
+    //         $sx($template->width_publish_date), $sy($template->height_publish_date),
+    //         15,
+    //         [31, 41, 55],
+    //         false
+    //     );
+
+    //     // 6. QR Code
+    //     if ($qrPath) {
+    //         $qrSize = 250; // mm - hardcode 40mm, sesuaikan kalau perlu
+
+    //         $pdf->Image(
+    //             $qrPath,
+    //             $sx($template->x_position_qr_code), // posisi x tetap dari database
+    //             $sy($template->y_position_qr_code), // posisi y tetap dari database
+    //             $qrSize,
+    //             $qrSize,
+    //             '', '', '', false, 300, '', false, false, 0
+    //         );
+    //     }
+
+    //     return $pdf;
+    // }
+
     private function generateCertificatePdf(
-    Certificate         $cert,
-    CertificateTemplate $template,
-    string              $templatePath,
-    ?string             $qrPath
+        Certificate         $cert,
+        CertificateTemplate $template,
+        string              $templatePath,
+        ?string             $qrPath
     ): TCPDF {
         $natW = (int) $template->width_template;
         $natH = (int) $template->height_template;
 
-        // ── Gunakan A4 Landscape sebagai ukuran PDF ───────────────────
-        $pdfW = 297; // mm
-        $pdfH = 210; // mm
+        $pdfW = 297;
+        $pdfH = 210;
+        $darkGold = [160, 120, 20];  // lebih tua
+        $lightGold= [212, 175, 55];  // lebih terang seperti di gambar
 
-        // ── Scale factor: template pixel → PDF mm ─────────────────────
         $scaleX = $pdfW / $natW;
         $scaleY = $pdfH / $natH;
+
+        // ── Font Manager ──────────────────────────────────────────────────
+        $fontManager = new \App\Services\TcpdfFontManager();
+        $fontDisplay = $fontManager->ensure('cinzel');   // heading & nama
+        $fontBody    = $fontManager->ensure('alice');    // body text
 
         $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
         $pdf->setPrintHeader(false);
@@ -422,80 +532,90 @@ class SertifikatController extends Controller
         $pdf->SetMargins(0, 0, 0);
         $pdf->AddPage();
 
-        // ── Background ────────────────────────────────────────────────
+        // ── Background ────────────────────────────────────────────────────
         $pdf->Image($templatePath, 0, 0, $pdfW, $pdfH, '', '', '', false, 300, '', false, false, 0);
 
-        $pdf->SetFont('helvetica', '', 12);
-        $pdf->SetTextColor(0, 0, 0);
-
-        // ── Helper scale px → mm ──────────────────────────────────────
+        // ── Helper scale px → mm ─────────────────────────────────────────
         $sx = fn(int $px) => round($px * $scaleX, 4);
         $sy = fn(int $px) => round($px * $scaleY, 4);
 
-        // 1. Nama
+        // ── Warna ─────────────────────────────────────────────────────────
+        $dark   = [31, 41, 55];
+        $gold   = [180, 140, 40];
+        $white  = [255, 255, 255];
+
+        // 1. Nama — Cinzel Bold, emas, besar
         $this->putTextMm($pdf,
-            $cert->username ?? '',
+            strtoupper($cert->username ?? ''),
             $sx($template->x_position_name), $sy($template->y_position_name),
             $sx($template->width_position_name), $sy($template->height_position_name),
-            35,
-            [31, 41, 55],  
-            true 
+            35, $gold, true, $fontDisplay
         );
 
-        // 2. Nomor Sertifikat
+        // 2. Nomor Sertifikat — Alice, kecil
         $this->putTextMm($pdf,
-            $cert->certificate_number ?? '',
+            'NO: ' . ($cert->certificate_number ?? ''),
             $sx($template->x_position_cert_number), $sy($template->y_position_cert_number),
             $sx($template->width_cert_number), $sy($template->height_cert_number),
-            18,
-            [31, 41, 55],
-            false
+            15, $dark, false, $fontBody
         );
 
-        // 3. Nilai
+        // 3. Grade/Nilai — Cinzel Bold, putih
         $this->putTextMm($pdf,
             $cert->grade ?? '',
             $sx($template->x_position_grade), $sy($template->y_position_grade),
             $sx($template->width_grade), $sy($template->height_grade),
-            25,
-            [255, 255, 255],
-            false
-
+            // 20, $white, true, $fontDisplay
+            40, $gold, true, $fontDisplay
         );
 
-        // 4. Program
+        // 4. Level — Alice
         $this->putTextMm($pdf,
-            $cert->program_name ?? '',
+            "OF ENGLISH ".$cert->level . " LEVEL COMPLETION",
             $sx($template->x_position_program_name), $sy($template->y_position_program_name),
             $sx($template->width_program_name), $sy($template->height_program_name),
-            18,
-            [31, 41, 55],
-            false,
+            18, $dark, false, $fontBody
         );
 
-        // 5. Tanggal Terbit
+        // 5. Tanggal Terbit — Alice
         $publishDate = $cert->publication_date
-            ? \Carbon\Carbon::parse($cert->publication_date)->format('d F Y')
+            ? \Carbon\Carbon::parse($cert->publication_date)->format('jS F Y')
             : '';
         $this->putTextMm($pdf,
             $publishDate,
             $sx($template->x_position_publish_date), $sy($template->y_position_publish_date),
             $sx($template->width_publish_date), $sy($template->height_publish_date),
-            15,
-            [31, 41, 55],
-            false
+            20, $dark, false, $fontBody
         );
+
+        // ── Teks statis ───────────────────────────────────────────────────
+        // "This certificate is proudly presented to"
+        $pdf->SetFont($fontBody, 'I', 18);
+        $pdf->SetTextColor(...$dark);
+        $pdf->SetXY(0, $sy($template->y_position_name) - 10);
+        // $pdf->Cell($pdfW, 6, 'This certificate is proudly presented to', 0, 0, 'C');
+
+        // "For completing the English ... examination"
+        $level       = $cert->level ?? 'English';
+        $orgName     = 'Our Learning Center - Kampung Inggris Kuningan';
+        $forLine1    = "For completing the {$level} examination";
+        $forLine2    = "held by {$orgName}";
+
+        $pdf->SetFont($fontBody, '', 18);
+        $pdf->SetTextColor(...$dark);
+        $pdf->SetXY(0, $sy($template->y_position_name) + $sy($template->height_position_name) + 4);
+        $pdf->Cell($pdfW, 5, $forLine1, 0, 1, 'C');
+        $pdf->SetX(0);
+        $pdf->Cell($pdfW, 5, $forLine2, 0, 0, 'C');
 
         // 6. QR Code
         if ($qrPath) {
-            $qrSize = 250; // mm - hardcode 40mm, sesuaikan kalau perlu
-
+            $qrSize = 220;
             $pdf->Image(
                 $qrPath,
-                $sx($template->x_position_qr_code), // posisi x tetap dari database
-                $sy($template->y_position_qr_code), // posisi y tetap dari database
-                $qrSize,
-                $qrSize,
+                $sx($template->x_position_qr_code),
+                $sy($template->y_position_qr_code),
+                $qrSize, $qrSize,
                 '', '', '', false, 300, '', false, false, 0
             );
         }
@@ -506,29 +626,48 @@ class SertifikatController extends Controller
     /**
      * Versi putText yang menerima mm langsung (bukan px).
      */
+    // private function putTextMm(
+    //     TCPDF $pdf,
+    //     string $text,
+    //     float $x, float $y,
+    //     float $w, float $h,
+    //     ?float $fontSize = null,
+    //     array $color = [0, 0, 0],   // RGB, default hitam
+    //     bool $bold = false
+    // ): void {
+    //     if (trim($text) === '') return;
+
+    //     $style = $bold ? 'B' : '';
+    //     $pdf->SetFont('helvetica', $style, 12);
+
+    //     $size = $fontSize ?? $this->autoFontSizeMm($pdf, $text, $w, $h);
+    //     $pdf->SetFontSize($size);
+    //     $pdf->SetTextColor($color[0], $color[1], $color[2]);
+    //     $pdf->SetXY($x, $y);
+    //     $pdf->MultiCell($w, $h, $text, 0, 'C', false, 1, $x, $y, true, 0, false, true, $h, 'M');
+
+    //     // Reset warna ke hitam setelah render
+    //     $pdf->SetTextColor(0, 0, 0);
+    // }
+
     private function putTextMm(
-        TCPDF $pdf,
-        string $text,
-        float $x, float $y,
-        float $w, float $h,
-        ?float $fontSize = null,
-        array $color = [0, 0, 0],   // RGB, default hitam
-        bool $bold = false
-    ): void {
-        if (trim($text) === '') return;
-
-        $style = $bold ? 'B' : '';
-        $pdf->SetFont('helvetica', $style, 12);
-
-        $size = $fontSize ?? $this->autoFontSizeMm($pdf, $text, $w, $h);
-        $pdf->SetFontSize($size);
-        $pdf->SetTextColor($color[0], $color[1], $color[2]);
-        $pdf->SetXY($x, $y);
-        $pdf->MultiCell($w, $h, $text, 0, 'C', false, 1, $x, $y, true, 0, false, true, $h, 'M');
-
-        // Reset warna ke hitam setelah render
-        $pdf->SetTextColor(0, 0, 0);
-    }
+    TCPDF  $pdf,
+    string $text,
+    float  $x,
+    float  $y,
+    float  $w,
+    float  $h,
+    int    $fontSize,
+    array  $color,
+    bool   $bold   = false,
+    string $font   = 'alice'
+): void {
+    $style = $bold ? 'B' : '';
+    $pdf->SetFont($font, $style, $fontSize);
+    $pdf->SetTextColor(...$color);
+    $pdf->SetXY($x, $y);
+    $pdf->Cell($w, $h, $text, 0, 0, 'C');
+}
 
     /**
      * autoFontSize versi mm.

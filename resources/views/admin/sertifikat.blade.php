@@ -925,7 +925,8 @@
         { key: 'name',         label: 'Name',            color: '#3b82f6', widthKey: 'width_position_name',    heightKey: 'height_position_name'    },
         { key: 'cert_number',  label: 'Certificate No.', color: '#ef4444', widthKey: 'width_cert_number',      heightKey: 'height_cert_number'      },
         { key: 'grade',        label: 'Grade',            color: '#22c55e', widthKey: 'width_grade',            heightKey: 'height_grade'            },
-        { key: 'program_name', label: 'Program Name',     color: '#f59e0b', widthKey: 'width_program_name',     heightKey: 'height_program_name'     },
+        { key: 'program_name', label: 'Level',     color: '#f59e0b', widthKey: 'width_program_name',     heightKey: 'height_program_name'     },
+        // { key: 'program_name', label: 'Program Name',     color: '#f59e0b', widthKey: 'width_program_name',     heightKey: 'height_program_name'     },
         { key: 'publish_date', label: 'Publish Date',     color: '#8b5cf6', widthKey: 'width_publish_date',     heightKey: 'height_publish_date'     },
         { key: 'qr_code',      label: 'QR Code',          color: '#0ea5e9', widthKey: 'width_qr_code',          heightKey: 'height_qr_code'          },
     ];

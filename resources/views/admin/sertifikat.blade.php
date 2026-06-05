@@ -1419,7 +1419,7 @@
         });
         if (!konfirmasi.isConfirmed) return;
 
-        Swal.fire({ title: 'Membuat PDF...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ title: 'Membuat ZIP...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
         // Buat hidden form lalu submit — browser otomatis trigger download
         const form = document.createElement('form');

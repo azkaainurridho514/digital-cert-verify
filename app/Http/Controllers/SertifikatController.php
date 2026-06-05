@@ -205,6 +205,7 @@ class SertifikatController extends Controller
     }
 
 
+
     public function show(string $id)
     {
         $cert = Certificate::findOrFail($id);
@@ -253,52 +254,73 @@ class SertifikatController extends Controller
         ]);
     }
 
+  public function bulkPrint(Request $request)
+{
+    $request->validate([
+        'ids'   => 'required|array',
+        'ids.*' => 'string|exists:certificates,id',
+    ]);
 
+    $certificates = Certificate::whereIn('id', $request->ids)
+        ->where('status', 'Di Terbitkan')
+        ->get();
 
-    // v1
-    //  public function print($id)
-    // {
-    //     // ── 1. Ambil data sertifikat ──────────────────────────────────────
-    //     $cert = Certificate::find($id);
-    //     if (!$cert) {
-    //         return response()->json(['success' => false, 'message' => 'Sertifikat tidak ditemukan.'], 404);
-    //     }
+    if ($certificates->isEmpty()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Tidak ada sertifikat berstatus "Di Terbitkan".',
+        ], 422);
+    }
 
-    //     // ── 2. Ambil template terbaru ─────────────────────────────────────
-    //     $template = CertificateTemplate::latest()->first();
-    //     if (!$template) {
-    //         return response()->json(['success' => false, 'message' => 'Template sertifikat belum dibuat. Silakan buat template terlebih dahulu.'], 404);
-    //     }
+    $tempFiles = [];
 
-    //     // ── 3. Resolve path file template ─────────────────────────────────
-    //     // DB menyimpan: "cert-templates/template_xxx.png"
-    //     $templatePath = public_path($template->path);
-    //     if (!file_exists($templatePath)) {
-    //         return response()->json(['success' => false, 'message' => 'File template tidak ditemukan di server.'], 404);
-    //     }
+    foreach ($certificates as $cert) {
+        $response = $this->print($cert->id);
 
-    //     // ── 4. Resolve path QR Code ───────────────────────────────────────
-    //     // file_path di DB sudah berisi path relatif seperti "v/qrcode/qrcode_xxx.svg"
-    //     $qrPath = null;
-    //     if ($cert->file_path) {
-    //         $qrPath = public_path($cert->file_path);
-    //         if (!file_exists($qrPath)) {
-    //             $qrPath = null; // QR tidak ada, lanjut tanpa QR
-    //         }
-    //     }
+        ob_start();
+        $response->sendContent();
+        $pdfContent = ob_get_clean();
 
-    //     // ── 5. Generate PDF ───────────────────────────────────────────────
-    //     $pdf = $this->generateCertificatePdf($cert, $template, $templatePath, $qrPath);
+        if (!empty($pdfContent)) {
+            $certificateNumber = preg_replace('/[\/\\\\:*?"<>|]/', '-', $cert->certificate_number ?? $cert->id);
+            $tempPath = sys_get_temp_dir() . '/cert_' . $cert->id . '_' . time() . '.pdf';
 
-    //     // ── 6. Output sebagai download ────────────────────────────────────
-    //     $filename = 'certificate-' . ($cert->certificate_number ?? $cert->id) . '.pdf';
+            file_put_contents($tempPath, $pdfContent);
+            $tempFiles[$tempPath] = 'certificate-' . $certificateNumber . '.pdf';
+        }
+    }
 
-    //     return response()->streamDownload(function () use ($pdf, $filename) {
-    //         echo $pdf->Output($filename, 'S');
-    //     }, $filename, [
-    //         'Content-Type' => 'application/pdf',
-    //     ]);
-    // }
+    if (empty($tempFiles)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal membuat PDF sertifikat.',
+        ], 500);
+    }
+
+    $zipPath = sys_get_temp_dir() . '/certificates_' . now()->format('Ymd_His') . '.zip';
+    $zip     = new \ZipArchive();
+
+    if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+        foreach (array_keys($tempFiles) as $path) @unlink($path);
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal membuat file ZIP.',
+        ], 500);
+    }
+
+    foreach ($tempFiles as $filePath => $nameInZip) {
+        $zip->addFile($filePath, $nameInZip);
+    }
+
+    $zip->close();
+    foreach (array_keys($tempFiles) as $path) @unlink($path);
+
+    // Langsung stream ZIP, hapus setelah terkirim
+    return response()->download($zipPath, basename($zipPath), [
+        'Content-Type' => 'application/zip',
+    ])->deleteFileAfterSend(true);
+}
+
 
     public function print($id)
     {
@@ -394,114 +416,6 @@ class SertifikatController extends Controller
         ]);
     }
 
-    /**
-     * Build TCPDF dengan template sebagai background
-     * dan tempel semua field sesuai koordinat dari database.
-     */
-    // private function generateCertificatePdf(
-    // Certificate         $cert,
-    // CertificateTemplate $template,
-    // string              $templatePath,
-    // ?string             $qrPath
-    // ): TCPDF {
-    //     $natW = (int) $template->width_template;
-    //     $natH = (int) $template->height_template;
-
-    //     // ── Gunakan A4 Landscape sebagai ukuran PDF ───────────────────
-    //     $pdfW = 297; // mm
-    //     $pdfH = 210; // mm
-
-    //     // ── Scale factor: template pixel → PDF mm ─────────────────────
-    //     $scaleX = $pdfW / $natW;
-    //     $scaleY = $pdfH / $natH;
-
-    //     $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
-    //     $pdf->setPrintHeader(false);
-    //     $pdf->setPrintFooter(false);
-    //     $pdf->SetAutoPageBreak(false);
-    //     $pdf->SetMargins(0, 0, 0);
-    //     $pdf->AddPage();
-
-    //     // ── Background ────────────────────────────────────────────────
-    //     $pdf->Image($templatePath, 0, 0, $pdfW, $pdfH, '', '', '', false, 300, '', false, false, 0);
-
-    //     $pdf->SetFont('helvetica', '', 12);
-    //     $pdf->SetTextColor(0, 0, 0);
-
-    //     // ── Helper scale px → mm ──────────────────────────────────────
-    //     $sx = fn(int $px) => round($px * $scaleX, 4);
-    //     $sy = fn(int $px) => round($px * $scaleY, 4);
-
-    //     // 1. Nama
-    //     $this->putTextMm($pdf,
-    //         $cert->username ?? '',
-    //         $sx($template->x_position_name), $sy($template->y_position_name),
-    //         $sx($template->width_position_name), $sy($template->height_position_name),
-    //         35,
-    //         [31, 41, 55],  
-    //         true 
-    //     );
-
-    //     // 2. Nomor Sertifikat
-    //     $this->putTextMm($pdf,
-    //         $cert->certificate_number ?? '',
-    //         $sx($template->x_position_cert_number), $sy($template->y_position_cert_number),
-    //         $sx($template->width_cert_number), $sy($template->height_cert_number),
-    //         18,
-    //         [31, 41, 55],
-    //         false
-    //     );
-
-    //     // 3. Nilai
-    //     $this->putTextMm($pdf,
-    //         $cert->grade ?? '',
-    //         $sx($template->x_position_grade), $sy($template->y_position_grade),
-    //         $sx($template->width_grade), $sy($template->height_grade),
-    //         25,
-    //         [255, 255, 255],
-    //         false
-
-    //     );
-
-    //     // 4. Program
-    //     $this->putTextMm($pdf,
-    //         $cert->level ?? '',
-    //         $sx($template->x_position_program_name), $sy($template->y_position_program_name),
-    //         $sx($template->width_program_name), $sy($template->height_program_name),
-    //         18,
-    //         [31, 41, 55],
-    //         false,
-    //     );
-
-    //     // 5. Tanggal Terbit
-    //     $publishDate = $cert->publication_date
-    //         ? \Carbon\Carbon::parse($cert->publication_date)->format('d F Y')
-    //         : '';
-    //     $this->putTextMm($pdf,
-    //         $publishDate,
-    //         $sx($template->x_position_publish_date), $sy($template->y_position_publish_date),
-    //         $sx($template->width_publish_date), $sy($template->height_publish_date),
-    //         15,
-    //         [31, 41, 55],
-    //         false
-    //     );
-
-    //     // 6. QR Code
-    //     if ($qrPath) {
-    //         $qrSize = 250; // mm - hardcode 40mm, sesuaikan kalau perlu
-
-    //         $pdf->Image(
-    //             $qrPath,
-    //             $sx($template->x_position_qr_code), // posisi x tetap dari database
-    //             $sy($template->y_position_qr_code), // posisi y tetap dari database
-    //             $qrSize,
-    //             $qrSize,
-    //             '', '', '', false, 300, '', false, false, 0
-    //         );
-    //     }
-
-    //     return $pdf;
-    // }
 
     private function generateCertificatePdf(
         Certificate         $cert,

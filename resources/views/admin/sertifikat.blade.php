@@ -914,6 +914,7 @@
     const URL_PRINT        = "{{ url('sertifikat') }}";
     const URL_BULK_UPDATE  = "{{ url('sertifikat/bulk-update') }}";
     const URL_BULK_DESTROY = "{{ url('sertifikat/bulk-destroy') }}";
+    const URL_BULK_PRINT   = "{{ url('sertifikat/bulk-print') }}";
     const CSRF             = "{{ csrf_token() }}";
 
     // ── URL Template ───────────────────────────────────────────────────────────────
@@ -993,7 +994,7 @@
                 </td>
                 <td><code style="font-size:12px;background:#f1f5f9;padding:2px 7px;border-radius:5px;color:#334155;">${cert.certificate_number || '-'}</code></td>
                 <td class="td-muted">${cert.grade || '-'}</td>
-                <td class="td-muted">${cert.program_name || '-'}</td>
+                <td class="td-muted">${cert.level || '-'}</td>
                 <td class="td-muted">${cert.publication_date || '-'}</td>
                 <td>${renderBadge(cert.status)}</td>
                 <td>
@@ -1094,7 +1095,7 @@
             <div class="pagination-wrap">
                 <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
                     <span class="pagination-info">
-                        Menampilkan <b>${from}–${to}</b> dari <b>${total}</b> data
+                        Menampilkan <b>${from}-${to}</b> dari <b>${total}</b> data
                     </span>
                     <div class="per-page-wrap">
                         <span>Baris:</span>
@@ -1370,6 +1371,40 @@
         }
     }
 
+    // async function doBulkPrint() {
+    //     const konfirmasi = await Swal.fire({
+    //         icon: 'info',
+    //         title: 'Print Data?',
+    //         html: `<b>${selectedIds.size}</b> sertifikat yang di pilih akan di print.`,
+    //         showCancelButton:   true,
+    //         confirmButtonText:  'Ya!',
+    //         cancelButtonText:   'Batal',
+    //         confirmButtonColor: '#3b82f6',
+    //         cancelButtonColor:  '#e2e8f0',
+    //         customClass: { cancelButton: 'swal-cancel-custom', popup: 'swal-popup-custom' },
+    //     });
+    //     if (!konfirmasi.isConfirmed) return;
+
+    //     Swal.fire({ title: 'Membuat PDF...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+    //     try {
+    //         const res  = await fetch(URL_BULK_PRINT, {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type':     'application/json',
+    //                 'X-CSRF-TOKEN':     CSRF,
+    //                 'X-Requested-With': 'XMLHttpRequest',
+    //             },
+    //             body: JSON.stringify({ ids: Array.from(selectedIds)}),
+    //         });
+    //         const json = await res.json();
+    //         if (!json.success) throw new Error(json.message ?? 'Gagal download.');
+    //         afterBulkSuccess('Data berhasil di buat.');
+    //     } catch (e) {
+    //         Swal.fire({ icon: 'error', title: 'Gagal', text: e.message });
+    //     }
+    // }
+
     async function doBulkPrint() {
         const konfirmasi = await Swal.fire({
             icon: 'info',
@@ -1384,24 +1419,35 @@
         });
         if (!konfirmasi.isConfirmed) return;
 
-        Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ title: 'Membuat PDF...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-        try {
-            const res  = await fetch(URL_BULK_DESTROY, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type':     'application/json',
-                    'X-CSRF-TOKEN':     CSRF,
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-                body: JSON.stringify({ ids: Array.from(selectedIds) }),
-            });
-            const json = await res.json();
-            if (!json.success) throw new Error(json.message ?? 'Gagal menghapus.');
-            afterBulkSuccess('Data berhasil dihapus.');
-        } catch (e) {
-            Swal.fire({ icon: 'error', title: 'Gagal', text: e.message });
-        }
+        // Buat hidden form lalu submit — browser otomatis trigger download
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = URL_BULK_PRINT;
+
+        // CSRF
+        const csrf = document.createElement('input');
+        csrf.type  = 'hidden';
+        csrf.name  = '_token';
+        csrf.value = CSRF;
+        form.appendChild(csrf);
+
+        // IDs
+        Array.from(selectedIds).forEach(id => {
+            const input = document.createElement('input');
+            input.type  = 'hidden';
+            input.name  = 'ids[]';
+            input.value = id;
+            form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+
+        Swal.close();
+        afterBulkSuccess('Data berhasil di print.');
     }
 
     // ─────────────────────────────────────────────────────────────────────────

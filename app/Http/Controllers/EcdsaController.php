@@ -6,7 +6,9 @@ namespace App\Http\Controllers;
 
 use App\Services\RealOutputEcdsaService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Throwable;
+use GMP;
 
 /**
  * EcdsaController
@@ -24,9 +26,15 @@ use Throwable;
  */
 class EcdsaController extends Controller
 {
+    private GMP $n;
     public function __construct(
-        private readonly RealOutputEcdsaService $ecdsaService
-    ) {}
+        private readonly RealOutputEcdsaService $ecdsaService,
+        
+    ) {
+        $this->n = gmp_init(
+            '115792089210356248762697446949407573529996955224135760342422259061068512044369'
+        );
+    }
 
     // ── Endpoint ──────────────────────────────────────────────────────────────
 
@@ -36,11 +44,36 @@ class EcdsaController extends Controller
      * Signs the provided message and returns the ECDSA signature as pure
      * decimal integers (r, s) together with every computation step.
      */
-    public function signRealOutput(): JsonResponse
+    
+    private function generateNonce(): GMP
+    {
+        do {
+            $k = gmp_import(random_bytes(32));
+        } while (
+            gmp_cmp($k, 1) < 0 ||
+            gmp_cmp($k, $this->n) >= 0
+        );
+
+        return $k;
+    }
+
+    public function signRealOutput(Request $request): JsonResponse
     {
         // ── Hard-coded inputs (as per the task specification) ─────────────────
         $message = 'LV /07-02-2026';
-        $k       = 111;                     // Fixed nonce — educational use only
+        $k       = 0;                     // Fixed nonce — educational use only
+        if($request->k != null){
+            if (!is_numeric($request->k)) {
+                return response()->json([
+                    'success' => false,
+                    'message'   => "K harus berupa angka",
+                ], 500);
+            }
+
+            $k = (int) $request->k;
+        }else{
+            $k = $this->generateNonce();  
+        }
 
         // ── Sign ──────────────────────────────────────────────────────────────
         try {
@@ -49,7 +82,7 @@ class EcdsaController extends Controller
         } catch (Throwable $e) {
             return response()->json([
                 'success' => false,
-                'error'   => $e->getMessage(),
+                'message'   => $e->getMessage(),
             ], 500);
         }
 
@@ -107,6 +140,8 @@ class EcdsaController extends Controller
             ],
         ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
+
+
 
     public function signSameMessage(): JsonResponse
     {

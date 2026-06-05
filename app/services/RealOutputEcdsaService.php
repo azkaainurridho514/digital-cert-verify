@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Services;
-
+use GMP;
 use RuntimeException;
 
 /**
@@ -102,7 +102,7 @@ final class RealOutputEcdsaService
      *     d_decimal:  string,
      * }
      */
-    public function sign(string $message, int $k = 111): array
+    public function sign(string $message, int|GMP $k = 111): array
     {
         // ── Step 1 : Hash the message ─────────────────────────────────────────
         //
@@ -115,7 +115,12 @@ final class RealOutputEcdsaService
         //
         //  k must satisfy  1 ≤ k ≤ n-1
         //
-        $kGmp = gmp_init($k);
+        // $kGmp = gmp_init($k);
+        if (!$k instanceof GMP) {
+            $k = gmp_init((string) $k);
+        }
+
+        $kGmp = $k;
         if (gmp_cmp($kGmp, 1) < 0 || gmp_cmp($kGmp, gmp_sub($this->n, 1)) > 0) {
             throw new RuntimeException('Nonce k must be in the range [1, n-1].');
         }
@@ -176,7 +181,8 @@ final class RealOutputEcdsaService
             'e_decimal' => gmp_strval($e, 10),
 
             // Step 2 — nonce
-            'k'         => $k,
+            'k'         => gmp_strval($k),
+            // 'k'         => $k,
 
             // Step 3 — point R
             'R'         => [

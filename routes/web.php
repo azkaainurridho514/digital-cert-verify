@@ -39,6 +39,8 @@ Route::middleware(['auth'])->group(function () {
             
     Route::prefix('sertifikat')->name('sertifikat.')->group(function () {
         Route::get('/{id}/print', [SertifikatController::class, 'print'])->name('sertifikat.print');
+        Route::post('/bulk-print', [SertifikatController::class, 'bulkPrint'])->name('print.bulk');
+        // Route::get('/bulk-print/download',  [SertifikatController::class, 'bulkPrintDownload'])->name('bulk-print.download');
         Route::post('/bulk-update', [SertifikatController::class, 'bulkUpdateStatus'])->name('update.bulk');
         Route::delete('/bulk-destroy', [SertifikatController::class, 'bulkDestroy'])->name('destroy.bulk');
         Route::get('/data',           [SertifikatController::class, 'data'])->name('data');

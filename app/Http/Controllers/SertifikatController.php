@@ -52,8 +52,11 @@ class SertifikatController extends Controller
             'file_path'          => $cert->file_path ? asset($cert->file_path) : "",
             'description'        => $cert->description ?? '-',
             'publication_date' => $cert->publication_date 
-            ? \Carbon\Carbon::parse($cert->publication_date)->translatedFormat('d F Y') 
-            : null,
+                ? \Carbon\Carbon::parse($cert->publication_date)->translatedFormat('d F Y') 
+                : null,
+            'publication_date_raw' => $cert->publication_date 
+                ? \Carbon\Carbon::parse($cert->publication_date)->format('Y-m-d')
+                : null,
             'level'             => $cert->level,
             'status'             => $cert->status,
         ]);
@@ -79,6 +82,7 @@ class SertifikatController extends Controller
             'level'              => 'nullable|string|max:50',
             'status'             => ['required', Rule::in(['Draft', 'Di Terbitkan'])],
             'description'        => 'nullable|string',
+            'publication_date'   => 'nullable|date',
         ]);
 
         $data = [
@@ -95,15 +99,14 @@ class SertifikatController extends Controller
         $cert = Certificate::create($data);
 
         if ($request->status === 'Di Terbitkan') {
-            $now = now();
             $text = (string) $cert->certificate_number;
-            $url = url('/scan?id=' . $cert->id);
+            $url  = url('/scan?id=' . $cert->id);
             $signature = $this->ecdsa->sign($text);
-            $qr = $this->qrCodeService->generate($url);
+            $qr        = $this->qrCodeService->generate($url);
             $cert->update([
-                'file_path' => $qr['path'],
+                'file_path'         => $qr['path'],
                 'digital_signature' => $signature->signature,
-                'publication_date'  => $now,
+                'publication_date' => $request->publication_date,
             ]);
         }
 
@@ -131,6 +134,7 @@ class SertifikatController extends Controller
             'level'              => 'nullable|string|max:50',
             'status'             => ['required', Rule::in(['Draft', 'Di Terbitkan'])],
             'description'        => 'nullable|string',
+            'publication_date'   => 'nullable|date', 
         ]);
 
         $dataUpdate = [
@@ -144,17 +148,14 @@ class SertifikatController extends Controller
         ];
 
         if ($request->status === 'Di Terbitkan') {
-
-            $now = now();
-
             $text = (string) $cert->certificate_number;
-            $url = url('/scan?id=' . $cert->id);
+            $url  = url('/scan?id=' . $cert->id);
             $signature = $this->ecdsa->sign($text);
-            $qr = $this->qrCodeService->generate($text);
+            $qr        = $this->qrCodeService->generate($url);  // ← fix: pakai $url bukan $text
 
-            $dataUpdate['file_path'] = $qr['path'];
+            $dataUpdate['file_path']         = $qr['path'];
             $dataUpdate['digital_signature'] = $signature->signature;
-            $dataUpdate['publication_date']  = $now;
+            $dataUpdate['publication_date'] = $request->publication_date;
         }
 
         $cert->update($dataUpdate);
@@ -168,9 +169,10 @@ class SertifikatController extends Controller
     public function bulkUpdateStatus(Request $request)
     {
         $request->validate([
-            'ids'    => 'required|array',
-            'ids.*'  => 'string|exists:certificates,id',
-            'status' => ['required', Rule::in(['Draft', 'Di Terbitkan'])],
+            'ids'              => 'required|array',
+            'ids.*'            => 'string|exists:certificates,id',
+            'status'           => ['required', Rule::in(['Draft', 'Di Terbitkan'])],
+            'publication_date' => 'nullable|date',  // ← tambah
         ]);
 
         DB::transaction(function () use ($request) {
@@ -179,19 +181,19 @@ class SertifikatController extends Controller
             foreach ($certificates as $cert) {
                 if ($cert->status === 'Di Terbitkan') continue;
 
-                $dataUpdate = ['status' => $request->status];
+                $dataUpdate = [
+                    'status'           => $request->status,
+                    'publication_date' => $request->publication_date,  // ← simpan untuk semua status
+                ];
 
                 if ($request->status === 'Di Terbitkan') {
-                    $now     = now();
                     $text = (string) $cert->certificate_number;
-                    $url = url('/scan?id=' . $cert->id);
+                    $url  = url('/scan?id=' . $cert->id);
                     $signature = $this->ecdsa->sign($text);
+                    $qr        = $this->qrCodeService->generate($url);
 
-                    $qr = $this->qrCodeService->generate($url);
-
-                    $dataUpdate['file_path'] = $qr['path'];
+                    $dataUpdate['file_path']         = $qr['path'];
                     $dataUpdate['digital_signature'] = $signature->signature;
-                    $dataUpdate['publication_date']  = $now;
                 }
 
                 $cert->update($dataUpdate);
@@ -212,7 +214,11 @@ class SertifikatController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $cert
+            'data'    => array_merge($cert->toArray(), [
+            'publication_date' => $cert->publication_date
+                    ? \Carbon\Carbon::parse($cert->publication_date)->format('Y-m-d')
+                    : null,
+            ]),
         ]);
     }
 
@@ -254,74 +260,73 @@ class SertifikatController extends Controller
         ]);
     }
 
-  public function bulkPrint(Request $request)
-{
-    $request->validate([
-        'ids'   => 'required|array',
-        'ids.*' => 'string|exists:certificates,id',
-    ]);
+    public function bulkPrint(Request $request)
+    {
+        $request->validate([
+            'ids'   => 'required|array',
+            'ids.*' => 'string|exists:certificates,id',
+        ]);
 
-    $certificates = Certificate::whereIn('id', $request->ids)
-        ->where('status', 'Di Terbitkan')
-        ->get();
+        $certificates = Certificate::whereIn('id', $request->ids)
+            ->where('status', 'Di Terbitkan')
+            ->get();
 
-    if ($certificates->isEmpty()) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Tidak ada sertifikat berstatus "Di Terbitkan".',
-        ], 422);
-    }
-
-    $tempFiles = [];
-
-    foreach ($certificates as $cert) {
-        $response = $this->print($cert->id);
-
-        ob_start();
-        $response->sendContent();
-        $pdfContent = ob_get_clean();
-
-        if (!empty($pdfContent)) {
-            $certificateNumber = preg_replace('/[\/\\\\:*?"<>|]/', '-', $cert->certificate_number ?? $cert->id);
-            $tempPath = sys_get_temp_dir() . '/cert_' . $cert->id . '_' . time() . '.pdf';
-
-            file_put_contents($tempPath, $pdfContent);
-            $tempFiles[$tempPath] = 'certificate-' . $certificateNumber . '.pdf';
+        if ($certificates->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak ada sertifikat berstatus "Di Terbitkan".',
+            ], 422);
         }
-    }
 
-    if (empty($tempFiles)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Gagal membuat PDF sertifikat.',
-        ], 500);
-    }
+        $tempFiles = [];
 
-    $zipPath = sys_get_temp_dir() . '/certificates_' . now()->format('Ymd_His') . '.zip';
-    $zip     = new \ZipArchive();
+        foreach ($certificates as $cert) {
+            $response = $this->print($cert->id);
 
-    if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+            ob_start();
+            $response->sendContent();
+            $pdfContent = ob_get_clean();
+
+            if (!empty($pdfContent)) {
+                $certificateNumber = preg_replace('/[\/\\\\:*?"<>|]/', '-', $cert->certificate_number ?? $cert->id);
+                $tempPath = sys_get_temp_dir() . '/cert_' . $cert->id . '_' . time() . '.pdf';
+
+                file_put_contents($tempPath, $pdfContent);
+                $tempFiles[$tempPath] = 'certificate-' . $certificateNumber . '.pdf';
+            }
+        }
+
+        if (empty($tempFiles)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal membuat PDF sertifikat.',
+            ], 500);
+        }
+
+        $zipPath = sys_get_temp_dir() . '/certificates_' . now()->format('Ymd_His') . '.zip';
+        $zip     = new \ZipArchive();
+
+        if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+            foreach (array_keys($tempFiles) as $path) @unlink($path);
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal membuat file ZIP.',
+            ], 500);
+        }
+
+        foreach ($tempFiles as $filePath => $nameInZip) {
+            $zip->addFile($filePath, $nameInZip);
+        }
+
+        $zip->close();
         foreach (array_keys($tempFiles) as $path) @unlink($path);
-        return response()->json([
-            'success' => false,
-            'message' => 'Gagal membuat file ZIP.',
-        ], 500);
+
+        // Langsung stream ZIP, hapus setelah terkirim
+        return response()->download($zipPath, basename($zipPath), [
+            'Content-Type' => 'application/zip',
+        ])->deleteFileAfterSend(true);
     }
-
-    foreach ($tempFiles as $filePath => $nameInZip) {
-        $zip->addFile($filePath, $nameInZip);
-    }
-
-    $zip->close();
-    foreach (array_keys($tempFiles) as $path) @unlink($path);
-
-    // Langsung stream ZIP, hapus setelah terkirim
-    return response()->download($zipPath, basename($zipPath), [
-        'Content-Type' => 'application/zip',
-    ])->deleteFileAfterSend(true);
-}
-
-
+    
     public function print($id)
     {
         // ── 1. Ambil data sertifikat ──────────────────────────────────────

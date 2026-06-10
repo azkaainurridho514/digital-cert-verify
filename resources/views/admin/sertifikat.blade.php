@@ -851,6 +851,46 @@
                         </select>
                     </div>
 
+
+                    {{-- ======= FIELD BARU: TANGGAL TERBIT ======= --}}
+<div class="field-item" id="fieldTanggalTerbit">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <div style="flex:1;">
+            <label class="field-label">Tanggal Terbit</label>
+            <div style="font-size:11px;color:var(--c-slate-400);margin-top:2px;" id="tglHint">
+                Gunakan tanggal hari ini secara otomatis
+            </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+            <span style="font-size:12px;color:var(--c-slate-500);" id="tglSwitchLabel">Otomatis</span>
+            <div class="form-check form-switch mb-0">
+                <input class="form-check-input" type="checkbox" role="switch"
+                       id="switchTanggalTerbit" checked
+                       onchange="toggleTanggalMode(this)">
+            </div>
+        </div>
+    </div>
+
+    {{-- Badge otomatis --}}
+    <div id="autoTglBadge" style="margin-top:8px;display:flex;align-items:center;gap:6px;
+         padding:7px 12px;background:var(--c-slate-50);
+         border:1px dashed var(--c-slate-200);border-radius:8px;
+         font-size:12px;color:var(--c-slate-500);">
+        <i class="bi bi-calendar-check" style="color:#378ADD;"></i>
+        <span>Otomatis: </span>
+        <span style="font-weight:500;color:var(--c-slate-800);" id="autoTglVal"></span>
+    </div>
+
+    {{-- Input manual (tersembunyi saat otomatis) --}}
+    <div id="manualTglRow" style="margin-top:8px;display:none;">
+        <div class="field-icon-wrap">
+            <i class="bi bi-calendar3 f-icon"></i>
+            <input type="date" class="field-input" id="inputPublicationDate" style="padding-left:34px;">
+        </div>
+    </div>
+</div>
+{{-- ======= END FIELD BARU ======= --}}
+
                     <div class="field-item">
                         <label class="field-label">Deskripsi</label>
                         <textarea class="field-input" rows="3" id="inputDescription" placeholder="Deskripsi sertifikat..."></textarea>
@@ -957,6 +997,30 @@
         modalDetail     = new bootstrap.Modal(document.getElementById('modalDetail'));
         fetchData();
     });
+
+    (function () {
+        const now = new Date();
+        const bulan = ['Januari','Februari','Maret','April','Mei','Juni',
+                    'Juli','Agustus','September','Oktober','November','Desember'];
+        const pad = n => String(n).padStart(2, '0');
+
+        document.getElementById('autoTglVal').textContent =
+            `${now.getDate()} ${bulan[now.getMonth()]} ${now.getFullYear()}`;
+
+        const inputDate = document.getElementById('inputPublicationDate');
+        if (inputDate) inputDate.value =
+            `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+    })();
+
+function toggleTanggalMode(sw) {
+    const isAuto = sw.checked;
+    document.getElementById('autoTglBadge').style.display  = isAuto ? 'flex'  : 'none';
+    document.getElementById('manualTglRow').style.display  = isAuto ? 'none'  : 'block';
+    document.getElementById('tglSwitchLabel').textContent  = isAuto ? 'Otomatis' : 'Manual';
+    document.getElementById('tglHint').textContent         = isAuto
+        ? 'Gunakan tanggal hari ini secara otomatis'
+        : 'Pilih tanggal terbit secara manual';
+}
 
     // ─────────────────────────────────────────────────────────────────────────
     // TABLE
@@ -1371,40 +1435,6 @@
         }
     }
 
-    // async function doBulkPrint() {
-    //     const konfirmasi = await Swal.fire({
-    //         icon: 'info',
-    //         title: 'Print Data?',
-    //         html: `<b>${selectedIds.size}</b> sertifikat yang di pilih akan di print.`,
-    //         showCancelButton:   true,
-    //         confirmButtonText:  'Ya!',
-    //         cancelButtonText:   'Batal',
-    //         confirmButtonColor: '#3b82f6',
-    //         cancelButtonColor:  '#e2e8f0',
-    //         customClass: { cancelButton: 'swal-cancel-custom', popup: 'swal-popup-custom' },
-    //     });
-    //     if (!konfirmasi.isConfirmed) return;
-
-    //     Swal.fire({ title: 'Membuat PDF...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-    //     try {
-    //         const res  = await fetch(URL_BULK_PRINT, {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type':     'application/json',
-    //                 'X-CSRF-TOKEN':     CSRF,
-    //                 'X-Requested-With': 'XMLHttpRequest',
-    //             },
-    //             body: JSON.stringify({ ids: Array.from(selectedIds)}),
-    //         });
-    //         const json = await res.json();
-    //         if (!json.success) throw new Error(json.message ?? 'Gagal download.');
-    //         afterBulkSuccess('Data berhasil di buat.');
-    //     } catch (e) {
-    //         Swal.fire({ icon: 'error', title: 'Gagal', text: e.message });
-    //     }
-    // }
-
     async function doBulkPrint() {
         const konfirmasi = await Swal.fire({
             icon: 'info',
@@ -1450,27 +1480,70 @@
         afterBulkSuccess('Data berhasil di print.');
     }
 
+    function toggleTanggalByStatus(status) {
+        const isDiterbitkan = status === 'Di Terbitkan';
+        const fieldWrap     = document.getElementById('fieldTanggalTerbit');
+        const sw            = document.getElementById('switchTanggalTerbit');
+        const badge         = document.getElementById('autoTglBadge');
+        const manualRow     = document.getElementById('manualTglRow');
+        const hint          = document.getElementById('tglHint');
+        const switchLabel   = document.getElementById('tglSwitchLabel');
+
+        if (isDiterbitkan) {
+            // Aktifkan field — tampilkan normal
+            fieldWrap.style.opacity        = '1';
+            fieldWrap.style.pointerEvents  = 'auto';
+            sw.disabled                    = false;
+        } else {
+            // Draft — disable seluruh field tanggal
+            fieldWrap.style.opacity        = '0.4';
+            fieldWrap.style.pointerEvents  = 'none';
+            sw.disabled                    = true;
+
+            // Reset ke otomatis saat disable
+            sw.checked           = true;
+            badge.style.display  = 'flex';
+            manualRow.style.display = 'none';
+            switchLabel.textContent = 'Otomatis';
+            hint.textContent        = 'Gunakan tanggal hari ini secara otomatis';
+        }
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // FORM (Create / Edit)
     // ─────────────────────────────────────────────────────────────────────────
 
     function getFormData() {
+        const isAuto  = document.getElementById('switchTanggalTerbit').checked;
+        const status  = document.getElementById('inputStatus').value.trim();
+        const pad     = n => String(n).padStart(2, '0');
+        const now     = new Date();
+        const today   = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+
+        let issuedAt = null;
+        if (status === 'Di Terbitkan') {
+            issuedAt = isAuto ? today : (document.getElementById('inputPublicationDate')?.value ?? '');
+        }
         return {
             certificateNumber: document.getElementById('inputCertificateNumber').value.trim(),
             username:          document.getElementById('inputStudent').value.trim(),
             programName:       document.getElementById('inputProgram').value.trim(),
             grade:             document.getElementById('inputGrade').value.trim(),
             level:             document.getElementById('inputLevel').value.trim(),
-            status:            document.getElementById('inputStatus').value.trim(),
+            status,
             desc:              document.getElementById('inputDescription').value.trim(),
+            issuedAt,
         };
     }
 
     function resetForm() {
         ['inputCertificateNumber', 'inputStudent', 'inputProgram',
-         'inputGrade', 'inputLevel', 'inputDescription']
+        'inputGrade', 'inputLevel', 'inputDescription']
             .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
         document.getElementById('inputStatus').value = 'Draft';
+
+        // Reset tanggal ke kondisi disabled (karena default Draft)
+        toggleTanggalByStatus('Draft');
     }
 
     function openCreateModal() {
@@ -1509,6 +1582,20 @@
             document.getElementById('inputDescription').value       = d.description        || '';
             document.getElementById('inputStatus').value            = d.status             || 'Draft';
 
+            toggleTanggalByStatus(d.status || 'Draft');
+
+            const sw      = document.getElementById('switchTanggalTerbit');
+            const rawDate = d.publication_date ? d.publication_date.substring(0, 10) : null;
+
+            if (rawDate) {
+                sw.checked = false;
+                toggleTanggalMode(sw);
+                document.getElementById('inputPublicationDate').value = rawDate;
+            } else {
+                sw.checked = true;
+                toggleTanggalMode(sw);
+            }
+
             modalSertifikat.show();
         } catch {
             Swal.fire({ icon: 'error', title: 'Gagal', text: 'Tidak dapat memuat data.' });
@@ -1516,7 +1603,7 @@
     }
 
     async function handleSubmit() {
-        const { certificateNumber, username, programName, grade, level, status, desc } = getFormData();
+        const { certificateNumber, username, programName, grade, level, status, desc, issuedAt } = getFormData();
 
         if (!username || !programName) {
             await Swal.fire({ icon: 'warning', title: 'Oops...', text: 'Nama siswa dan Program wajib diisi.' });
@@ -1532,18 +1619,12 @@
         });
         if (!result.isConfirmed) return;
 
-        if (status === 'Di Terbitkan') {
-            const confirmPublish = await Swal.fire({
-                icon: 'warning',
-                title: 'Yakin menerbitkan?',
-                html: 'Status ini permanen & tidak bisa diedit lagi.',
-                showCancelButton:  true,
-                confirmButtonText: 'Ya, Terbitkan!',
-            });
-            if (!confirmPublish.isConfirmed) return;
+        if (status === 'Di Terbitkan' && !issuedAt) {
+            await Swal.fire({ icon: 'warning', title: 'Oops...', text: 'Tanggal terbit wajib diisi.' });
+            return;
         }
 
-        await submitData({ certificateNumber, username, programName, grade, level, status, desc });
+        await submitData({ certificateNumber, username, programName, grade, level, status, desc, issuedAt });
     }
 
     async function submitData(data) {
@@ -1571,6 +1652,7 @@
                     level:              data.level,
                     status:             data.status,
                     description:        data.desc,
+                    publication_date:   data.issuedAt, 
                 }),
             });
             const json = await res.json();
@@ -2112,6 +2194,20 @@
             document.getElementById('tplBtnSaveLabel').textContent = 'Simpan Template';
         }
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        modalSertifikat = new bootstrap.Modal(document.getElementById('modalSertifikat'));
+        modalDetail     = new bootstrap.Modal(document.getElementById('modalDetail'));
+        fetchData();
+
+        // ← tambah ini
+        document.getElementById('inputStatus').addEventListener('change', function () {
+            toggleTanggalByStatus(this.value);
+        });
+
+        // Jalankan sekali saat load — default status = Draft
+        toggleTanggalByStatus(document.getElementById('inputStatus').value);
+    });
 
 </script>
 @endpush

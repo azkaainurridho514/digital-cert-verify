@@ -423,6 +423,25 @@
                 <span class="info-label">Tanggal Terbit</span>
                 <span class="info-value" id="res-tanggal">-</span>
               </div>
+              {{-- Digital Signature (hidden by default) --}}
+              <div class="info-row" id="digital-signature-row" style="display: none;">
+                <span class="info-value" id="res-signature"
+                      style="font-family: monospace; font-size: 0.72rem; word-break: break-all; color: #6b7280;">
+                  -
+                </span>
+              </div>
+
+              <div class="mt-2 text-end" id="signature-toggle-wrapper" style="display: none;">
+                <button
+                  type="button"
+                  onclick="toggleSignature()"
+                  id="btn-toggle-signature"
+                  style="font-size: 0.75rem; background: none; border: none; color: #6b7280; cursor: pointer; text-decoration: underline; padding: 0;">
+                  Lihat Digital Signature ▼
+                </button>
+              </div>
+
+
             </div>
 
             <!-- INVALID -->
@@ -478,16 +497,29 @@
   }
 
   function showValid(data) {
+    console.log(data)
     $("#res-nama").text(data.username ?? '-');
     $("#res-program").text(data.program_name ?? '-');
     $("#res-nilai").text(data.grade ?? '-');
     $("#res-no").text(data.certificate_number ?? '-');
+   
     // $("#res-tanggal").text(data.publication_date ?? '-');
     $("#res-tanggal").text(
         data.publication_date
             ? new Date(data.publication_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
             : '-'
     );
+      // Digital Signature
+    $("#res-signature").text(data.digital_signature ?? '-');
+    $("#digital-signature-row").hide();         // ← reset ke hidden
+    $("#btn-toggle-signature").text("Lihat Digital Signature ▼"); // ← reset teks tombol
+    if (data.digital_signature) {
+        $("#signature-toggle-wrapper").show();  // ← tombol muncul hanya jika ada data
+    } else {
+        $("#signature-toggle-wrapper").hide();
+    }
+
+
     $("#invalidCard").hide();
     $("#validCard").fadeIn();
   }
@@ -496,6 +528,15 @@
     $("#validCard").hide();
     $("#invalidCard").find('.invalid-message').text(message);
     $("#invalidCard").fadeIn();
+  }
+
+  function toggleSignature() {
+    const row = document.getElementById('digital-signature-row');
+    const btn = document.getElementById('btn-toggle-signature');
+    const isHidden = row.style.display === 'none';
+
+    row.style.display = isHidden ? 'flex' : 'none';
+    btn.textContent = isHidden ? 'Sembunyikan Digital Signature ▲' : 'Lihat Digital Signature ▼';
   }
 
   function stopScanner() {

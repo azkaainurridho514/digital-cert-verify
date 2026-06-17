@@ -531,17 +531,17 @@ class SertifikatController extends Controller
         );
 
         // 6. QR Code
-        if ($qrPath) {
-            $qrSize = 300;
-            // $qrSize = 220;
-            $pdf->Image(
-                $qrPath,
-                $sx($template->x_position_qr_code),
-                $sy($template->y_position_qr_code),
-                $qrSize, $qrSize,
-                '', '', '', false, 300, '', false, false, 0
-            );
-        }
+        // if ($qrPath) {
+        //     $qrSize = 300;
+        //     // $qrSize = 220;
+        //     $pdf->Image(
+        //         $qrPath,
+        //         $sx($template->x_position_qr_code),
+        //         $sy($template->y_position_qr_code),
+        //         $qrSize, $qrSize,
+        //         '', '', '', false, 300, '', false, false, 0
+        //     );
+        // }
 
         return $pdf;
     }

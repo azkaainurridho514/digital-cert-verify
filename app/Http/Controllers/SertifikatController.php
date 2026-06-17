@@ -34,7 +34,7 @@ class SertifikatController extends Controller
         $query = Certificate::query()
             ->when($search, function ($q) use ($search) {
                 $q->where('username', 'like', "%$search%")
-                ->orWhere('program_name', 'like', "%$search%");
+                ->orWhere('certificate_number', 'like', "%$search%");
             })
             ->when($bulan, fn($q) => $q->whereMonth('created_at', $bulan))
             ->when($tahun, fn($q) => $q->whereYear('created_at', $tahun))

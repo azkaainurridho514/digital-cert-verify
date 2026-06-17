@@ -639,7 +639,7 @@
                 </svg>
             </span>
             <input type="text" class="search-input" id="searchSertifikat"
-                   placeholder="Cari nama, sertifikat..."
+                   placeholder="Cari nama / nomor sertifikat..."
                    onkeyup="handleSearch(this)">
             <button class="clear-btn" id="clearSearch" onclick="clearSearchInput()" style="display:none;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">

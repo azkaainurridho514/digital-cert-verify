@@ -264,7 +264,7 @@
         </div>  
 
         <h2>Selamat Datang</h2>
-        <p class="subtitle">Masuk ke OLC System untuk melanjutkan</p>
+        <p class="subtitle">Silakan login untuk mengakses Sistem Sertifikat OLC</p>
 
         <form id="loginForm" action="{{ route('login.post') }}" method="POST" novalidate>
             @csrf
@@ -334,13 +334,13 @@
         </form>
 
         {{-- Demo Accounts --}}
-        <div class="divider-text">Akun Demo</div>
+        {{-- <div class="divider-text">Akun Demo</div>
         <div class="demo-accounts">
             <div class="demo-btn" onclick="fillDemo('ourlearningcenterkuningan@gmail.com', 'password')">
                 <strong><i class="bi bi-shield-fill-check me-1"></i>Admin</strong>
                ourlearningcenterkuningan@gmail.com
             </div>
-        </div>
+        </div> --}}
 
     </div>
 

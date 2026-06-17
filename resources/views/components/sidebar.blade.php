@@ -236,12 +236,12 @@
             <span class="nav-text">Sertifikat</span>
         </a>
 
-        <a href="{{ route('verifikasi') }}"
+        {{-- <a href="{{ route('verifikasi') }}"
            class="nav-item-link {{ request()->routeIs('verifikasi*') ? 'active' : '' }}"
            data-label="Verifikasi">
             <i class="bi bi-patch-check-fill nav-icon"></i>
             <span class="nav-text">Verifikasi</span>
-        </a>
+        </a> --}}
 
     </div>
 

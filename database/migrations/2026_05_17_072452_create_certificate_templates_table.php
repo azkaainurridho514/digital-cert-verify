@@ -41,6 +41,11 @@ return new class extends Migration
             $table->integer('width_publish_date');
             $table->integer('height_publish_date');
 
+            $table->integer('x_position_description');
+            $table->integer('y_position_description');
+            $table->integer('width_description');
+            $table->integer('height_description');
+
             $table->integer('x_position_qr_code');
             $table->integer('y_position_qr_code');
             $table->integer('width_qr_code');

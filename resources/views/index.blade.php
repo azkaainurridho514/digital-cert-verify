@@ -547,7 +547,7 @@
     <div class="hero-grid"></div>
     <div class="container position-relative">
       <div class="row align-items-center g-5">
-        <div class="col-lg-6">
+        <div class="col-lg-12">
           <div class="hero-label">✦ Official Certificate System</div>
           <h1 class="hero-title">
             English <span class="gold">Mastery</span><br>Starts Here
@@ -578,7 +578,7 @@
           </div> --}}
         </div>
 
-        <div class="col-lg-6">
+        {{-- <div class="col-lg-6">
           <div class="hero-visual">
 
             <div class="float-badge float-badge-1">
@@ -620,7 +620,7 @@
             </div>
 
           </div>
-        </div>
+        </div> --}}
       </div>
     </div>
   </section>

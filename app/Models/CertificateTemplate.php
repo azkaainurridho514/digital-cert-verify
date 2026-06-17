@@ -38,6 +38,11 @@ class CertificateTemplate extends Model
         'width_publish_date',
         'height_publish_date',
 
+        'x_position_description',
+        'y_position_description',
+        'width_description',
+        'height_description',
+
         'x_position_qr_code',
         'y_position_qr_code',
         'width_qr_code',

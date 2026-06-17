@@ -491,40 +491,44 @@ class SertifikatController extends Controller
             "OF ENGLISH ". strtoupper($cert->level) . " LEVEL COMPLETION",
             $sx($template->x_position_program_name), $sy($template->y_position_program_name),
             $sx($template->width_program_name), $sy($template->height_program_name),
-            14, $dark, false, $fontDisplayBold
+            12, $dark, false, $fontDisplayBold
         );
+
+        // ── Warna soft untuk teks description & tanggal ───────────────────
+        $darkSoft = [76, 84, 95]; // ← pindah ke sini
 
         // 5. Tanggal Terbit — Alice
         $publishDate = $cert->publication_date
             ? \Carbon\Carbon::parse($cert->publication_date)->format('jS F Y')
             : '';
-        $this->putTextMm($pdf,
+
+        $pdf->SetFont($fontBody, '', 15);
+        $pdf->SetTextColor($darkSoft[0], $darkSoft[1], $darkSoft[2]);
+        $pdf->SetXY(
+            $sx($template->x_position_publish_date),
+            $sy($template->y_position_publish_date)
+        );
+        $pdf->MultiCell(
+            $sx($template->width_publish_date),
+            $sy($template->height_publish_date),
             $publishDate,
-            $sx($template->x_position_publish_date), $sy($template->y_position_publish_date),
-            $sx($template->width_publish_date), $sy($template->height_publish_date),
-            20, $dark, false, $fontBody
+            0, 'C', false, 1
         );
 
-        // ── Teks statis ───────────────────────────────────────────────────
-        $darkSoft = [76, 84, 95]; 
-        // "This certificate is proudly presented to"
-        $pdf->SetFont($fontBody, 'I', 18);
-        $pdf->SetTextColor(...$darkSoft);
-        $pdf->SetXY(0, $sy($template->y_position_name) - 10);
-        // $pdf->Cell($pdfW, 6, 'This certificate is proudly presented to', 0, 0, 'C');
-
-        // "For completing the English ... examination"
-        $level       = $cert->level ?? 'English';
-        $orgName     = 'Our Learning Center - Kampung Inggris Kuningan';
-        $forLine1    = "For completing the {$level} examination";
-        $forLine2    = "held by {$orgName}";
-
-        $pdf->SetFont($fontBody, '', 18);
-        $pdf->SetTextColor(...$darkSoft);
-        $pdf->SetXY(0, $sy($template->y_position_name) + $sy($template->height_position_name) + 4);
-        $pdf->Cell($pdfW, 5, $forLine1, 0, 1, 'C');
-        $pdf->SetX(0);
-        $pdf->Cell($pdfW, 5, $forLine2, 0, 0, 'C');
+        // ── Teks description dari database ────────────────────────────────
+        $description = $cert->description ?? '';
+        $pdf->SetFont($fontBody, '', 15);
+        $pdf->SetTextColor($darkSoft[0], $darkSoft[1], $darkSoft[2]);
+        $pdf->SetXY(
+            $sx($template->x_position_description),
+            $sy($template->y_position_description)
+        );
+        $pdf->MultiCell(
+            $sx($template->width_description),
+            $sy($template->height_description),
+            $description,
+            0, 'C', false, 1
+        );
 
         // 6. QR Code
         if ($qrPath) {

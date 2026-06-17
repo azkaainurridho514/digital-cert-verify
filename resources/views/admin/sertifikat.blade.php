@@ -611,7 +611,7 @@
 {{-- Page Header --}}
 <div class="page-header">
     <h4>Sertifikat</h4>
-    <p>Buat dan kelola sertifikat siswa secara efisien.</p>
+    <p>Buat dan kelola sertifikat.</p>
 </div>
 
 {{-- Main Card --}}
@@ -968,6 +968,7 @@
         { key: 'grade',        label: 'Grade',            color: '#22c55e', widthKey: 'width_grade',            heightKey: 'height_grade'            },
         { key: 'program_name', label: 'Level',     color: '#f59e0b', widthKey: 'width_program_name',     heightKey: 'height_program_name'     },
         // { key: 'program_name', label: 'Program Name',     color: '#f59e0b', widthKey: 'width_program_name',     heightKey: 'height_program_name'     },
+        { key: 'description',  label: 'Description',      color: '#ec4899', widthKey: 'width_description',      heightKey: 'height_description'      },
         { key: 'publish_date', label: 'Publish Date',     color: '#8b5cf6', widthKey: 'width_publish_date',     heightKey: 'height_publish_date'     },
         { key: 'qr_code',      label: 'QR Code',          color: '#0ea5e9', widthKey: 'width_qr_code',          heightKey: 'height_qr_code'          },
     ];
@@ -2107,8 +2108,31 @@ function toggleTanggalMode(sw) {
     // }
 
 
-    // new
+    // new 1
+    // function spawnBoxes(savedData) {
+    //     const s = tplScale();
 
+    //     PREDEFINED_FIELDS.forEach((field, i) => {
+    //         const px = savedData ? (savedData[`x_position_${field.key}`] ?? 0) * s : 10 * s;
+    //         const py = savedData ? (savedData[`y_position_${field.key}`] ?? 0) * s : (10 + i * 40) * s;
+
+    //         // ← Fix ukuran QR 300x300, field lain tetap bisa resize
+    //         let bw, bh;
+    //         if (field.key === 'qr_code') {
+    //             bw = 300 * s;
+    //             bh = 300 * s;
+    //         } else {
+    //             bw = savedData && savedData[field.widthKey]  ? savedData[field.widthKey]  * s : 120 * s;
+    //             bh = savedData && savedData[field.heightKey] ? savedData[field.heightKey] * s : 24  * s;
+    //         }
+
+    //         tplCreateBox(field, px, py, bw, bh);
+    //     });
+
+    //     tplSetActive(PREDEFINED_FIELDS[0].key);
+    // }
+
+    // new 2
     function spawnBoxes(savedData) {
         const s = tplScale();
 
@@ -2116,11 +2140,14 @@ function toggleTanggalMode(sw) {
             const px = savedData ? (savedData[`x_position_${field.key}`] ?? 0) * s : 10 * s;
             const py = savedData ? (savedData[`y_position_${field.key}`] ?? 0) * s : (10 + i * 40) * s;
 
-            // ← Fix ukuran QR 300x300, field lain tetap bisa resize
             let bw, bh;
             if (field.key === 'qr_code') {
                 bw = 300 * s;
                 bh = 300 * s;
+            } else if (field.key === 'description') {
+                // ← default lebar untuk description
+                bw = savedData && savedData[field.widthKey] ? savedData[field.widthKey] * s : 400 * s;
+                bh = savedData && savedData[field.heightKey] ? savedData[field.heightKey] * s : 40  * s;
             } else {
                 bw = savedData && savedData[field.widthKey]  ? savedData[field.widthKey]  * s : 120 * s;
                 bh = savedData && savedData[field.heightKey] ? savedData[field.heightKey] * s : 24  * s;
@@ -2131,6 +2158,7 @@ function toggleTanggalMode(sw) {
 
         tplSetActive(PREDEFINED_FIELDS[0].key);
     }
+
     // ── File input ─────────────────────────────────────────────────────────────────
     function tplInitFileInput() {
         const input = document.getElementById('tplInputImage');

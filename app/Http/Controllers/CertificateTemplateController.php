@@ -89,6 +89,12 @@ class CertificateTemplateController extends Controller
             'y_position_publish_date'  => 'required|integer',
             'width_publish_date'       => 'required|integer',
             'height_publish_date'      => 'required|integer',
+            'height_program_name'      => 'required|integer',
+
+            'x_position_description'  => 'required|integer',
+            'y_position_description'  => 'required|integer',
+            'width_description'       => 'required|integer',
+            'height_description'      => 'required|integer',
 
             'x_position_qr_code'       => 'required|integer',
             'y_position_qr_code'       => 'required|integer',
@@ -108,6 +114,7 @@ class CertificateTemplateController extends Controller
                 'x_position_grade',        'y_position_grade',        'width_grade',             'height_grade',
                 'x_position_program_name', 'y_position_program_name', 'width_program_name',      'height_program_name',
                 'x_position_publish_date', 'y_position_publish_date', 'width_publish_date',      'height_publish_date',
+                'x_position_description', 'y_position_description', 'width_description',      'height_description',
                 'x_position_qr_code',      'y_position_qr_code',      'width_qr_code',           'height_qr_code',
             ])
         ));
@@ -155,6 +162,11 @@ class CertificateTemplateController extends Controller
             'width_publish_date'       => 'required|integer',
             'height_publish_date'      => 'required|integer',
 
+            'x_position_description'  => 'required|integer',
+            'y_position_description'  => 'required|integer',
+            'width_description'       => 'required|integer',
+            'height_description'      => 'required|integer',
+
             'x_position_qr_code'       => 'required|integer',
             'y_position_qr_code'       => 'required|integer',
             'width_qr_code'            => 'required|integer',
@@ -177,6 +189,7 @@ class CertificateTemplateController extends Controller
             'x_position_grade',        'y_position_grade',        'width_grade',             'height_grade',
             'x_position_program_name', 'y_position_program_name', 'width_program_name',      'height_program_name',
             'x_position_publish_date', 'y_position_publish_date', 'width_publish_date',      'height_publish_date',
+            'x_position_description', 'y_position_description', 'width_description',      'height_description',
             'x_position_qr_code',      'y_position_qr_code',      'width_qr_code',           'height_qr_code',
         ]))->save();
 
@@ -262,6 +275,11 @@ class CertificateTemplateController extends Controller
             'y_position_publish_date'  => $t->y_position_publish_date,
             'width_publish_date'       => $t->width_publish_date,
             'height_publish_date'      => $t->height_publish_date,
+
+            'x_position_description'  => $t->x_position_description,
+            'y_position_description'  => $t->y_position_description,
+            'width_description'       => $t->width_description,
+            'height_description'      => $t->height_description,
 
             'x_position_qr_code'       => $t->x_position_qr_code,
             'y_position_qr_code'       => $t->y_position_qr_code,

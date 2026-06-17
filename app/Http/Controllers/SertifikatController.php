@@ -99,9 +99,8 @@ class SertifikatController extends Controller
         $cert = Certificate::create($data);
 
         if ($request->status === 'Di Terbitkan') {
-            $text = (string) $cert->certificate_number;
             $url  = url('/scan?id=' . $cert->id);
-            $signature = $this->ecdsa->sign($text);
+            $signature = $this->ecdsa->sign($cert->certificate_number);
             $qr        = $this->qrCodeService->generate($url);
             $cert->update([
                 'file_path'         => $qr['path'],
@@ -148,9 +147,8 @@ class SertifikatController extends Controller
         ];
 
         if ($request->status === 'Di Terbitkan') {
-            $text = (string) $cert->certificate_number;
             $url  = url('/scan?id=' . $cert->id);
-            $signature = $this->ecdsa->sign($text);
+            $signature = $this->ecdsa->sign($cert->certificate_number);
             $qr        = $this->qrCodeService->generate($url);  // ← fix: pakai $url bukan $text
 
             $dataUpdate['file_path']         = $qr['path'];
@@ -187,9 +185,8 @@ class SertifikatController extends Controller
                 ];
 
                 if ($request->status === 'Di Terbitkan') {
-                    $text = (string) $cert->certificate_number;
                     $url  = url('/scan?id=' . $cert->id);
-                    $signature = $this->ecdsa->sign($text);
+                    $signature = $this->ecdsa->sign($cert->certificate_number);
                     $qr        = $this->qrCodeService->generate($url);
 
                     $dataUpdate['file_path']         = $qr['path'];
@@ -442,6 +439,7 @@ class SertifikatController extends Controller
         // ── Font Manager ──────────────────────────────────────────────────
         $fontManager = new \App\Services\TcpdfFontManager();
         $fontDisplay = $fontManager->ensure('cinzel');   // heading & nama
+        $fontDisplayBold = $fontManager->ensure('cinzel-bold');
         $fontBody    = $fontManager->ensure('alice');    // body text
 
         $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
@@ -468,7 +466,7 @@ class SertifikatController extends Controller
             strtoupper($cert->username ?? ''),
             $sx($template->x_position_name), $sy($template->y_position_name),
             $sx($template->width_position_name), $sy($template->height_position_name),
-            35, $gold, true, $fontDisplay
+            35, $gold, true, $fontDisplayBold
         );
 
         // 2. Nomor Sertifikat — Alice, kecil
@@ -485,15 +483,15 @@ class SertifikatController extends Controller
             $sx($template->x_position_grade), $sy($template->y_position_grade),
             $sx($template->width_grade), $sy($template->height_grade),
             // 20, $white, true, $fontDisplay
-            40, $gold, true, $fontDisplay
+            40, $gold, true, $fontDisplayBold
         );
 
         // 4. Level — Alice
         $this->putTextMm($pdf,
-            "OF ENGLISH ".$cert->level . " LEVEL COMPLETION",
+            "OF ENGLISH ". strtoupper($cert->level) . " LEVEL COMPLETION",
             $sx($template->x_position_program_name), $sy($template->y_position_program_name),
             $sx($template->width_program_name), $sy($template->height_program_name),
-            18, $dark, false, $fontBody
+            14, $dark, false, $fontDisplayBold
         );
 
         // 5. Tanggal Terbit — Alice
@@ -508,9 +506,10 @@ class SertifikatController extends Controller
         );
 
         // ── Teks statis ───────────────────────────────────────────────────
+        $darkSoft = [76, 84, 95]; 
         // "This certificate is proudly presented to"
         $pdf->SetFont($fontBody, 'I', 18);
-        $pdf->SetTextColor(...$dark);
+        $pdf->SetTextColor(...$darkSoft);
         $pdf->SetXY(0, $sy($template->y_position_name) - 10);
         // $pdf->Cell($pdfW, 6, 'This certificate is proudly presented to', 0, 0, 'C');
 
@@ -521,7 +520,7 @@ class SertifikatController extends Controller
         $forLine2    = "held by {$orgName}";
 
         $pdf->SetFont($fontBody, '', 18);
-        $pdf->SetTextColor(...$dark);
+        $pdf->SetTextColor(...$darkSoft);
         $pdf->SetXY(0, $sy($template->y_position_name) + $sy($template->height_position_name) + 4);
         $pdf->Cell($pdfW, 5, $forLine1, 0, 1, 'C');
         $pdf->SetX(0);
@@ -529,7 +528,8 @@ class SertifikatController extends Controller
 
         // 6. QR Code
         if ($qrPath) {
-            $qrSize = 220;
+            $qrSize = 300;
+            // $qrSize = 220;
             $pdf->Image(
                 $qrPath,
                 $sx($template->x_position_qr_code),
@@ -542,51 +542,59 @@ class SertifikatController extends Controller
         return $pdf;
     }
 
-    /**
-     * Versi putText yang menerima mm langsung (bukan px).
-     */
+    // old black doff
     // private function putTextMm(
-    //     TCPDF $pdf,
+    //     TCPDF  $pdf,
     //     string $text,
-    //     float $x, float $y,
-    //     float $w, float $h,
-    //     ?float $fontSize = null,
-    //     array $color = [0, 0, 0],   // RGB, default hitam
-    //     bool $bold = false
+    //     float  $x,
+    //     float  $y,
+    //     float  $w,
+    //     float  $h,
+    //     int    $fontSize,
+    //     array  $color,
+    //     bool   $bold   = false,
+    //     string $font   = 'alice'
     // ): void {
-    //     if (trim($text) === '') return;
-
     //     $style = $bold ? 'B' : '';
-    //     $pdf->SetFont('helvetica', $style, 12);
-
-    //     $size = $fontSize ?? $this->autoFontSizeMm($pdf, $text, $w, $h);
-    //     $pdf->SetFontSize($size);
-    //     $pdf->SetTextColor($color[0], $color[1], $color[2]);
+    //     $pdf->SetFont($font, $style, $fontSize);
+    //     $pdf->SetTextColor(...$color);
     //     $pdf->SetXY($x, $y);
-    //     $pdf->MultiCell($w, $h, $text, 0, 'C', false, 1, $x, $y, true, 0, false, true, $h, 'M');
-
-    //     // Reset warna ke hitam setelah render
-    //     $pdf->SetTextColor(0, 0, 0);
+    //     $pdf->Cell($w, $h, $text, 0, 0, 'C');
     // }
 
     private function putTextMm(
-    TCPDF  $pdf,
-    string $text,
-    float  $x,
-    float  $y,
-    float  $w,
-    float  $h,
-    int    $fontSize,
-    array  $color,
-    bool   $bold   = false,
-    string $font   = 'alice'
-): void {
-    $style = $bold ? 'B' : '';
-    $pdf->SetFont($font, $style, $fontSize);
-    $pdf->SetTextColor(...$color);
-    $pdf->SetXY($x, $y);
-    $pdf->Cell($w, $h, $text, 0, 0, 'C');
-}
+        TCPDF  $pdf,
+        string $text,
+        float  $x,
+        float  $y,
+        float  $w,
+        float  $h,
+        int    $fontSize,
+        array  $color,
+        bool   $bold   = false,
+        string $font   = 'alice'
+    ): void {
+        $style = $bold ? 'B' : '';
+        $pdf->SetFont($font, $style, $fontSize);
+
+        // Khusus warna gelap (hitam/dark), simulasi opacity 0.8
+        // dengan blend ke putih: result = color + (255 - color) * (1 - opacity)
+        $opacity = 0.8;
+        $adjustedColor = array_map(function($c) use ($opacity) {
+            $isDark = $c < 100; // anggap gelap jika nilai RGB < 100
+            if ($isDark) {
+                return (int) round($c + (255 - $c) * (1 - $opacity));
+            }
+            return $c;
+        }, $color);
+
+        $pdf->SetTextColor(...$adjustedColor);
+        $pdf->SetXY($x, $y);
+        $pdf->Cell($w, $h, $text, 0, 0, 'C');
+
+        // Reset warna
+        $pdf->SetTextColor(0, 0, 0);
+    }
 
     /**
      * autoFontSize versi mm.

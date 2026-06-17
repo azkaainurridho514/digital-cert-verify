@@ -136,7 +136,7 @@
                     <thead>
                         <tr>
                             <th style="padding-left:20px;">Nama</th>
-                            <th>Program</th>
+                            <th>Tanggal Buat</th>
                             <th>Status</th>
                         </tr>
                     </thead>
@@ -146,7 +146,7 @@
                             <td style="padding-left:20px;">
                                 {{ $cert->username }}
                             </td>
-                            <td>{{ $cert->program_name }}</td>
+                            <td>{{ \Carbon\Carbon::parse($cert->created_at)->translatedFormat('d F Y') }}</td>
                             <td>
                                 @if($cert->status == 'Di Terbitkan')
                                     <span class="badge bg-success">Diterbitkan</span>

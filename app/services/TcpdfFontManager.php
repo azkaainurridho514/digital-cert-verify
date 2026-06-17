@@ -10,6 +10,9 @@ class TcpdfFontManager
         'cinzel' => [
             'path' => 'fonts/cinzel-font.ttf',
         ],
+        'cinzel-bold' => [                          // ← tambah ini
+            'path' => 'fonts/cinzel-font-bold.ttf',
+        ],
         'alice' => [
             'path' => 'fonts/alice-font.ttf',
         ],

@@ -18,7 +18,9 @@ class QrCodeService
 
         QrCode::format('svg')
             ->size($size)
-            ->errorCorrection('Q')
+            ->errorCorrection('L') 
+            ->margin(2)  
+            // ->errorCorrection('Q')
             ->generate($text, $filePath);
 
         return [

@@ -649,7 +649,7 @@
         </div>
 
         {{-- Filter Tahun --}}
-        <div class="cs" id="filterTahun">
+        {{-- <div class="cs" id="filterTahun">
             <button class="cs-btn" type="button" onclick="tog('filterTahun')" style="min-width:175px;">
                 <svg class="ico" viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="#3b82f6">
                     <rect x="3" y="4" width="18" height="18" rx="3"/>
@@ -674,7 +674,7 @@
                 </div>
                 @endforeach
             </div>
-        </div>
+        </div> --}}
 
         <button class="btn-create" onclick="openCreateModal()">
             <i class="bi bi-plus-lg"></i> Buat Sertifikat
@@ -1957,6 +1957,31 @@ function toggleTanggalMode(sw) {
     }
 
     // ── Create box element ─────────────────────────────────────────────────────────
+    // old QR BISA DI EDIT
+    // function tplCreateBox(field, px, py, bw, bh) {
+    //     const el = document.createElement('div');
+    //     el.className = 'pf-drag-box';
+    //     tplApplyColor(el, field.color);
+
+    //     const lbl = document.createElement('div');
+    //     lbl.className   = 'pf-box-label';
+    //     lbl.textContent = field.label;
+    //     el.appendChild(lbl);
+
+    //     const handle = document.createElement('div');
+    //     handle.className   = 'pf-resize-handle';
+    //     handle.style.color = field.color;
+    //     el.appendChild(handle);
+
+    //     document.getElementById('tplPfImgWrap').appendChild(el);
+
+    //     const b = { key: field.key, label: field.label, color: field.color, field, px, py, bw, bh, el };
+    //     tplBoxes.push(b);
+    //     tplApplyDOM(b);
+    //     tplAttachEvents(b, handle);
+    //     return b;
+    // }
+
     function tplCreateBox(field, px, py, bw, bh) {
         const el = document.createElement('div');
         el.className = 'pf-drag-box';
@@ -1970,6 +1995,12 @@ function toggleTanggalMode(sw) {
         const handle = document.createElement('div');
         handle.className   = 'pf-resize-handle';
         handle.style.color = field.color;
+
+        // ← Sembunyikan resize handle untuk QR
+        if (field.key === 'qr_code') {
+            handle.style.display = 'none';
+        }
+
         el.appendChild(handle);
 
         document.getElementById('tplPfImgWrap').appendChild(el);
@@ -2059,20 +2090,47 @@ function toggleTanggalMode(sw) {
         img.src = src;
     }
 
+    // old QR BISA DI EDIT
+
+    // function spawnBoxes(savedData) {
+    //     const s = tplScale();
+
+    //     PREDEFINED_FIELDS.forEach((field, i) => {
+    //         const px = savedData ? (savedData[`x_position_${field.key}`] ?? 0) * s : 10 * s;
+    //         const py = savedData ? (savedData[`y_position_${field.key}`] ?? 0) * s : (10 + i * 40) * s;
+    //         const bw = savedData && savedData[field.widthKey]  ? savedData[field.widthKey]  * s : 120 * s;
+    //         const bh = savedData && savedData[field.heightKey] ? savedData[field.heightKey] * s : 24  * s;
+    //         tplCreateBox(field, px, py, bw, bh);
+    //     });
+
+    //     tplSetActive(PREDEFINED_FIELDS[0].key);
+    // }
+
+
+    // new
+
     function spawnBoxes(savedData) {
         const s = tplScale();
 
         PREDEFINED_FIELDS.forEach((field, i) => {
             const px = savedData ? (savedData[`x_position_${field.key}`] ?? 0) * s : 10 * s;
             const py = savedData ? (savedData[`y_position_${field.key}`] ?? 0) * s : (10 + i * 40) * s;
-            const bw = savedData && savedData[field.widthKey]  ? savedData[field.widthKey]  * s : 120 * s;
-            const bh = savedData && savedData[field.heightKey] ? savedData[field.heightKey] * s : 24  * s;
+
+            // ← Fix ukuran QR 300x300, field lain tetap bisa resize
+            let bw, bh;
+            if (field.key === 'qr_code') {
+                bw = 300 * s;
+                bh = 300 * s;
+            } else {
+                bw = savedData && savedData[field.widthKey]  ? savedData[field.widthKey]  * s : 120 * s;
+                bh = savedData && savedData[field.heightKey] ? savedData[field.heightKey] * s : 24  * s;
+            }
+
             tplCreateBox(field, px, py, bw, bh);
         });
 
         tplSetActive(PREDEFINED_FIELDS[0].key);
     }
-
     // ── File input ─────────────────────────────────────────────────────────────────
     function tplInitFileInput() {
         const input = document.getElementById('tplInputImage');

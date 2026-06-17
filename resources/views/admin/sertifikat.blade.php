@@ -624,7 +624,7 @@
         <div id="bulkActionBar" style="display:none; padding:8px 22px; border-bottom:1px solid var(--c-slate-100);">
             <span id="bulkCount" style="font-size:13px; color:var(--c-slate-500);"></span>
             <button onclick="bulkUpdateStatus()" class="btn btn-primary btn-sm ms-3">
-                <i class="bi bi-arrow-repeat"></i> Update Status
+                <i class="bi bi-arrow-repeat"></i> Aksi
             </button>
             <button onclick="clearSelection()" class="btn btn-secondary btn-sm ms-1">
                 <i class="bi bi-x"></i> Batal

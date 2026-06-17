@@ -426,7 +426,7 @@
               {{-- Digital Signature (hidden by default) --}}
               <div class="info-row" id="digital-signature-row" style="display: none;">
                 <span class="info-value" id="res-signature"
-                      style="font-family: monospace; font-size: 0.72rem; word-break: break-all; color: #6b7280;">
+                      style="font-family: monospace; font-size: 0.72rem; word-break: break-all; color: #ffffff;">
                   -
                 </span>
               </div>
@@ -436,7 +436,7 @@
                   type="button"
                   onclick="toggleSignature()"
                   id="btn-toggle-signature"
-                  style="font-size: 0.75rem; background: none; border: none; color: #6b7280; cursor: pointer; text-decoration: underline; padding: 0;">
+                  style="font-size: 0.75rem; background: none; border: none; color: #6b7280; cursor: pointer; padding: 0;">
                   Lihat Digital Signature ▼
                 </button>
               </div>

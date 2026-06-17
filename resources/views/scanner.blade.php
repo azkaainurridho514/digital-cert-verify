@@ -482,8 +482,12 @@
     $("#res-program").text(data.program_name ?? '-');
     $("#res-nilai").text(data.grade ?? '-');
     $("#res-no").text(data.certificate_number ?? '-');
-    $("#res-tanggal").text(data.publication_date ?? '-');
-
+    // $("#res-tanggal").text(data.publication_date ?? '-');
+    $("#res-tanggal").text(
+        data.publication_date
+            ? new Date(data.publication_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+            : '-'
+    );
     $("#invalidCard").hide();
     $("#validCard").fadeIn();
   }

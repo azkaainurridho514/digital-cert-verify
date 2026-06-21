@@ -55,7 +55,7 @@ class SertifikatController extends Controller
                 ? \Carbon\Carbon::parse($cert->publication_date)->translatedFormat('d F Y') 
                 : null,
             'publication_date_raw' => $cert->publication_date 
-                ? \Carbon\Carbon::parse($cert->publication_date)->format('Y-m-d')
+                ? \Carbon\Carbon::parse($cert->publication_date)->format('d M Y')
                 : null,
             'level'             => $cert->level,
             'status'             => $cert->status,
@@ -97,15 +97,17 @@ class SertifikatController extends Controller
         ];
 
         $cert = Certificate::create($data);
-
+        
         if ($request->status === 'Di Terbitkan') {
+            $certificateNumber = $request->certificate_number . " /". Carbon::parse($request->publication_date)->format('d-m-Y');
             $url  = url('/scan?id=' . $cert->id);
-            $signature = $this->ecdsa->sign($cert->certificate_number);
+            $signature = $this->ecdsa->sign($certificateNumber);
             $qr        = $this->qrCodeService->generate($url);
             $cert->update([
-                'file_path'         => $qr['path'],
-                'digital_signature' => $signature->signature,
-                'publication_date' => $request->publication_date,
+                'file_path'             => $qr['path'],
+                'digital_signature'     => $signature->signature,
+                'publication_date'      => $request->publication_date,
+                'certificate_number'    => $certificateNumber,
             ]);
         }
 
@@ -147,13 +149,15 @@ class SertifikatController extends Controller
         ];
 
         if ($request->status === 'Di Terbitkan') {
+            $certificateNumber = $request->certificate_number . " /". Carbon::parse($request->publication_date)->format('d-m-Y');
             $url  = url('/scan?id=' . $cert->id);
-            $signature = $this->ecdsa->sign($cert->certificate_number);
-            $qr        = $this->qrCodeService->generate($url);  // ← fix: pakai $url bukan $text
+            $signature = $this->ecdsa->sign($certificateNumber);
+            $qr        = $this->qrCodeService->generate($url); 
 
             $dataUpdate['file_path']         = $qr['path'];
             $dataUpdate['digital_signature'] = $signature->signature;
             $dataUpdate['publication_date'] = $request->publication_date;
+            $dataUpdate['certificate_number'] = $certificateNumber;
         }
 
         $cert->update($dataUpdate);
@@ -177,20 +181,23 @@ class SertifikatController extends Controller
             $certificates = Certificate::whereIn('id', $request->ids)->get();
 
             foreach ($certificates as $cert) {
+               
                 if ($cert->status === 'Di Terbitkan') continue;
 
                 $dataUpdate = [
                     'status'           => $request->status,
-                    'publication_date' => $request->publication_date,  // ← simpan untuk semua status
+                    'publication_date' => $request->publication_date,  
                 ];
 
                 if ($request->status === 'Di Terbitkan') {
+                    $certificateNumber = $cert->certificate_number . " /". Carbon::parse($request->publication_date)->format('d-m-Y');
                     $url  = url('/scan?id=' . $cert->id);
-                    $signature = $this->ecdsa->sign($cert->certificate_number);
+                    $signature = $this->ecdsa->sign($certificateNumber);
                     $qr        = $this->qrCodeService->generate($url);
 
                     $dataUpdate['file_path']         = $qr['path'];
                     $dataUpdate['digital_signature'] = $signature->signature;
+                    $dataUpdate['certificate_number'] = $certificateNumber;
                 }
 
                 $cert->update($dataUpdate);
@@ -213,7 +220,7 @@ class SertifikatController extends Controller
             'success' => true,
             'data'    => array_merge($cert->toArray(), [
             'publication_date' => $cert->publication_date
-                    ? \Carbon\Carbon::parse($cert->publication_date)->format('Y-m-d')
+                    ? \Carbon\Carbon::parse($cert->publication_date)->format('d M Y')
                     : null,
             ]),
         ]);
